@@ -1,25 +1,24 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
   "cxxNamespace": [
-    "qmblurview"
+    "nitrolist"
   ],
   "ios": {
-    "iosModuleName": "NitroQmblurview"
+    "iosModuleName": "NitroList"
   },
   "android": {
     "androidNamespace": [
-      "qmblurview"
+      "nitrolist"
     ],
-    "androidCxxLibName": "NitroQmblurview"
+    "androidCxxLibName": "NitroList"
   },
   "autolinking": {
-    "BlurView": {
-      "kotlin": "HybridBlurView",
-      "swift": "HybridBlurView"
+    "ViewHolder": {
+      "kotlin": "HybridViewHolder",
+      "swift": "HybridViewHolder"
     },
-    "BlurViewGroup": {
-      "kotlin": "HybridBlurViewGroup",
-      "swift": "HybridBlurViewGroup"
+    "AdapterFactory": {
+      "kotlin": "HybridAdapterFactory"
     }
   },
   "ignorePaths": [

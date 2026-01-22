@@ -1,8 +1,11 @@
 {
-  "name": "react-native-qmblurview",
+  "name": "react-native-nitro-list",
+  "version": "0.0.1",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "files": [
+    "package.json"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
