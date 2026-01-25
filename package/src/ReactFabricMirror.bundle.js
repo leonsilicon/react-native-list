@@ -1,20 +1,8 @@
-import { Text, View } from "react-native";
-import {scheduleOnUI} from "react-native-worklets"
-import {NitroModules} from "react-native-nitro-modules"
-import {AdapterFactory, ViewHolder} from "react-native-nitro-list"
-
-function WorkletTest() {
-    'worklet'
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var IS_REACT_ACT_ENVIRONMENT = false;
-var reportError = console.error;
-var MessageChannel = undefined;
-var __REACT_DEVTOOLS_GLOBAL_HOOK__ = undefined;
+
 // ../node_modules/react-reconciler/node_modules/react/cjs/react.development.js
 var require_react_development = __commonJS((exports2, module2) => {
   (function() {
-    var reportError = console.error;
-    var IS_REACT_ACT_ENVIRONMENT = false;
     function defineDeprecationWarning(methodName, info) {
       Object.defineProperty(Component.prototype, methodName, {
         get: function() {
@@ -11548,26 +11536,3 @@ var Renderer = Reconciler(HostConfig);
 global.Render = function(element, container, callback) {
   Renderer.updateContainer(element, container, null, callback);
 };
-
-}
-
-scheduleOnUI(WorkletTest)
-console.log("WorkletTest scheduled!")
-
-scheduleOnUI(() => {
-    "worklet"
-    console.log("Global render function", typeof global.Render)
-});
-
-export default function App() {
-    // i like me better when i am with you
-    console.log("App render")
-
-    return <View style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    }}>
-        <Text>Worklet Test</Text>
-    </View>
-}
