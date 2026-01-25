@@ -23,6 +23,7 @@
 #include "JHybridViewHolderSpec.hpp"
 #include "views/JHybridViewHolderStateUpdater.hpp"
 #include <NitroModules/DefaultConstructableObject.hpp>
+#include "HybridUiManagerHelper.hpp"
 
 namespace margelo::nitro::nitrolist {
 
@@ -64,6 +65,15 @@ int initialize(JavaVM* vm) {
         static DefaultConstructableObject<JHybridUiListModuleSpec::javaobject> object("com/margelo/nitro/nitrolist/HybridUiListModule");
         auto instance = object.create();
         return instance->cthis()->shared();
+      }
+    );
+    HybridObjectRegistry::registerHybridObjectConstructor(
+      "UiManagerHelper",
+      []() -> std::shared_ptr<HybridObject> {
+        static_assert(std::is_default_constructible_v<HybridUiManagerHelper>,
+                      "The HybridObject \"HybridUiManagerHelper\" is not default-constructible! "
+                      "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
+        return std::make_shared<HybridUiManagerHelper>();
       }
     );
   });

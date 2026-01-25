@@ -8,6 +8,7 @@ set (CMAKE_CXX_STANDARD 20)
 # Define C++ library and add all sources
 add_library(${PACKAGE_NAME} SHARED
         src/main/cpp/cpp-adapter.cpp
+        src/main/cpp/HybridUiManagerHelper.cpp
 )
 
 # Add Nitrogen specs :)
@@ -18,6 +19,7 @@ include_directories(
         "src/main/cpp"
         "../cpp"
 )
+
 
 find_library(LOG_LIB log)
 

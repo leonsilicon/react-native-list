@@ -22,6 +22,9 @@
     },
     "UiListModule": {
       "kotlin": "HybridUiListModule"
+    },
+    "UiManagerHelper": {
+      "cpp": "HybridUiManagerHelper"
     }
   },
   "ignorePaths": [

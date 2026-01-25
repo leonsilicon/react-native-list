@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import {scheduleOnUI} from "react-native-worklets"
 import {NitroModules} from "react-native-nitro-modules"
-import {AdapterFactory, ViewHolder, dafuq} from "react-native-nitro-list"
+import {AdapterFactory, ViewHolder, dafuq, renderSync} from "react-native-nitro-list"
 dafuq();
 
 function WorkletTest() {
@@ -12344,7 +12344,7 @@ var {
 } = require_constants();
 global.currentUpdatePriority = NoEventPriority;
 global.rootInstance = {
-  containerTag: 1,
+  containerTag: 3,
   publicInstance: null
 };
 function log(...args) {
@@ -12491,7 +12491,7 @@ global.Render = function(element, callback) {
   }
   Renderer.updateContainerSync(element, global.rootContainer, null, callback);
   Renderer.flushSyncWork();
-  log("[ReactFabricMirror] updateContainer finished. Render done?");
+  log("[ReactFabricMirror] updateContainer finished.");
 };
 
 }
@@ -12519,6 +12519,11 @@ scheduleOnUI(() => {
     // const shadowNode = ref.current.node; // jsi::Object NativeState ShadowNodeWrapper
     const tag = ref.current.canonical.nativeTag;
     global.log("Ref current nativeTag: ", tag);
+
+    // cause a sync render to create the actual native view
+    const start = performance.now()
+    renderSync();
+    global.log("renderSync took ", performance.now() - start, "ms");
 });
 
 export default function App() {

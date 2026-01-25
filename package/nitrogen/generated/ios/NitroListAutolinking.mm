@@ -11,6 +11,7 @@
 #import <type_traits>
 
 #include "HybridViewHolderSpecSwift.hpp"
+#include "HybridUiManagerHelper.hpp"
 
 @interface NitroListAutolinking : NSObject
 @end
@@ -26,6 +27,15 @@
     []() -> std::shared_ptr<HybridObject> {
       std::shared_ptr<HybridViewHolderSpec> hybridObject = NitroList::NitroListAutolinking::ViewHolder::create();
       return hybridObject;
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "UiManagerHelper",
+    []() -> std::shared_ptr<HybridObject> {
+      static_assert(std::is_default_constructible_v<HybridUiManagerHelper>,
+                    "The HybridObject \"HybridUiManagerHelper\" is not default-constructible! "
+                    "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
+      return std::make_shared<HybridUiManagerHelper>();
     }
   );
 }

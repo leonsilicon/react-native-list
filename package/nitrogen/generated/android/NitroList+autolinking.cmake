@@ -36,6 +36,7 @@ target_sources(
   ../nitrogen/generated/shared/c++/HybridAdapterSpec.cpp
   ../nitrogen/generated/shared/c++/HybridAdapterFactorySpec.cpp
   ../nitrogen/generated/shared/c++/HybridUiListModuleSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridUiManagerHelperSpec.cpp
   ../nitrogen/generated/shared/c++/HybridViewHolderSpec.cpp
   ../nitrogen/generated/shared/c++/views/HybridViewHolderComponent.cpp
   # Android-specific Nitrogen C++ sources

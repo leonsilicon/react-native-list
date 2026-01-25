@@ -30,13 +30,29 @@
 
 import { NitroModules } from 'react-native-nitro-modules'
 import { UiListModule } from './specs/UIListModule.nitro'
+import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
 
+const uiListModule =
+  NitroModules.createHybridObject<UiListModule>('UiListModule')
 export function dafuq() {
-  const uiListModule =
-    NitroModules.createHybridObject<UiListModule>('UiListModule')
   uiListModule.setupExternalSurface()
   console.log('UIListModule initialized')
+}
+
+const uiManagerHelper =
+  NitroModules.createHybridObject<UiManagerHelper>('UiManagerHelper')
+
+const captured = nativeFabricUIManager
+export function renderSync() {
+  'worklet'
+
+  console.log('renderSync() with nativeFabricUIManager: ', captured)
+  uiManagerHelper.renderSync(
+    // worklets is somehow getting that from the JS runtime into the global of this one, which i am cool with
+    captured
+  )
+  console.log('renderSync() done')
 }

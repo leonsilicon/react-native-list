@@ -25,6 +25,7 @@ class HybridUiListModule : HybridUiListModuleSpec() {
         val surface = reactHost.createSurface(context, "", null)
         val surfaceView = surface.view as? ReactSurfaceView
             ?: throw IllegalStateException("Surface view is not a ReactSurfaceView!")
+        surfaceView.rootViewTag = 3;
 
         uiManager.startSurface(
             surfaceView,

@@ -14,7 +14,7 @@ const {
 global.currentUpdatePriority = NoEventPriority
 
 global.rootInstance = {
-  containerTag: 1, // 0 is the root instance of our main react native app i believe
+  containerTag: 3,
   publicInstance: null,
 }
 
