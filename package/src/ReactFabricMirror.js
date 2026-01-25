@@ -32,10 +32,9 @@ const HostConfig = {
   getChildHostContext() {
     return global.childHostContext
   },
-  prepareForCommit(containerInfo) {},
-  resetAfterCommit(containerInfo) {},
-  // TODO: switch to persistent mode, once figured out the worklets part
-  supportsMutation: true,
+  //   prepareForCommit(containerInfo) {},
+  //   resetAfterCommit(containerInfo) {},
+  supportsPersistence: true,
   createInstance: (
     type,
     newProps,
@@ -88,33 +87,36 @@ const HostConfig = {
     }
   },
 
+  finalizeInitialChildren(parentInstance, type, props, hostContext) {
+    console.log('[finalizeInitialChildren]')
+    return false
+  },
+
+  cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
+    console.log('[cloneInstance]')
+    // TODO: implement
+
+    return instance
+  },
+  createContainerChildSet() {
+    console.log('[createContainerChildSet]')
+    return nativeFabricUIManager.createChildSet()
+  },
+  appendChildToContainerChildSet(childSet, child) {
+    console.log('[appendChildToContainerChildSet]')
+    nativeFabricUIManager.appendChildToSet(childSet, child.node)
+  },
+  finalizeContainerChildren(container, newChildren) {
+    // Noop - children will be replaced in replaceContainerChildren
+    console.log('[finalizeContainerChildren]')
+  },
   appendInitialChild(parentInstance, child) {
     console.log('[appendInitialChild]')
+    nativeFabricUIManager.appendChild(parentInstance.node, child.node)
   },
-  appendChild(parent, child) {
-    console.log('[appendChild]')
-  },
-  finalizeInitialChildren(element, type, props) {
-    console.log('[finalizeInitialChildren]')
-  },
-  appendChildToContainer(container, child) {
-    console.log('[appendChildToContainer]', {
-        container,
-        child
-    })
-  },
-  prepareUpdate(instance, oldProps, newProps) {
-    console.log('[prepareUpdate]')
-    return true
-  },
-  commitUpdate(domElement, updatePayload, type, oldProps, newProps) {
-    console.log('[commitUpdate]')
-  },
-  commitTextUpdate(textInstance, oldText, newText) {
-    console.log('[commitTextUpdate]')
-  },
-  removeChild(parentInstance, child) {
-    console.log('[removeChild]')
+  replaceContainerChildren(container, newChildren) {
+    console.log('[replaceContainerChildren]')
+    nativeFabricUIManager.completeRoot(container.containerTag, newChildren)
   },
 
   // TODO: hm, this could get problematic, to share event priorities between the fabric ui manager.
@@ -154,6 +156,16 @@ const HostConfig = {
   return DefaultEventPriority; */
   },
 
+  getPublicInstance(instance) {
+    // TODO: implement returning react element
+    return instance
+  },
+
+  prepareForCommit(containerInfo) {
+    return null
+  },
+  resetAfterCommit(containerInfo) {},
+
   trackSchedulerEvent() {},
   resolveEventType() {
     return null
@@ -165,20 +177,60 @@ const HostConfig = {
     return false
   },
   shouldSetTextContent(type, props) {
-    return false;
+    return false
   },
-  getPublicInstance(instance) {
-    // TODO: implement returning react element
-    return instance
-  },
+  // TODO: microtask scheduling, should work with worklets on the UI thread i believe! not sure though if even RN implements this?
   supportsMicrotasks: false,
 
-  // TODO: microtask scheduling, should work with worklets on the UI thread i believe!
-
-  // TODO: those methods are for mutable mode and should be removed later
-  clearContainer(container) {},
-
   detachDeletedInstance(node) {},
+  beforeActiveInstanceBlur(internalInstanceHandle) {
+    // noop
+  },
+
+  afterActiveInstanceBlur() {
+    // noop
+  },
+
+  preparePortalMount(portalInstance) {
+    // noop
+  },
+
+  detachDeletedInstance(node) {
+    // noop
+  },
+
+  requestPostPaintCallback(callback) {
+    // noop
+  },
+
+  maySuspendCommit(type, props) {
+    return false
+  },
+
+  maySuspendCommitOnUpdate(type, oldProps, newProps) {
+    return false
+  },
+  maySuspendCommitInSyncRender(type, props) {
+    return false
+  },
+
+  preloadInstance(instance, type, props) {
+    return true
+  },
+  startSuspendingCommit() {
+    return null
+  },
+  suspendInstance(state, instance, type, props) {},
+
+  suspendOnActiveViewTransition(state, container) {},
+
+  waitForCommitToBeReady(state, timeoutOffset) {
+    return null
+  },
+
+  getSuspendedCommitReason(state, rootContainer) {
+    return null
+  },
 
   isPrimaryRenderer: false,
 }
@@ -196,23 +248,24 @@ global.Render = function (element, callback) {
       null,
       'ui-renderer',
       function onUncaughtError(error, info) {
-        console.error('[ReactFabricMirror] Uncaught error in React renderer: ',
-            error,
-            info
+        console.error(
+          '[ReactFabricMirror] Uncaught error in React renderer: ',
+          error,
+          info
         )
       },
       function onCaughtError(error, info) {
         console.error(
-            '[ReactFabricMirror] Caught error in React renderer: ',
-            error,
-            info
+          '[ReactFabricMirror] Caught error in React renderer: ',
+          error,
+          info
         )
       },
       function onRecoverableError(error, info) {
         console.error(
-            '[ReactFabricMirror] Recoverable error in React renderer: ',
-            error,
-            info
+          '[ReactFabricMirror] Recoverable error in React renderer: ',
+          error,
+          info
         )
       },
       function nativeOnDefaultTransitionIndicator() {

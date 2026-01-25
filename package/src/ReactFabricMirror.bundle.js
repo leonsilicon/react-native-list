@@ -12343,9 +12343,7 @@ var HostConfig = {
   getChildHostContext() {
     return global.childHostContext;
   },
-  prepareForCommit(containerInfo) {},
-  resetAfterCommit(containerInfo) {},
-  supportsMutation: true,
+  supportsPersistence: true,
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
     console.log("[createInstnace] debugA");
     const tag = global.nextReactTag;
@@ -12364,33 +12362,32 @@ var HostConfig = {
       }
     };
   },
+  finalizeInitialChildren(parentInstance, type, props, hostContext) {
+    console.log("[finalizeInitialChildren]");
+    return false;
+  },
+  cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
+    console.log("[cloneInstance]");
+    return instance;
+  },
+  createContainerChildSet() {
+    console.log("[createContainerChildSet]");
+    return nativeFabricUIManager.createChildSet();
+  },
+  appendChildToContainerChildSet(childSet, child) {
+    console.log("[appendChildToContainerChildSet]");
+    nativeFabricUIManager.appendChildToSet(childSet, child.node);
+  },
+  finalizeContainerChildren(container, newChildren) {
+    console.log("[finalizeContainerChildren]");
+  },
   appendInitialChild(parentInstance, child) {
     console.log("[appendInitialChild]");
+    nativeFabricUIManager.appendChild(parentInstance.node, child.node);
   },
-  appendChild(parent, child) {
-    console.log("[appendChild]");
-  },
-  finalizeInitialChildren(element, type, props) {
-    console.log("[finalizeInitialChildren]");
-  },
-  appendChildToContainer(container, child) {
-    console.log("[appendChildToContainer]", {
-      container,
-      child
-    });
-  },
-  prepareUpdate(instance, oldProps, newProps) {
-    console.log("[prepareUpdate]");
-    return true;
-  },
-  commitUpdate(domElement, updatePayload, type, oldProps, newProps) {
-    console.log("[commitUpdate]");
-  },
-  commitTextUpdate(textInstance, oldText, newText) {
-    console.log("[commitTextUpdate]");
-  },
-  removeChild(parentInstance, child) {
-    console.log("[removeChild]");
+  replaceContainerChildren(container, newChildren) {
+    console.log("[replaceContainerChildren]");
+    nativeFabricUIManager.completeRoot(container.containerTag, newChildren);
   },
   setCurrentUpdatePriority(priority) {
     global.currentUpdatePriority = priority;
@@ -12405,6 +12402,13 @@ var HostConfig = {
       return DefaultEventPriority;
     }
   },
+  getPublicInstance(instance) {
+    return instance;
+  },
+  prepareForCommit(containerInfo) {
+    return null;
+  },
+  resetAfterCommit(containerInfo) {},
   trackSchedulerEvent() {},
   resolveEventType() {
     return null;
@@ -12418,12 +12422,36 @@ var HostConfig = {
   shouldSetTextContent(type, props) {
     return false;
   },
-  getPublicInstance(instance) {
-    return instance;
-  },
   supportsMicrotasks: false,
-  clearContainer(container) {},
   detachDeletedInstance(node) {},
+  beforeActiveInstanceBlur(internalInstanceHandle) {},
+  afterActiveInstanceBlur() {},
+  preparePortalMount(portalInstance) {},
+  detachDeletedInstance(node) {},
+  requestPostPaintCallback(callback) {},
+  maySuspendCommit(type, props) {
+    return false;
+  },
+  maySuspendCommitOnUpdate(type, oldProps, newProps) {
+    return false;
+  },
+  maySuspendCommitInSyncRender(type, props) {
+    return false;
+  },
+  preloadInstance(instance, type, props) {
+    return true;
+  },
+  startSuspendingCommit() {
+    return null;
+  },
+  suspendInstance(state, instance, type, props) {},
+  suspendOnActiveViewTransition(state, container) {},
+  waitForCommitToBeReady(state, timeoutOffset) {
+    return null;
+  },
+  getSuspendedCommitReason(state, rootContainer) {
+    return null;
+  },
   isPrimaryRenderer: false
 };
 var Renderer = Reconciler(HostConfig);
