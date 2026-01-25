@@ -11557,6 +11557,13 @@ console.log("WorkletTest scheduled!")
 scheduleOnUI(() => {
     "worklet"
     console.log("Global render function", typeof global.Render)
+    const rootInstance = {
+        containerTag: 1, // 0 is the root instance of our main react native app i believe
+        publicInstance: null,
+    }
+    global.Render({}, rootInstance, null, () => {
+        console.log("Render complete")
+    });
 });
 
 export default function App() {

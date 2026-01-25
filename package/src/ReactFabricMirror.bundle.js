@@ -11511,11 +11511,31 @@ var require_react_reconciler = __commonJS((exports2, module2) => {
   }
 });
 
+// ../node_modules/react-reconciler/cjs/react-reconciler-constants.development.js
+var require_react_reconciler_constants_development = __commonJS((exports2) => {
+  exports2.ConcurrentRoot = 1, exports2.ContinuousEventPriority = 8, exports2.DefaultEventPriority = 32, exports2.DiscreteEventPriority = 2, exports2.IdleEventPriority = 268435456, exports2.LegacyRoot = 0, exports2.NoEventPriority = 0;
+});
+
+// ../node_modules/react-reconciler/constants.js
+var require_constants = __commonJS((exports2, module2) => {
+  if (false) {} else {
+    module2.exports = require_react_reconciler_constants_development();
+  }
+});
+
 // src/ReactFabricMirror.js
 globalThis.reportError = console.error;
 var Reconciler = require_react_reconciler();
 global.rootHostContext = {};
 global.childHostContext = {};
+var {
+  NoEventPriority,
+  DefaultEventPriority,
+  DiscreteEventPriority,
+  ContinuousEventPriority,
+  IdleEventPriority
+} = require_constants();
+global.currentUpdatePriority = NoEventPriority;
 var HostConfig = {
   now: performance.now,
   getRootHostContext(rootContainerInstance) {
@@ -11530,6 +11550,19 @@ var HostConfig = {
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
     console.log("createInstance", type, newProps);
     return null;
+  },
+  setCurrentUpdatePriority(priority) {
+    global.currentUpdatePriority = priority;
+  },
+  getCurrentUpdatePriority() {
+    return global.currentUpdatePriority;
+  },
+  resolveUpdatePriority() {
+    if (global.currentUpdatePriority !== NoEventPriority) {
+      return global.currentUpdatePriority;
+    } else {
+      return DefaultEventPriority;
+    }
   }
 };
 var Renderer = Reconciler(HostConfig);
