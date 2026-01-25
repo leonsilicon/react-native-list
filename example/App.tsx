@@ -12387,6 +12387,8 @@ var HostConfig = {
   },
   appendChildToContainer(container, child) {
     console.log("[appendChildToContainer]");
+    console.log(container)
+    // console.log(child)
   },
   prepareUpdate(instance, oldProps, newProps) {
     console.log("[prepareUpdate]");
@@ -12432,6 +12434,7 @@ var HostConfig = {
   },
   supportsMicrotasks: false,
   clearContainer(container) {},
+  detachDeletedInstance(node) {},
   isPrimaryRenderer: false
 };
 var Renderer = Reconciler(HostConfig);
@@ -12458,7 +12461,9 @@ scheduleOnUI(() => {
     "worklet"
     console.log("Global render function", typeof global.Render)
 
-    const Test = global.React.createElement("RCTView");
+    const Test = global.React.createElement("RCTView", null /*, [
+        global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right 
+    ] */);
     console.log("Test element created", Test)
 
     global.Render(Test, () => {

@@ -25,6 +25,16 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.example"
     },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "buildReactNativeFromSource": true
+          }
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }

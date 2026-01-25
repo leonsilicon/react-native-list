@@ -27,6 +27,7 @@
   "devDependencies": {
     "@react-native/metro-config": "^0.83.1",
     "@types/react": "~19.1.0",
+    "expo-build-properties": "^1.0.10",
     "typescript": "~5.9.2"
   },
   "expo": {

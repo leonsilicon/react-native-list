@@ -12374,7 +12374,10 @@ var HostConfig = {
     console.log("[finalizeInitialChildren]");
   },
   appendChildToContainer(container, child) {
-    console.log("[appendChildToContainer]");
+    console.log("[appendChildToContainer]", {
+      container,
+      child
+    });
   },
   prepareUpdate(instance, oldProps, newProps) {
     console.log("[prepareUpdate]");
@@ -12420,6 +12423,7 @@ var HostConfig = {
   },
   supportsMicrotasks: false,
   clearContainer(container) {},
+  detachDeletedInstance(node) {},
   isPrimaryRenderer: false
 };
 var Renderer = Reconciler(HostConfig);

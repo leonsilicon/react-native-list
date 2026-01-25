@@ -98,7 +98,10 @@ const HostConfig = {
     console.log('[finalizeInitialChildren]')
   },
   appendChildToContainer(container, child) {
-    console.log('[appendChildToContainer]')
+    console.log('[appendChildToContainer]', {
+        container,
+        child
+    })
   },
   prepareUpdate(instance, oldProps, newProps) {
     console.log('[prepareUpdate]')
@@ -174,6 +177,8 @@ const HostConfig = {
 
   // TODO: those methods are for mutable mode and should be removed later
   clearContainer(container) {},
+
+  detachDeletedInstance(node) {},
 
   isPrimaryRenderer: false,
 }

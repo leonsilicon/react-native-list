@@ -35,7 +35,8 @@
     "typescript": "tsc",
     "specs": "tsc --noEmit false && nitrogen --logLevel=\"debug\"",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "bundle:js": "bun build src/ReactFabricMirror.js --outfile=src/ReactFabricMirror.bundle.js --format=cjs"
   },
   "keywords": [
     "react-native",
