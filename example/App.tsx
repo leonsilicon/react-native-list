@@ -12356,6 +12356,7 @@ function log(...args) {
     }
   }).join(" "));
 }
+global.log = log;
 global.nextReactTag = 2;
 var HostConfig = {
   now: performance.now,
@@ -12501,16 +12502,23 @@ console.log("WorkletTest scheduled!")
 scheduleOnUI(() => {
     "worklet"
 
-    const Test = global.React.createElement("RCTView", null /*, [
+    const ref = global.React.createRef();
+    const Test = global.React.createElement("RCTView", { ref }/*, [
         global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right 
     ] */);
-    global._log("Test element created: " + Test)
+    global.log("Test element created: ", Test)
 
     global.Render(Test, () => {
         global._log("Render complete")
     });
-    // TODO: figure out how to make sync, probably something like flush() ?
-    global._log("global.Render() called")
+
+    if (ref.current == null) {
+        throw new Error("Ref is null after render");
+    }
+    
+    // const shadowNode = ref.current.node; // jsi::Object NativeState ShadowNodeWrapper
+    const tag = ref.current.canonical.nativeTag;
+    global.log("Ref current nativeTag: ", tag);
 });
 
 export default function App() {

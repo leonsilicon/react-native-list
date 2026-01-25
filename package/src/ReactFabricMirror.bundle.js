@@ -12343,6 +12343,7 @@ function log(...args) {
     }
   }).join(" "));
 }
+global.log = log;
 global.nextReactTag = 2;
 var HostConfig = {
   now: performance.now,

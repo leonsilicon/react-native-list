@@ -33,6 +33,7 @@ function log(...args) {
         .join(' ')
   )
 }
+global.log = log
 
 // Counter for uniquely identifying views.
 // % 10 === 1 means it is a rootTag.
