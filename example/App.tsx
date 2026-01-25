@@ -12344,9 +12344,18 @@ var {
 } = require_constants();
 global.currentUpdatePriority = NoEventPriority;
 global.rootInstance = {
-  containerTag: 3,
+  containerTag: 1,
   publicInstance: null
 };
+function log(...args) {
+  global._log("[ReactFabricMirror] " + args.map((a) => {
+    try {
+      return JSON.stringify(a);
+    } catch (e) {
+      return String(a);
+    }
+  }).join(" "));
+}
 global.nextReactTag = 2;
 var HostConfig = {
   now: performance.now,
@@ -12358,12 +12367,12 @@ var HostConfig = {
   },
   supportsPersistence: true,
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
-    console.log("[createInstnace] debugA");
+    log("[createInstnace] debugA");
     const tag = global.nextReactTag;
     global.nextReactTag += 2;
-    console.log("[createInstnace] debugB");
+    log("[createInstnace] debugB");
     const node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, newProps, workInProgress);
-    console.log("[createInstance] node=", node);
+    log("[createInstance] node=", node);
     return {
       node,
       canonical: {
@@ -12376,30 +12385,30 @@ var HostConfig = {
     };
   },
   finalizeInitialChildren(parentInstance, type, props, hostContext) {
-    console.log("[finalizeInitialChildren]");
+    log("[finalizeInitialChildren]");
     return false;
   },
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
-    console.log("[cloneInstance]");
+    log("[cloneInstance]");
     return instance;
   },
   createContainerChildSet() {
-    console.log("[createContainerChildSet]");
+    log("[createContainerChildSet]");
     return nativeFabricUIManager.createChildSet();
   },
   appendChildToContainerChildSet(childSet, child) {
-    console.log("[appendChildToContainerChildSet]");
+    log("[appendChildToContainerChildSet]");
     nativeFabricUIManager.appendChildToSet(childSet, child.node);
   },
   finalizeContainerChildren(container, newChildren) {
-    console.log("[finalizeContainerChildren]");
+    log("[finalizeContainerChildren]");
   },
   appendInitialChild(parentInstance, child) {
-    console.log("[appendInitialChild]");
+    log("[appendInitialChild]");
     nativeFabricUIManager.appendChild(parentInstance.node, child.node);
   },
   replaceContainerChildren(container, newChildren) {
-    console.log("[replaceContainerChildren]");
+    log("[replaceContainerChildren]");
     nativeFabricUIManager.completeRoot(container.containerTag, newChildren);
   },
   setCurrentUpdatePriority(priority) {
@@ -12479,7 +12488,9 @@ global.Render = function(element, callback) {
       console.error("[ReactFabricMirror] Recoverable error in React renderer: ", error, info);
     }, function nativeOnDefaultTransitionIndicator() {});
   }
-  return Renderer.updateContainer(element, global.rootContainer, null, callback);
+  Renderer.updateContainerSync(element, global.rootContainer, null, callback);
+  Renderer.flushSyncWork();
+  log("[ReactFabricMirror] updateContainer finished. Render done?");
 };
 
 }
@@ -12489,16 +12500,17 @@ console.log("WorkletTest scheduled!")
 
 scheduleOnUI(() => {
     "worklet"
-    console.log("Global render function", typeof global.Render)
 
     const Test = global.React.createElement("RCTView", null /*, [
         global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right 
     ] */);
-    console.log("Test element created", Test)
+    global._log("Test element created: " + Test)
 
     global.Render(Test, () => {
-        console.log("Render complete")
+        global._log("Render complete")
     });
+    // TODO: figure out how to make sync, probably something like flush() ?
+    global._log("global.Render() called")
 });
 
 export default function App() {

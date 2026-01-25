@@ -18,6 +18,22 @@ global.rootInstance = {
   publicInstance: null,
 }
 
+function log(...args) {
+  // log('[ReactFabricMirror]', ...args)
+  global._log(
+    '[ReactFabricMirror] ' +
+      args
+        .map((a) => {
+          try {
+            return JSON.stringify(a)
+          } catch (e) {
+            return String(a)
+          }
+        })
+        .join(' ')
+  )
+}
+
 // Counter for uniquely identifying views.
 // % 10 === 1 means it is a rootTag.
 // % 2 === 0 means it is a Fabric tag.
@@ -42,10 +58,10 @@ const HostConfig = {
     _currentHostContext,
     workInProgress
   ) => {
-    console.log('[createInstnace] debugA')
+    log('[createInstnace] debugA')
     const tag = global.nextReactTag
     global.nextReactTag += 2
-    console.log('[createInstnace] debugB')
+    log('[createInstnace] debugB')
 
     // TODO:
     //   const viewConfig = getViewConfigForType(type);
@@ -71,7 +87,7 @@ const HostConfig = {
       workInProgress // internalInstanceHandle
     )
 
-    console.log('[createInstance] node=', node)
+    log('[createInstance] node=', node)
 
     // I think react is using getPublicInstance here
     return {
@@ -88,34 +104,34 @@ const HostConfig = {
   },
 
   finalizeInitialChildren(parentInstance, type, props, hostContext) {
-    console.log('[finalizeInitialChildren]')
+    log('[finalizeInitialChildren]')
     return false
   },
 
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
-    console.log('[cloneInstance]')
+    log('[cloneInstance]')
     // TODO: implement
 
     return instance
   },
   createContainerChildSet() {
-    console.log('[createContainerChildSet]')
+    log('[createContainerChildSet]')
     return nativeFabricUIManager.createChildSet()
   },
   appendChildToContainerChildSet(childSet, child) {
-    console.log('[appendChildToContainerChildSet]')
+    log('[appendChildToContainerChildSet]')
     nativeFabricUIManager.appendChildToSet(childSet, child.node)
   },
   finalizeContainerChildren(container, newChildren) {
     // Noop - children will be replaced in replaceContainerChildren
-    console.log('[finalizeContainerChildren]')
+    log('[finalizeContainerChildren]')
   },
   appendInitialChild(parentInstance, child) {
-    console.log('[appendInitialChild]')
+    log('[appendInitialChild]')
     nativeFabricUIManager.appendChild(parentInstance.node, child.node)
   },
   replaceContainerChildren(container, newChildren) {
-    console.log('[replaceContainerChildren]')
+    log('[replaceContainerChildren]')
     nativeFabricUIManager.completeRoot(container.containerTag, newChildren)
   },
 
@@ -274,6 +290,8 @@ global.Render = function (element, callback) {
     )
   }
 
-  // TODO: there is also: updateContainerSync
-  return Renderer.updateContainer(element, global.rootContainer, null, callback) // TODO: maybe skip callback for now?
+  // updateContainerSync + flushSyncWork is making the renderer work immediately/blocking/…sync
+  Renderer.updateContainerSync(element, global.rootContainer, null, callback)
+  Renderer.flushSyncWork()
+  log('[ReactFabricMirror] updateContainer finished. Render done?')
 }
