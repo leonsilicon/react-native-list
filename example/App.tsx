@@ -12342,6 +12342,11 @@ var {
   IdleEventPriority
 } = require_constants();
 global.currentUpdatePriority = NoEventPriority;
+global.rootInstance = {
+  containerTag: 1,
+  publicInstance: null
+};
+global.nextReactTag = 2;
 var HostConfig = {
   now: performance.now,
   getRootHostContext(rootContainerInstance) {
@@ -12354,8 +12359,47 @@ var HostConfig = {
   resetAfterCommit(containerInfo) {},
   supportsMutation: true,
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
-    console.log("createInstance", type, newProps);
-    return null;
+    console.log("[createInstnace] debugA");
+    const tag = global.nextReactTag;
+    global.nextReactTag += 2;
+    console.log("[createInstnace] debugB");
+    const node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, newProps, workInProgress);
+    console.log("[createInstance] node=", node);
+    return {
+      node,
+      canonical: {
+        nativeTag: tag,
+        currentProps: newProps,
+        internalInstanceHandle: workInProgress,
+        publicInstance: null,
+        publicRootInstance: rootContainerInstance.publicInstance
+      }
+    };
+  },
+  appendInitialChild(parentInstance, child) {
+    console.log("[appendInitialChild]");
+  },
+  appendChild(parent, child) {
+    console.log("[appendChild]");
+  },
+  finalizeInitialChildren(element, type, props) {
+    console.log("[finalizeInitialChildren]");
+  },
+  appendChildToContainer(container, child) {
+    console.log("[appendChildToContainer]");
+  },
+  prepareUpdate(instance, oldProps, newProps) {
+    console.log("[prepareUpdate]");
+    return true;
+  },
+  commitUpdate(domElement, updatePayload, type, oldProps, newProps) {
+    console.log("[commitUpdate]");
+  },
+  commitTextUpdate(textInstance, oldText, newText) {
+    console.log("[commitTextUpdate]");
+  },
+  removeChild(parentInstance, child) {
+    console.log("[removeChild]");
   },
   setCurrentUpdatePriority(priority) {
     global.currentUpdatePriority = priority;
@@ -12380,17 +12424,27 @@ var HostConfig = {
   shouldAttemptEagerTransition() {
     return false;
   },
-  clearContainer(container) {}
+  shouldSetTextContent(type, props) {
+    return false;
+  },
+  getPublicInstance(instance) {
+    return instance;
+  },
+  supportsMicrotasks: false,
+  clearContainer(container) {},
+  isPrimaryRenderer: false
 };
 var Renderer = Reconciler(HostConfig);
 global.React = require_react2();
 global.Render = function(element, callback) {
   if (!global.rootContainer) {
-    const rootInstance = {
-      containerTag: 1,
-      publicInstance: null
-    };
-    global.rootContainer = Renderer.createContainer(rootInstance, 0, null, false, null, "ui-renderer", console.error, console.error, console.error, function nativeOnDefaultTransitionIndicator() {});
+    global.rootContainer = Renderer.createContainer(global.rootInstance, 0, null, false, null, "ui-renderer", function onUncaughtError(error, info) {
+      console.error("[ReactFabricMirror] Uncaught error in React renderer: ", error, info);
+    }, function onCaughtError(error, info) {
+      console.error("[ReactFabricMirror] Caught error in React renderer: ", error, info);
+    }, function onRecoverableError(error, info) {
+      console.error("[ReactFabricMirror] Recoverable error in React renderer: ", error, info);
+    }, function nativeOnDefaultTransitionIndicator() {});
   }
   return Renderer.updateContainer(element, global.rootContainer, null, callback);
 };
