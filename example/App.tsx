@@ -1,7 +1,8 @@
 import { Text, View } from "react-native";
 import {scheduleOnUI} from "react-native-worklets"
 import {NitroModules} from "react-native-nitro-modules"
-import {AdapterFactory, ViewHolder} from "react-native-nitro-list"
+import {AdapterFactory, ViewHolder, dafuq} from "react-native-nitro-list"
+dafuq();
 
 function WorkletTest() {
     'worklet'
@@ -12343,7 +12344,7 @@ var {
 } = require_constants();
 global.currentUpdatePriority = NoEventPriority;
 global.rootInstance = {
-  containerTag: 1,
+  containerTag: 3,
   publicInstance: null
 };
 global.nextReactTag = 2;

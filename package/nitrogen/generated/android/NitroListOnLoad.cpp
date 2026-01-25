@@ -19,6 +19,7 @@
 #include "JHybridAdapterFactorySpec.hpp"
 #include "JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double.hpp"
 #include "JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double.hpp"
+#include "JHybridUiListModuleSpec.hpp"
 #include "JHybridViewHolderSpec.hpp"
 #include "views/JHybridViewHolderStateUpdater.hpp"
 #include <NitroModules/DefaultConstructableObject.hpp>
@@ -36,6 +37,7 @@ int initialize(JavaVM* vm) {
     margelo::nitro::nitrolist::JHybridAdapterFactorySpec::registerNatives();
     margelo::nitro::nitrolist::JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::registerNatives();
     margelo::nitro::nitrolist::JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::registerNatives();
+    margelo::nitro::nitrolist::JHybridUiListModuleSpec::registerNatives();
     margelo::nitro::nitrolist::JHybridViewHolderSpec::registerNatives();
     margelo::nitro::nitrolist::views::JHybridViewHolderStateUpdater::registerNatives();
 
@@ -52,6 +54,14 @@ int initialize(JavaVM* vm) {
       "AdapterFactory",
       []() -> std::shared_ptr<HybridObject> {
         static DefaultConstructableObject<JHybridAdapterFactorySpec::javaobject> object("com/margelo/nitro/nitrolist/HybridAdapterFactory");
+        auto instance = object.create();
+        return instance->cthis()->shared();
+      }
+    );
+    HybridObjectRegistry::registerHybridObjectConstructor(
+      "UiListModule",
+      []() -> std::shared_ptr<HybridObject> {
+        static DefaultConstructableObject<JHybridUiListModuleSpec::javaobject> object("com/margelo/nitro/nitrolist/HybridUiListModule");
         auto instance = object.create();
         return instance->cthis()->shared();
       }

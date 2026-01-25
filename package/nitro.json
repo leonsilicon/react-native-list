@@ -19,6 +19,9 @@
     },
     "AdapterFactory": {
       "kotlin": "HybridAdapterFactory"
+    },
+    "UiListModule": {
+      "kotlin": "HybridUiListModule"
     }
   },
   "ignorePaths": [
