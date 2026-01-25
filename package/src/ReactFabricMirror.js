@@ -92,9 +92,9 @@ const HostConfig = {
 }
 
 const Renderer = Reconciler(HostConfig)
-// global.React = require('react')
+global.React = require('react')
 
-global.Render = function (element, container, callback) {
+global.Render = function (element, callback) {
   if (!global.rootContainer) {
 
     const rootInstance = {
