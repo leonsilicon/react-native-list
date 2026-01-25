@@ -11563,9 +11563,26 @@ var HostConfig = {
     } else {
       return DefaultEventPriority;
     }
+  },
+  resolveEventType() {
+    return null;
+  },
+  resolveEventTimeStamp() {
+    return -1.1;
+  },
+  shouldAttemptEagerTransition() {
+    return false;
   }
 };
+
 var Renderer = Reconciler(HostConfig);
 global.Render = function(element, container, callback) {
-  Renderer.updateContainer(element, container, null, callback);
+  if (!global.rootContainer) {
+    const rootInstance = {
+      containerTag: 1,
+      publicInstance: null
+    };
+    global.rootContainer = Renderer.createContainer(rootInstance, 0, null, false, null, "ui-renderer", console.error, console.error, console.error, function nativeOnDefaultTransitionIndicator() {});
+  }
+  return Renderer.updateContainer(element, global.rootContainer, null, callback);
 };

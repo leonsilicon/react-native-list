@@ -5,16 +5,18 @@ import {AdapterFactory, ViewHolder} from "react-native-nitro-list"
 
 function WorkletTest() {
     'worklet'
+    var IS_REACT_ACT_ENVIRONMENT = false;
+    var reportError = console.error;
+    var MessageChannel = undefined;
+    var __REACT_DEVTOOLS_GLOBAL_HOOK__ = undefined;
+    var AbortController = undefined;
+
+    var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var IS_REACT_ACT_ENVIRONMENT = false;
-var reportError = console.error;
-var MessageChannel = undefined;
-var __REACT_DEVTOOLS_GLOBAL_HOOK__ = undefined;
+
 // ../node_modules/react-reconciler/node_modules/react/cjs/react.development.js
 var require_react_development = __commonJS((exports2, module2) => {
   (function() {
-    var reportError = console.error;
-    var IS_REACT_ACT_ENVIRONMENT = false;
     function defineDeprecationWarning(methodName, info) {
       Object.defineProperty(Component.prototype, methodName, {
         get: function() {
@@ -11523,11 +11525,31 @@ var require_react_reconciler = __commonJS((exports2, module2) => {
   }
 });
 
+// ../node_modules/react-reconciler/cjs/react-reconciler-constants.development.js
+var require_react_reconciler_constants_development = __commonJS((exports2) => {
+  exports2.ConcurrentRoot = 1, exports2.ContinuousEventPriority = 8, exports2.DefaultEventPriority = 32, exports2.DiscreteEventPriority = 2, exports2.IdleEventPriority = 268435456, exports2.LegacyRoot = 0, exports2.NoEventPriority = 0;
+});
+
+// ../node_modules/react-reconciler/constants.js
+var require_constants = __commonJS((exports2, module2) => {
+  if (false) {} else {
+    module2.exports = require_react_reconciler_constants_development();
+  }
+});
+
 // src/ReactFabricMirror.js
 globalThis.reportError = console.error;
 var Reconciler = require_react_reconciler();
 global.rootHostContext = {};
 global.childHostContext = {};
+var {
+  NoEventPriority,
+  DefaultEventPriority,
+  DiscreteEventPriority,
+  ContinuousEventPriority,
+  IdleEventPriority
+} = require_constants();
+global.currentUpdatePriority = NoEventPriority;
 var HostConfig = {
   now: performance.now,
   getRootHostContext(rootContainerInstance) {
@@ -11542,12 +11564,44 @@ var HostConfig = {
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
     console.log("createInstance", type, newProps);
     return null;
-  }
+  },
+  setCurrentUpdatePriority(priority) {
+    global.currentUpdatePriority = priority;
+  },
+  getCurrentUpdatePriority() {
+    return global.currentUpdatePriority;
+  },
+  resolveUpdatePriority() {
+    if (global.currentUpdatePriority !== NoEventPriority) {
+      return global.currentUpdatePriority;
+    } else {
+      return DefaultEventPriority;
+    }
+  },
+  trackSchedulerEvent() {},
+  resolveEventType() {
+    return null;
+  },
+  resolveEventTimeStamp() {
+    return -1.1;
+  },
+  shouldAttemptEagerTransition() {
+    return false;
+  },
+  clearContainer(container) {},
 };
 var Renderer = Reconciler(HostConfig);
 global.Render = function(element, container, callback) {
-  Renderer.updateContainer(element, container, null, callback);
+  if (!global.rootContainer) {
+    const rootInstance = {
+      containerTag: 1,
+      publicInstance: null
+    };
+    global.rootContainer = Renderer.createContainer(rootInstance, 0, null, false, null, "ui-renderer", console.error, console.error, console.error, function nativeOnDefaultTransitionIndicator() {});
+  }
+  return Renderer.updateContainer(element, global.rootContainer, null, callback);
 };
+
 
 }
 
@@ -11557,11 +11611,8 @@ console.log("WorkletTest scheduled!")
 scheduleOnUI(() => {
     "worklet"
     console.log("Global render function", typeof global.Render)
-    const rootInstance = {
-        containerTag: 1, // 0 is the root instance of our main react native app i believe
-        publicInstance: null,
-    }
-    global.Render({}, rootInstance, null, () => {
+
+    global.Render({}, () => {
         console.log("Render complete")
     });
 });

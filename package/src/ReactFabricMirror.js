@@ -74,11 +74,48 @@ const HostConfig = {
   return DefaultEventPriority; */
   },
 
+  trackSchedulerEvent() {},
+  resolveEventType() {
+    return null;
+  },
+  resolveEventTimeStamp() {
+    return -1.1;
+  },
+  shouldAttemptEagerTransition() {
+    return false;
+  },
+
   // TODO: microtask scheduling, should work with worklets on the UI thread i believe!
+
+  // TODO: those methods are for mutable mode and should be removed later
+  clearContainer(container) {},
 }
 
 const Renderer = Reconciler(HostConfig)
+// global.React = require('react')
 
 global.Render = function (element, container, callback) {
-  Renderer.updateContainer(element, container, null, callback) // TODO: maybe skip callback for now?
+  if (!global.rootContainer) {
+
+    const rootInstance = {
+      containerTag: 1, // 0 is the root instance of our main react native app i believe
+      publicInstance: null,
+    }
+    global.rootContainer = Renderer.createContainer(
+      rootInstance,
+      0, // concurrentRoot ? 1 : 0
+      null,
+      false,
+      null,
+      'ui-renderer',
+      console.error,
+      console.error,
+      console.error,
+      function nativeOnDefaultTransitionIndicator() {
+        // Native doesn't have a default indicator.
+      }
+    )
+  }
+
+  return Renderer.updateContainer(element, global.rootContainer, null, callback) // TODO: maybe skip callback for now?
 }
