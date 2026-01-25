@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "react-native-qmblurview": ["../package/src/index.ts"]
+      "react-native-nitro-list": ["../package/src/index.tsx"]
     }
   }
 }

@@ -48,7 +48,7 @@ abstract class HybridAdapterSpec: HybridObject() {
   // Methods
   @DoNotStrip
   @Keep
-  abstract fun changeDataSet(newDataSet: AnyMap): Unit
+  abstract fun changeDataSet(newDataSet: Array<AnyMap>): Unit
   
   @DoNotStrip
   @Keep

@@ -10,6 +10,7 @@
 
 
 #include <NitroModules/AnyMap.hpp>
+#include <vector>
 #include <NitroModules/JAnyMap.hpp>
 
 namespace margelo::nitro::nitrolist {
@@ -51,9 +52,18 @@ namespace margelo::nitro::nitrolist {
   
 
   // Methods
-  void JHybridAdapterSpec::changeDataSet(const std::shared_ptr<AnyMap>& newDataSet) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* newDataSet */)>("changeDataSet");
-    method(_javaPart, JAnyMap::create(newDataSet));
+  void JHybridAdapterSpec::changeDataSet(const std::vector<std::shared_ptr<AnyMap>>& newDataSet) {
+    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JArrayClass<JAnyMap::javaobject>> /* newDataSet */)>("changeDataSet");
+    method(_javaPart, [&]() {
+      size_t __size = newDataSet.size();
+      jni::local_ref<jni::JArrayClass<JAnyMap::javaobject>> __array = jni::JArrayClass<JAnyMap::javaobject>::newArray(__size);
+      for (size_t __i = 0; __i < __size; __i++) {
+        const auto& __element = newDataSet[__i];
+        auto __elementJni = JAnyMap::create(__element);
+        __array->setElement(__i, __elementJni.get());
+      }
+      return __array;
+    }());
   }
   void JHybridAdapterSpec::insertItem(const std::shared_ptr<AnyMap>& item, double index) {
     static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("insertItem");

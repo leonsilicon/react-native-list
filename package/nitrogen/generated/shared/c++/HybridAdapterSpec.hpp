@@ -16,6 +16,7 @@
 
 
 #include <NitroModules/AnyMap.hpp>
+#include <vector>
 
 namespace margelo::nitro::nitrolist {
 
@@ -48,7 +49,7 @@ namespace margelo::nitro::nitrolist {
 
     public:
       // Methods
-      virtual void changeDataSet(const std::shared_ptr<AnyMap>& newDataSet) = 0;
+      virtual void changeDataSet(const std::vector<std::shared_ptr<AnyMap>>& newDataSet) = 0;
       virtual void insertItem(const std::shared_ptr<AnyMap>& item, double index) = 0;
       virtual void changeItem(const std::shared_ptr<AnyMap>& item, double index) = 0;
       virtual void removeItem(double index) = 0;

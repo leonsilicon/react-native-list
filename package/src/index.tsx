@@ -27,3 +27,6 @@
  * />
  * 
  */
+
+export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
+export { ViewHolder } from './specs/ViewHolder.nitro'

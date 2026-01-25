@@ -55,7 +55,7 @@ namespace margelo::nitro::nitrolist {
 
   public:
     // Methods
-    void changeDataSet(const std::shared_ptr<AnyMap>& newDataSet) override;
+    void changeDataSet(const std::vector<std::shared_ptr<AnyMap>>& newDataSet) override;
     void insertItem(const std::shared_ptr<AnyMap>& item, double index) override;
     void changeItem(const std::shared_ptr<AnyMap>& item, double index) override;
     void removeItem(double index) override;

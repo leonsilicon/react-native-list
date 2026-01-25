@@ -2,7 +2,7 @@ import type { AnyMap, HybridObject } from 'react-native-nitro-modules'
 import type { ViewHolder } from './ViewHolder.nitro'
 
 export interface Adapter extends HybridObject<{ android: 'kotlin' }> {
-  changeDataSet(newDataSet: AnyMap): void
+  changeDataSet(newDataSet: AnyMap[]): void
   insertItem(item: AnyMap, index: number): void
   changeItem(item: AnyMap, index: number): void
   removeItem(index: number): void

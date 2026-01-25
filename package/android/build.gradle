@@ -20,7 +20,7 @@ def isNewArchitectureEnabled() {
 
 apply plugin: "com.android.library"
 apply plugin: 'org.jetbrains.kotlin.android'
-apply from: '../nitrogen/generated/android/NitroQmblurview+autolinking.gradle'
+apply from: '../nitrogen/generated/android/NitroList+autolinking.gradle'
 apply from: "./fix-prefab.gradle"
 
 if (isNewArchitectureEnabled()) {
@@ -28,16 +28,15 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["NitroQmblurview_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["NitroList_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NitroQmblurview_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NitroList_" + name]).toInteger()
 }
 
 android {
-  namespace "com.margelo.nitro.qmblurview"
-
+  namespace "com.margelo.nitro.nitrolist"
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
@@ -138,7 +137,5 @@ dependencies {
 
   // Add a dependency on NitroModules
   implementation project(":react-native-nitro-modules")
-
-  implementation 'com.qmdeve.blurview:core:1.1.2'
 }
 
