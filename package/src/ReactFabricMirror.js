@@ -292,7 +292,8 @@ global.Render = function (element, callback) {
 
   // updateContainerSync + flushSyncWork is making the renderer work immediately/blocking/…sync
   Renderer.updateContainerSync(element, global.rootContainer, null, callback)
+  // Renderer.flushPassiveEffects();
   Renderer.flushSyncWork()
-  log('[ReactFabricMirror] updateContainer finished. Render done?')
+  log('[ReactFabricMirror] updateContainer finished')
 }
 log('[ReactFabricMirror] ReactFabricMirror initialized', typeof global.React.createRef)

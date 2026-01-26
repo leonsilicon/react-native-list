@@ -16,13 +16,14 @@ import { runOnUI, scheduleOnUI } from "react-native-worklets";
 setup(); // TODO: put that in library somewhere
 
 const colorRedProcessed = processColor("red");
+const colorGreenProcessed = processColor("green");
 
 let isSetup = false;
 export default function App() {
   // i like me better when i am with you
   console.log("App render");
   const uiListRef = useRef<UiListView>(null);
-  const {height, width} = useWindowDimensions()
+  const { height, width } = useWindowDimensions();
 
   return (
     <View
@@ -63,14 +64,16 @@ export default function App() {
                   width: 100,
                   height: 100,
                   backgroundColor: colorRedProcessed,
-                  // style: {
-                  //   width: 100,
-                  //   height: 100,
-                  //   backgroundColor: "red",
-                  // },
-                } /*, [
-        global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right
-    ] */
+                },
+                // TODO: currently this causes the renderer to never finish…?
+                // [
+                //   global.React.createElement("RCTView", {
+                //     key: "child1",
+                //     width: 50,
+                //     height: 50,
+                //     backgroundColor: colorGreenProcessed,
+                //   }),
+                // ]
               );
               global.log("Test element created: ", Test);
 
