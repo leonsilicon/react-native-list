@@ -1,5 +1,6 @@
 package com.margelo.nitro.nitrolist
 
+import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +13,16 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
     private var _callback: (() -> Double)? = null
 
     // TODO: implement the actual view
-    override val view: ViewGroup
-        get() = LinearLayout(reactContext)
+    override val view: LinearLayout by lazy {
+            // Create a new LinearLayout with MATCH_PARENT params
+            LinearLayout(reactContext).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                setBackgroundColor(Color.BLUE)
+            }
+        }
 
     fun makeView(): View {
         val capturedCallback =
@@ -43,7 +52,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
         this._callback = callback
 
         val testView = makeView()
-        Log.d("HybridUiListView", "Successfully made native view: $testView")
+        Log.d("HybridUiListView", "View to insert into size ${view.measuredWidth}x${view.measuredHeight}, testView size ${testView.measuredWidth}x${testView.measuredHeight}")
         view.addView(testView)
     }
 }

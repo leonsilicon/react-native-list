@@ -1,20 +1,28 @@
 import { useRef } from "react";
-import { Text, View } from "react-native";
-import { UiList, setup, renderSync, uiListModule } from "react-native-nitro-list";
+import { processColor, Text, useWindowDimensions, View } from "react-native";
+import {
+  renderSync,
+  setup,
+  UiList,
+  uiListModule,
+} from "react-native-nitro-list";
 import {
   UiListView,
   UiListViewMethods,
 } from "react-native-nitro-list/src/specs/UiListView.nitro";
 import { callback } from "react-native-nitro-modules";
-import { scheduleOnUI, runOnUI } from "react-native-worklets";
+import { runOnUI, scheduleOnUI } from "react-native-worklets";
 
 setup(); // TODO: put that in library somewhere
+
+const colorRedProcessed = processColor("red");
 
 let isSetup = false;
 export default function App() {
   // i like me better when i am with you
   console.log("App render");
   const uiListRef = useRef<UiListView>(null);
+  const {height, width} = useWindowDimensions()
 
   return (
     <View
@@ -26,6 +34,11 @@ export default function App() {
     >
       <Text>Worklet Test</Text>
       <UiList
+        style={{
+          flex: 1,
+          height,
+          width,
+        }}
         hybridRef={callback((ref) => {
           if (isSetup) return;
           isSetup = true;
@@ -44,8 +57,19 @@ export default function App() {
               const ref = global.React.createRef();
               const Test = global.React.createElement(
                 "RCTView",
-                { ref } /*, [
-        global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right 
+                {
+                  ref,
+                  collapsable: false,
+                  width: 100,
+                  height: 100,
+                  backgroundColor: colorRedProcessed,
+                  // style: {
+                  //   width: 100,
+                  //   height: 100,
+                  //   backgroundColor: "red",
+                  // },
+                } /*, [
+        global.React.createElement("RCTView", { key: "child1" }), // this causes a react crash right
     ] */
               );
               global.log("Test element created: ", Test);
