@@ -1,3 +1,12 @@
+export function setupWorklet() {
+  "worklet";
+  var IS_REACT_ACT_ENVIRONMENT = false;
+  var reportError = console.error;
+  var MessageChannel = undefined;
+  var __REACT_DEVTOOLS_GLOBAL_HOOK__ = undefined;
+  var AbortController = undefined;
+
+    
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 
 // ../node_modules/react-reconciler/node_modules/react/cjs/react.development.js
@@ -12318,7 +12327,6 @@ var require_react2 = __commonJS((exports2, module2) => {
 });
 
 // src/ReactFabricMirror.js
-globalThis.reportError = console.error;
 var Reconciler = require_react_reconciler();
 global.rootHostContext = {};
 global.childHostContext = {};
@@ -12331,7 +12339,7 @@ var {
 } = require_constants();
 global.currentUpdatePriority = NoEventPriority;
 global.rootInstance = {
-  containerTag: 1,
+  containerTag: 3,
   publicInstance: null
 };
 function log(...args) {
@@ -12480,3 +12488,6 @@ global.Render = function(element, callback) {
   Renderer.flushSyncWork();
   log("[ReactFabricMirror] updateContainer finished. Render done?");
 };
+log("[ReactFabricMirror] ReactFabricMirror initialized", typeof global.React.createRef);
+
+}

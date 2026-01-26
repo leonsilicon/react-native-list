@@ -65,6 +65,7 @@
         "react": "*",
         "react-native": "*",
         "react-native-nitro-modules": "*",
+        "react-native-worklets": "^0.7.2",
       },
     },
   },

@@ -28,31 +28,39 @@
  *
  */
 
-import { NitroModules } from 'react-native-nitro-modules'
+import { getHostComponent, NitroModules } from 'react-native-nitro-modules'
 import { UiListModule } from './specs/UIListModule.nitro'
 import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
+import { UiListViewMethods, UiListViewProps } from './specs/UiListView.nitro'
+import UiListViewConfig from '../nitrogen/generated/shared/json/UiListViewConfig.json'
+import { scheduleOnUI } from 'react-native-worklets'
+// @ts-expect-error shrug
+import { setupWorklet } from './ReactFabricMirror.bundle'
 
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
 
 const uiListModule =
   NitroModules.createHybridObject<UiListModule>('UiListModule')
-export function dafuq() {
+export function setup() {
   uiListModule.setupExternalSurface()
   console.log('UIListModule initialized')
+
+  scheduleOnUI(setupWorklet)
 }
 
 const uiManagerHelper =
   NitroModules.createHybridObject<UiManagerHelper>('UiManagerHelper')
 
+// @ts-expect-error
 const captured = nativeFabricUIManager
 export function renderSync() {
   'worklet'
 
-  console.log('renderSync() with nativeFabricUIManager: ', captured)
-  uiManagerHelper.renderSync(
-    // worklets is somehow getting that from the JS runtime into the global of this one, which i am cool with
-    captured
-  )
-  console.log('renderSync() done')
+  uiManagerHelper.renderSync(captured)
 }
+
+export const UiList = getHostComponent<UiListViewProps, UiListViewMethods>(
+  'UiListView',
+  () => UiListViewConfig
+)

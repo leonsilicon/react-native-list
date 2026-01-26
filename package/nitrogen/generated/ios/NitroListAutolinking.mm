@@ -11,6 +11,7 @@
 #import <type_traits>
 
 #include "HybridViewHolderSpecSwift.hpp"
+#include "HybridUiListViewSpecSwift.hpp"
 #include "HybridUiManagerHelper.hpp"
 
 @interface NitroListAutolinking : NSObject
@@ -26,6 +27,13 @@
     "ViewHolder",
     []() -> std::shared_ptr<HybridObject> {
       std::shared_ptr<HybridViewHolderSpec> hybridObject = NitroList::NitroListAutolinking::ViewHolder::create();
+      return hybridObject;
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "UiListView",
+    []() -> std::shared_ptr<HybridObject> {
+      std::shared_ptr<HybridUiListViewSpec> hybridObject = NitroList::NitroListAutolinking::UiListView::create();
       return hybridObject;
     }
   );

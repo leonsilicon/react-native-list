@@ -1,4 +1,3 @@
-globalThis.reportError = console.error
 const Reconciler = require('react-reconciler')
 
 global.rootHostContext = {}
@@ -296,3 +295,4 @@ global.Render = function (element, callback) {
   Renderer.flushSyncWork()
   log('[ReactFabricMirror] updateContainer finished. Render done?')
 }
+log('[ReactFabricMirror] ReactFabricMirror initialized', typeof global.React.createRef)

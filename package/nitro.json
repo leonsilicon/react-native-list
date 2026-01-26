@@ -17,6 +17,10 @@
       "kotlin": "HybridViewHolder",
       "swift": "HybridViewHolder"
     },
+    "UiListView": {
+      "kotlin": "HybridUiListView",
+      "swift": "HybridUiListView"
+    },
     "AdapterFactory": {
       "kotlin": "HybridAdapterFactory"
     },

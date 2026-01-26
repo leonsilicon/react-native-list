@@ -8,12 +8,38 @@
 #include "NitroList-Swift-Cxx-Bridge.hpp"
 
 // Include C++ implementation defined types
+#include "HybridUiListViewSpecSwift.hpp"
 #include "HybridViewHolderSpecSwift.hpp"
 #include "NitroList-Swift-Cxx-Umbrella.hpp"
 #include <NitroModules/NitroDefines.hpp>
 
 namespace margelo::nitro::nitrolist::bridge::swift {
 
+  // pragma MARK: std::function<bool()>
+  Func_bool create_Func_bool(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = NitroList::Func_bool::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)]() mutable -> bool {
+      auto __result = swiftClosure.call();
+      return __result;
+    };
+  }
+  
+  // pragma MARK: std::shared_ptr<HybridUiListViewSpec>
+  std::shared_ptr<HybridUiListViewSpec> create_std__shared_ptr_HybridUiListViewSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    NitroList::HybridUiListViewSpec_cxx swiftPart = NitroList::HybridUiListViewSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::nitrolist::HybridUiListViewSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridUiListViewSpec_(std__shared_ptr_HybridUiListViewSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::nitrolist::HybridUiListViewSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::nitrolist::HybridUiListViewSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridUiListViewSpec\" is not implemented in Swift!");
+    }
+    #endif
+    NitroList::HybridUiListViewSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+  
   // pragma MARK: std::shared_ptr<HybridViewHolderSpec>
   std::shared_ptr<HybridViewHolderSpec> create_std__shared_ptr_HybridViewHolderSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     NitroList::HybridViewHolderSpec_cxx swiftPart = NitroList::HybridViewHolderSpec_cxx::fromUnsafe(swiftUnsafePointer);

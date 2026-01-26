@@ -36,7 +36,7 @@
     "specs": "tsc --noEmit false && nitrogen --logLevel=\"debug\"",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "bundle:js": "bun build src/ReactFabricMirror.js --outfile=src/ReactFabricMirror.bundle.js --format=cjs"
+    "bundle:js": "bun run bundle.ts"
   },
   "keywords": [
     "react-native",
@@ -73,6 +73,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
+    "react-native-worklets": "*",
     "react-native-nitro-modules": "*"
   },
   "eslintConfig": {

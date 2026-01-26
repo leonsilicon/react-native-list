@@ -8,15 +8,23 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `HybridUiListViewSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListViewSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 
 // Forward declarations of Swift defined types
+// Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.
+namespace NitroList { class HybridUiListViewSpec_cxx; }
 // Forward declaration of `HybridViewHolderSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridViewHolderSpec_cxx; }
 
 // Include C++ defined types
+#include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
+#include <NitroModules/Result.hpp>
+#include <exception>
+#include <functional>
 #include <memory>
 
 /**
@@ -25,6 +33,50 @@ namespace NitroList { class HybridViewHolderSpec_cxx; }
  */
 namespace margelo::nitro::nitrolist::bridge::swift {
 
+  // pragma MARK: std::function<bool()>
+  /**
+   * Specialized version of `std::function<bool()>`.
+   */
+  using Func_bool = std::function<bool()>;
+  /**
+   * Wrapper class for a `std::function<bool()>`, this can be used from Swift.
+   */
+  class Func_bool_Wrapper final {
+  public:
+    explicit Func_bool_Wrapper(std::function<bool()>&& func): _function(std::make_unique<std::function<bool()>>(std::move(func))) {}
+    inline bool call() const noexcept {
+      auto __result = _function->operator()();
+      return __result;
+    }
+  private:
+    std::unique_ptr<std::function<bool()>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_bool create_Func_bool(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_bool_Wrapper wrap_Func_bool(Func_bool value) noexcept {
+    return Func_bool_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<HybridUiListViewSpec>
+  /**
+   * Specialized version of `std::shared_ptr<HybridUiListViewSpec>`.
+   */
+  using std__shared_ptr_HybridUiListViewSpec_ = std::shared_ptr<HybridUiListViewSpec>;
+  std::shared_ptr<HybridUiListViewSpec> create_std__shared_ptr_HybridUiListViewSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridUiListViewSpec_(std__shared_ptr_HybridUiListViewSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<HybridUiListViewSpec>
+  using std__weak_ptr_HybridUiListViewSpec_ = std::weak_ptr<HybridUiListViewSpec>;
+  inline std__weak_ptr_HybridUiListViewSpec_ weakify_std__shared_ptr_HybridUiListViewSpec_(const std::shared_ptr<HybridUiListViewSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: Result<void>
+  using Result_void_ = Result<void>;
+  inline Result_void_ create_Result_void_() noexcept {
+    return Result<void>::withValue();
+  }
+  inline Result_void_ create_Result_void_(const std::exception_ptr& error) noexcept {
+    return Result<void>::withError(error);
+  }
+  
   // pragma MARK: std::shared_ptr<HybridViewHolderSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridViewHolderSpec>`.
