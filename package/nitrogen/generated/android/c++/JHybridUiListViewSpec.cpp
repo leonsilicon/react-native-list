@@ -7,10 +7,14 @@
 
 #include "JHybridUiListViewSpec.hpp"
 
+// Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 
-
+#include <memory>
+#include "HybridUiListModuleSpec.hpp"
+#include "JHybridUiListModuleSpec.hpp"
 #include <functional>
-#include "JFunc_bool.hpp"
+#include "JFunc_double.hpp"
 #include <NitroModules/JNICallable.hpp>
 
 namespace margelo::nitro::nitrolist {
@@ -52,9 +56,9 @@ namespace margelo::nitro::nitrolist {
   
 
   // Methods
-  void JHybridUiListViewSpec::setMakeNativeViewCallback(const std::function<bool()>& callback) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JFunc_bool::javaobject> /* callback */)>("setMakeNativeViewCallback_cxx");
-    method(_javaPart, JFunc_bool_cxx::fromCpp(callback));
+  void JHybridUiListViewSpec::setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) {
+    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JHybridUiListModuleSpec::javaobject> /* uiListModule */, jni::alias_ref<JFunc_double::javaobject> /* callback */)>("setMakeNativeViewCallback_cxx");
+    method(_javaPart, std::dynamic_pointer_cast<JHybridUiListModuleSpec>(uiListModule)->getJavaPart(), JFunc_double_cxx::fromCpp(callback));
   }
 
 } // namespace margelo::nitro::nitrolist

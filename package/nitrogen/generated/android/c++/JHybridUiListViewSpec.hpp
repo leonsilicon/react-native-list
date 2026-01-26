@@ -55,7 +55,7 @@ namespace margelo::nitro::nitrolist {
 
   public:
     // Methods
-    void setMakeNativeViewCallback(const std::function<bool()>& callback) override;
+    void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) override;
 
   private:
     friend HybridBase;

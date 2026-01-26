@@ -126,11 +126,15 @@ open class HybridUiListViewSpec_cxx {
 
   // Methods
   @inline(__always)
-  public final func setMakeNativeViewCallback(callback: bridge.Func_bool) -> bridge.Result_void_ {
+  public final func setMakeNativeViewCallback(uiListModule: bridge.std__shared_ptr_HybridUiListModuleSpec_, callback: bridge.Func_double) -> bridge.Result_void_ {
     do {
-      try self.__implementation.setMakeNativeViewCallback(callback: { () -> () -> Bool in
-        let __wrappedFunction = bridge.wrap_Func_bool(callback)
-        return { () -> Bool in
+      try self.__implementation.setMakeNativeViewCallback(uiListModule: { () -> HybridUiListModuleSpec in
+        let __unsafePointer = bridge.get_std__shared_ptr_HybridUiListModuleSpec_(uiListModule)
+        let __instance = HybridUiListModuleSpec_cxx.fromUnsafe(__unsafePointer)
+        return __instance.getHybridUiListModuleSpec()
+      }(), callback: { () -> () -> Double in
+        let __wrappedFunction = bridge.wrap_Func_double(callback)
+        return { () -> Double in
           let __result = __wrappedFunction.call()
           return __result
         }

@@ -14,7 +14,7 @@ public protocol HybridUiListViewSpec_protocol: HybridObject, HybridView {
   
 
   // Methods
-  func setMakeNativeViewCallback(callback: @escaping () -> Bool) throws -> Void
+  func setMakeNativeViewCallback(uiListModule: (any HybridUiListModuleSpec), callback: @escaping () -> Double) throws -> Void
 }
 
 public extension HybridUiListViewSpec_protocol {

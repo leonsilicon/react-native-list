@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Text, View } from "react-native";
-import { UiList, setup, renderSync } from "react-native-nitro-list";
+import { UiList, setup, renderSync, uiListModule } from "react-native-nitro-list";
 import {
   UiListView,
   UiListViewMethods,
@@ -8,13 +8,7 @@ import {
 import { callback } from "react-native-nitro-modules";
 import { scheduleOnUI, runOnUI } from "react-native-worklets";
 
-setup();
-
-function test() {
-  "worklet";
-  global.log("Test worklet running", global.React);
-}
-scheduleOnUI(test);
+setup(); // TODO: put that in librar somewhere
 
 function makeNativeViewCallback() {
   "worklet";
@@ -72,7 +66,7 @@ export default function App() {
               "Setting makeNativeViewCallback on UiListView on",
               typeof ref.setMakeNativeViewCallback
             );
-            ref.setMakeNativeViewCallback(() => {
+            ref.setMakeNativeViewCallback(uiListModule, () => {
               "worklet";
 
               const ref = global.React.createRef();
@@ -101,7 +95,7 @@ export default function App() {
               renderSync();
               global.log("renderSync took ", performance.now() - start, "ms");
 
-              return true;
+              return tag;
             });
           });
         })}

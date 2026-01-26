@@ -12,8 +12,11 @@
 // Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListViewSpec_cxx; }
 
+// Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 
-
+#include <memory>
+#include "HybridUiListModuleSpec.hpp"
 #include <functional>
 
 #include "NitroList-Swift-Cxx-Umbrella.hpp"
@@ -66,8 +69,8 @@ namespace margelo::nitro::nitrolist {
 
   public:
     // Methods
-    inline void setMakeNativeViewCallback(const std::function<bool()>& callback) override {
-      auto __result = _swiftPart.setMakeNativeViewCallback(callback);
+    inline void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) override {
+      auto __result = _swiftPart.setMakeNativeViewCallback(uiListModule, callback);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

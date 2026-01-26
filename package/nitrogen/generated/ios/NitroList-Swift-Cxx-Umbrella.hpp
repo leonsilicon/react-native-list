@@ -8,12 +8,15 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 // Forward declaration of `HybridUiListViewSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridUiListViewSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 
 // Include C++ defined types
+#include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
 #include <NitroModules/Result.hpp>
@@ -31,6 +34,8 @@ namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 #include <NitroModules/DateToChronoDate.hpp>
 
 // Forward declarations of Swift defined types
+// Forward declaration of `HybridUiListModuleSpec_cxx` to properly resolve imports.
+namespace NitroList { class HybridUiListModuleSpec_cxx; }
 // Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListViewSpec_cxx; }
 // Forward declaration of `HybridViewHolderSpec_cxx` to properly resolve imports.

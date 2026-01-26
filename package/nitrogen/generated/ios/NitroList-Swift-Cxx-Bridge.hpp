@@ -8,18 +8,23 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 // Forward declaration of `HybridUiListViewSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridUiListViewSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 
 // Forward declarations of Swift defined types
+// Forward declaration of `HybridUiListModuleSpec_cxx` to properly resolve imports.
+namespace NitroList { class HybridUiListModuleSpec_cxx; }
 // Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListViewSpec_cxx; }
 // Forward declaration of `HybridViewHolderSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridViewHolderSpec_cxx; }
 
 // Include C++ defined types
+#include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
 #include <NitroModules/Result.hpp>
@@ -33,27 +38,39 @@ namespace NitroList { class HybridViewHolderSpec_cxx; }
  */
 namespace margelo::nitro::nitrolist::bridge::swift {
 
-  // pragma MARK: std::function<bool()>
+  // pragma MARK: std::shared_ptr<HybridUiListModuleSpec>
   /**
-   * Specialized version of `std::function<bool()>`.
+   * Specialized version of `std::shared_ptr<HybridUiListModuleSpec>`.
    */
-  using Func_bool = std::function<bool()>;
+  using std__shared_ptr_HybridUiListModuleSpec_ = std::shared_ptr<HybridUiListModuleSpec>;
+  std::shared_ptr<HybridUiListModuleSpec> create_std__shared_ptr_HybridUiListModuleSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridUiListModuleSpec_(std__shared_ptr_HybridUiListModuleSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<HybridUiListModuleSpec>
+  using std__weak_ptr_HybridUiListModuleSpec_ = std::weak_ptr<HybridUiListModuleSpec>;
+  inline std__weak_ptr_HybridUiListModuleSpec_ weakify_std__shared_ptr_HybridUiListModuleSpec_(const std::shared_ptr<HybridUiListModuleSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: std::function<double()>
   /**
-   * Wrapper class for a `std::function<bool()>`, this can be used from Swift.
+   * Specialized version of `std::function<double()>`.
    */
-  class Func_bool_Wrapper final {
+  using Func_double = std::function<double()>;
+  /**
+   * Wrapper class for a `std::function<double()>`, this can be used from Swift.
+   */
+  class Func_double_Wrapper final {
   public:
-    explicit Func_bool_Wrapper(std::function<bool()>&& func): _function(std::make_unique<std::function<bool()>>(std::move(func))) {}
-    inline bool call() const noexcept {
+    explicit Func_double_Wrapper(std::function<double()>&& func): _function(std::make_unique<std::function<double()>>(std::move(func))) {}
+    inline double call() const noexcept {
       auto __result = _function->operator()();
       return __result;
     }
   private:
-    std::unique_ptr<std::function<bool()>> _function;
+    std::unique_ptr<std::function<double()>> _function;
   } SWIFT_NONCOPYABLE;
-  Func_bool create_Func_bool(void* NON_NULL swiftClosureWrapper) noexcept;
-  inline Func_bool_Wrapper wrap_Func_bool(Func_bool value) noexcept {
-    return Func_bool_Wrapper(std::move(value));
+  Func_double create_Func_double(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_double_Wrapper wrap_Func_double(Func_double value) noexcept {
+    return Func_double_Wrapper(std::move(value));
   }
   
   // pragma MARK: std::shared_ptr<HybridUiListViewSpec>

@@ -2,12 +2,15 @@ package com.margelo.nitro.nitrolist
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.fabric.FabricUIManager
 import com.facebook.react.runtime.ReactSurfaceView
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
 import com.margelo.nitro.NitroModules
 
 class HybridUiListModule : HybridUiListModuleSpec() {
+    var reactSurfaceView: ReactSurfaceView? = null
+
     override fun setupExternalSurface() {
         val context: ReactApplicationContext = NitroModules.applicationContext
             ?: throw IllegalStateException("ReactApplicationContext is null! Is Nitro installed?")
@@ -25,7 +28,7 @@ class HybridUiListModule : HybridUiListModuleSpec() {
         val surface = reactHost.createSurface(context, "", null)
         val surfaceView = surface.view as? ReactSurfaceView
             ?: throw IllegalStateException("Surface view is not a ReactSurfaceView!")
-        surfaceView.rootViewTag = 3;
+        surfaceView.rootViewTag = 3
 
         uiManager.startSurface(
             surfaceView,
@@ -35,5 +38,7 @@ class HybridUiListModule : HybridUiListModuleSpec() {
             surfaceView.measuredWidth,
             surfaceView.measuredHeight
         )
+
+        reactSurfaceView = surfaceView
     }
 }

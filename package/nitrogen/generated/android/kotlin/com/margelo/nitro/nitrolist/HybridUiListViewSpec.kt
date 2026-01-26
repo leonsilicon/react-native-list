@@ -45,12 +45,12 @@ abstract class HybridUiListViewSpec: HybridView() {
   
 
   // Methods
-  abstract fun setMakeNativeViewCallback(callback: () -> Boolean): Unit
+  abstract fun setMakeNativeViewCallback(uiListModule: HybridUiListModuleSpec, callback: () -> Double): Unit
   
   @DoNotStrip
   @Keep
-  private fun setMakeNativeViewCallback_cxx(callback: Func_bool): Unit {
-    val __result = setMakeNativeViewCallback(callback)
+  private fun setMakeNativeViewCallback_cxx(uiListModule: HybridUiListModuleSpec, callback: Func_double): Unit {
+    val __result = setMakeNativeViewCallback(uiListModule, callback)
     return __result
   }
 

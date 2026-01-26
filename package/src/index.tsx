@@ -40,7 +40,7 @@ import { setupWorklet } from './ReactFabricMirror.bundle'
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
 
-const uiListModule =
+export const uiListModule =
   NitroModules.createHybridObject<UiListModule>('UiListModule')
 export function setup() {
   uiListModule.setupExternalSurface()

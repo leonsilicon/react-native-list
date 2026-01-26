@@ -5,6 +5,7 @@ import {
   HybridViewProps,
   Sync,
 } from 'react-native-nitro-modules'
+import { UiListModule } from './UIListModule.nitro'
 // import { ViewHolder } from './ViewHolder.nitro'
 
 export interface UiListViewProps extends HybridViewProps {
@@ -12,7 +13,10 @@ export interface UiListViewProps extends HybridViewProps {
 }
 
 export interface UiListViewMethods extends HybridViewMethods {
-  setMakeNativeViewCallback(callback: Sync<() => boolean>): void
+  setMakeNativeViewCallback(
+    uiListModule: UiListModule,
+    callback: Sync<() => number>
+  ): void
 }
 
 export type UiListView = HybridView<UiListViewProps, UiListViewMethods>

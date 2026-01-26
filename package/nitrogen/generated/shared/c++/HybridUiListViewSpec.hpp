@@ -13,8 +13,11 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 
-
+#include <memory>
+#include "HybridUiListModuleSpec.hpp"
 #include <functional>
 
 namespace margelo::nitro::nitrolist {
@@ -48,7 +51,7 @@ namespace margelo::nitro::nitrolist {
 
     public:
       // Methods
-      virtual void setMakeNativeViewCallback(const std::function<bool()>& callback) = 0;
+      virtual void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) = 0;
 
     protected:
       // Hybrid Setup
