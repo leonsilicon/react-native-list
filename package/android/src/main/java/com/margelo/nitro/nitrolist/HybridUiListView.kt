@@ -51,8 +51,12 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
     override fun setMakeNativeViewCallback(uiListModule: HybridUiListModuleSpec, callback: () -> Double) {
         this._callback = callback
 
-        val testView = makeView()
-        Log.d("HybridUiListView", "View to insert into size ${view.measuredWidth}x${view.measuredHeight}, testView size ${testView.measuredWidth}x${testView.measuredHeight}")
-        view.addView(testView)
+        val testView1 = makeView()
+//        Log.d("HybridUiListView", "View to insert into size ${view.measuredWidth}x${view.measuredHeight}, testView size ${testView.measuredWidth}x${testView.measuredHeight}")
+        val testView2 = makeView()
+        view.addView(testView1)
+
+        // TODO: figure out how to render multiple items, right now only one works and it tries to replace that one lol
+//        view.addView(testView2)
     }
 }

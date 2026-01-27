@@ -79,15 +79,24 @@ const HostConfig = {
     //     viewConfig.validAttributes,
     //   );
 
-    const node = nativeFabricUIManager.createNode(
-      tag, // reactTag
-      type, // viewName
-      rootContainerInstance.containerTag, // rootTag
-      newProps, // props
-      workInProgress // internalInstanceHandle
-    )
-
-    log('[createInstance] node=', node)
+    let node
+    try {
+      log('[createInstance] calling createNode with type=', type, 'tag=', tag)
+      log('[createInstance] workInProgress=', workInProgress)
+      node = nativeFabricUIManager.createNode(
+        tag, // reactTag
+        type, // viewName
+        rootContainerInstance.containerTag, // rootTag
+        newProps, // props
+        // TODO: problem, right now either nitro or worklets is crashing here as it tries to convert to a JSIDynamic
+        workInProgress // internalInstanceHandle
+      )
+      log('[createInstance] node=', node)
+    } catch (e) {
+      log('[createInstance] ERROR in createNode:', e.message || String(e))
+      log('Stack:', new Error().stack)
+      throw e
+    }
 
     // I think react is using getPublicInstance here
     return {

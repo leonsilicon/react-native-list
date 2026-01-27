@@ -66,14 +66,14 @@ export default function App() {
                   backgroundColor: colorRedProcessed,
                 },
                 // TODO: currently this causes the renderer to never finish…?
-                // [
-                //   global.React.createElement("RCTView", {
-                //     key: "child1",
-                //     width: 50,
-                //     height: 50,
-                //     backgroundColor: colorGreenProcessed,
-                //   }),
-                // ]
+                [
+                  global.React.createElement("RCTView", {
+                    key: "child1",
+                    width: 50,
+                    height: 50,
+                    backgroundColor: colorGreenProcessed,
+                  }),
+                ]
               );
               global.log("Test element created: ", Test);
 

@@ -12367,8 +12367,17 @@ var HostConfig = {
     const tag = global.nextReactTag;
     global.nextReactTag += 2;
     log("[createInstnace] debugB");
-    const node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, newProps, workInProgress);
-    log("[createInstance] node=", node);
+    let node;
+    try {
+      log("[createInstance] calling createNode with type=", type, "tag=", tag);
+      log("[createInstance] workInProgress=", workInProgress);
+      node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, newProps, workInProgress);
+      log("[createInstance] node=", node);
+    } catch (e) {
+      log("[createInstance] ERROR in createNode:", e.message || String(e));
+      log("Stack:", new Error().stack);
+      throw e;
+    }
     return {
       node,
       canonical: {
@@ -12485,7 +12494,6 @@ global.Render = function(element, callback) {
     }, function nativeOnDefaultTransitionIndicator() {});
   }
   Renderer.updateContainerSync(element, global.rootContainer, null, callback);
-  Renderer.flushPassiveEffects();
   Renderer.flushSyncWork();
   log("[ReactFabricMirror] updateContainer finished");
 };
