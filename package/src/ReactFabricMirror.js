@@ -1,4 +1,10 @@
 const Reconciler = require('react-reconciler')
+// const {
+//   createAttributePayload,
+//   diffAttributePayloads,
+// } = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface');
+
+const {create: createAttributePayload} = require("react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload")
 
 global.rootHostContext = {}
 global.childHostContext = {}
@@ -58,13 +64,21 @@ const HostConfig = {
     _currentHostContext,
     workInProgress
   ) => {
+    // try { 
+    //   const viewConfig = global.rnViewConfigs.get(type);
+    //   log('[createInstance] viewConfig=', viewConfig);
+    // } catch (e) {
+    //   log('[createInstance] ERROR getting view config for type=', type, ' error=', e.message || String(e))
+    //   throw e
+    // }
+
+
     log('[createInstnace] debugA')
     const tag = global.nextReactTag
     global.nextReactTag += 2
     log('[createInstnace] debugB')
 
     // TODO:
-    //   const viewConfig = getViewConfigForType(type);
 
     //   if (__DEV__) {
     //     for (const key in viewConfig.validAttributes) {
@@ -74,20 +88,38 @@ const HostConfig = {
     //     }
     //   }
 
-    //   const updatePayload = createAttributePayload(
-    //     props,
-    //     viewConfig.validAttributes,
-    //   );
+    const viewConfig = new Proxy({}, {
+          get: (target, prop) => {
+            log('[createInstance] ValidAttributes proxy get for prop=', prop)
+            if (prop === 'children' || prop === 'ref') {
+              log('[createInstance] ValidAttributes proxy returning false for prop=', prop)
+              return undefined;
+            }
+            if (prop === 'style') {
+              return new Proxy({}, {
+                get: (target, styleProp) => {
+                  return true;
+                },
+              });
+            }
+            return true;
+          },
+        })
+        log('[createInstance] viewConfig proxy created, test, viewConfig.test=', viewConfig.test)
+      const updatePayload = createAttributePayload(
+        newProps,
+        viewConfig,
+      );
 
     let node
     try {
       log('[createInstance] calling createNode with type=', type, 'tag=', tag)
-      log('[createInstance] workInProgress=', workInProgress)
+      log('[createInstance] props=', updatePayload)
       node = nativeFabricUIManager.createNode(
         tag, // reactTag
         type, // viewName
         rootContainerInstance.containerTag, // rootTag
-        newProps, // props
+        updatePayload, // props
         // TODO: problem, right now either nitro or worklets is crashing here as it tries to convert to a JSIDynamic
         workInProgress // internalInstanceHandle
       )

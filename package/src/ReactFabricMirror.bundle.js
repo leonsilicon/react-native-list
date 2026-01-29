@@ -7,7 +7,35 @@ export function setupWorklet() {
   var AbortController = undefined;
 
     
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __moduleCache = /* @__PURE__ */ new WeakMap;
+var __toCommonJS = (from) => {
+  var entry = __moduleCache.get(from), desc;
+  if (entry)
+    return entry;
+  entry = __defProp({}, "__esModule", { value: true });
+  if (from && typeof from === "object" || typeof from === "function")
+    __getOwnPropNames(from).map((key) => !__hasOwnProp.call(entry, key) && __defProp(entry, key, {
+      get: () => from[key],
+      enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    }));
+  __moduleCache.set(from, entry);
+  return entry;
+};
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, {
+      get: all[name],
+      enumerable: true,
+      configurable: true,
+      set: (newValue) => all[name] = () => newValue
+    });
+};
+var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 
 // ../node_modules/react-reconciler/node_modules/react/cjs/react.development.js
 var require_react_development = __commonJS((exports2, module2) => {
@@ -11520,6 +11548,350 @@ var require_react_reconciler = __commonJS((exports2, module2) => {
   }
 });
 
+// node_modules/react-native/Libraries/StyleSheet/flattenStyle.js
+function flattenStyle(style) {
+  if (style === null || typeof style !== "object") {
+    return;
+  }
+  if (!Array.isArray(style)) {
+    return style;
+  }
+  const result = {};
+  for (let i = 0, styleLength = style.length;i < styleLength; ++i) {
+    const computedStyle = flattenStyle(style[i]);
+    if (computedStyle) {
+      for (const key in computedStyle) {
+        result[key] = computedStyle[key];
+      }
+    }
+  }
+  return result;
+}
+var flattenStyle_default;
+var init_flattenStyle = __esm(() => {
+  flattenStyle_default = flattenStyle;
+});
+
+// node_modules/react-native/Libraries/Utilities/differ/deepDiffer.js
+function unstable_setLogListeners(listeners) {
+  logListeners = listeners;
+}
+function deepDiffer(one, two, maxDepthOrOptions = -1, maybeOptions) {
+  const options = typeof maxDepthOrOptions === "number" ? maybeOptions : maxDepthOrOptions;
+  const maxDepth = typeof maxDepthOrOptions === "number" ? maxDepthOrOptions : -1;
+  if (maxDepth === 0) {
+    return true;
+  }
+  if (one === two) {
+    return false;
+  }
+  if (typeof one === "function" && typeof two === "function") {
+    let unsafelyIgnoreFunctions = options?.unsafelyIgnoreFunctions;
+    if (unsafelyIgnoreFunctions == null) {
+      if (logListeners && logListeners.onDifferentFunctionsIgnored && (!options || !("unsafelyIgnoreFunctions" in options))) {
+        logListeners.onDifferentFunctionsIgnored(one.name, two.name);
+      }
+      unsafelyIgnoreFunctions = true;
+    }
+    return !unsafelyIgnoreFunctions;
+  }
+  if (typeof one !== "object" || one === null) {
+    return one !== two;
+  }
+  if (typeof two !== "object" || two === null) {
+    return true;
+  }
+  if (one.constructor !== two.constructor) {
+    return true;
+  }
+  if (Array.isArray(one)) {
+    const len = one.length;
+    if (two.length !== len) {
+      return true;
+    }
+    for (let ii = 0;ii < len; ii++) {
+      if (deepDiffer(one[ii], two[ii], maxDepth - 1, options)) {
+        return true;
+      }
+    }
+  } else {
+    for (const key in one) {
+      if (deepDiffer(one[key], two[key], maxDepth - 1, options)) {
+        return true;
+      }
+    }
+    for (const twoKey in two) {
+      if (one[twoKey] === undefined && two[twoKey] !== undefined) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+var logListeners, deepDiffer_default;
+var init_deepDiffer = __esm(() => {
+  deepDiffer.unstable_setLogListeners = unstable_setLogListeners;
+  deepDiffer_default = deepDiffer;
+});
+
+// node_modules/react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload.js
+var exports_ReactNativeAttributePayload = {};
+__export(exports_ReactNativeAttributePayload, {
+  diff: () => diff,
+  create: () => create
+});
+function defaultDiffer(prevProp, nextProp) {
+  if (typeof nextProp !== "object" || nextProp === null) {
+    return true;
+  } else {
+    return deepDiffer_default(prevProp, nextProp, deepDifferOptions);
+  }
+}
+function restoreDeletedValuesInNestedArray(updatePayload, node, validAttributes) {
+  if (Array.isArray(node)) {
+    let i = node.length;
+    while (i-- && removedKeyCount > 0) {
+      restoreDeletedValuesInNestedArray(updatePayload, node[i], validAttributes);
+    }
+  } else if (node && removedKeyCount > 0) {
+    const obj = node;
+    for (const propKey in removedKeys) {
+      if (!removedKeys[propKey]) {
+        continue;
+      }
+      let nextProp = obj[propKey];
+      if (nextProp === undefined) {
+        continue;
+      }
+      const attributeConfig = validAttributes[propKey];
+      if (!attributeConfig) {
+        continue;
+      }
+      if (typeof nextProp === "function") {
+        nextProp = true;
+      }
+      if (typeof nextProp === "undefined") {
+        nextProp = null;
+      }
+      if (typeof attributeConfig !== "object") {
+        updatePayload[propKey] = nextProp;
+      } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+        updatePayload[propKey] = nextValue;
+      }
+      removedKeys[propKey] = false;
+      removedKeyCount--;
+    }
+  }
+}
+function diffNestedArrayProperty(updatePayload, prevArray, nextArray, validAttributes) {
+  const minLength = prevArray.length < nextArray.length ? prevArray.length : nextArray.length;
+  let i;
+  for (i = 0;i < minLength; i++) {
+    updatePayload = diffNestedProperty(updatePayload, prevArray[i], nextArray[i], validAttributes);
+  }
+  for (;i < prevArray.length; i++) {
+    updatePayload = clearNestedProperty(updatePayload, prevArray[i], validAttributes);
+  }
+  for (;i < nextArray.length; i++) {
+    const nextProp = nextArray[i];
+    if (!nextProp) {
+      continue;
+    }
+    updatePayload = addNestedProperty(updatePayload, nextProp, validAttributes);
+  }
+  return updatePayload;
+}
+function diffNestedProperty(updatePayload, prevProp, nextProp, validAttributes) {
+  if (!updatePayload && prevProp === nextProp) {
+    return updatePayload;
+  }
+  if (!prevProp || !nextProp) {
+    if (nextProp) {
+      return addNestedProperty(updatePayload, nextProp, validAttributes);
+    }
+    if (prevProp) {
+      return clearNestedProperty(updatePayload, prevProp, validAttributes);
+    }
+    return updatePayload;
+  }
+  if (!Array.isArray(prevProp) && !Array.isArray(nextProp)) {
+    return diffProperties(updatePayload, prevProp, nextProp, validAttributes);
+  }
+  if (Array.isArray(prevProp) && Array.isArray(nextProp)) {
+    return diffNestedArrayProperty(updatePayload, prevProp, nextProp, validAttributes);
+  }
+  if (Array.isArray(prevProp)) {
+    return diffProperties(updatePayload, flattenStyle_default(prevProp), nextProp, validAttributes);
+  }
+  return diffProperties(updatePayload, prevProp, flattenStyle_default(nextProp), validAttributes);
+}
+function clearNestedProperty(updatePayload, prevProp, validAttributes) {
+  if (!prevProp) {
+    return updatePayload;
+  }
+  if (!Array.isArray(prevProp)) {
+    return clearProperties(updatePayload, prevProp, validAttributes);
+  }
+  for (let i = 0;i < prevProp.length; i++) {
+    updatePayload = clearNestedProperty(updatePayload, prevProp[i], validAttributes);
+  }
+  return updatePayload;
+}
+function diffProperties(updatePayload, prevProps, nextProps, validAttributes) {
+  let attributeConfig;
+  let nextProp;
+  let prevProp;
+  for (const propKey in nextProps) {
+    attributeConfig = validAttributes[propKey];
+    if (!attributeConfig) {
+      continue;
+    }
+    prevProp = prevProps[propKey];
+    nextProp = nextProps[propKey];
+    if (typeof nextProp === "function") {
+      const attributeConfigHasProcess = typeof attributeConfig === "object" && typeof attributeConfig.process === "function";
+      if (!attributeConfigHasProcess) {
+        nextProp = true;
+        if (typeof prevProp === "function") {
+          prevProp = true;
+        }
+      }
+    }
+    if (typeof nextProp === "undefined") {
+      nextProp = null;
+      if (typeof prevProp === "undefined") {
+        prevProp = null;
+      }
+    }
+    if (removedKeys) {
+      removedKeys[propKey] = false;
+    }
+    if (updatePayload && updatePayload[propKey] !== undefined) {
+      if (typeof attributeConfig !== "object") {
+        updatePayload[propKey] = nextProp;
+      } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+        updatePayload[propKey] = nextValue;
+      }
+      continue;
+    }
+    if (prevProp === nextProp) {
+      continue;
+    }
+    if (typeof attributeConfig !== "object") {
+      if (defaultDiffer(prevProp, nextProp)) {
+        (updatePayload || (updatePayload = {}))[propKey] = nextProp;
+      }
+    } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+      const shouldUpdate = prevProp === undefined || (typeof attributeConfig.diff === "function" ? attributeConfig.diff(prevProp, nextProp) : defaultDiffer(prevProp, nextProp));
+      if (shouldUpdate) {
+        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+        (updatePayload || (updatePayload = {}))[propKey] = nextValue;
+      }
+    } else {
+      removedKeys = null;
+      removedKeyCount = 0;
+      updatePayload = diffNestedProperty(updatePayload, prevProp, nextProp, attributeConfig);
+      if (removedKeyCount > 0 && updatePayload) {
+        restoreDeletedValuesInNestedArray(updatePayload, nextProp, attributeConfig);
+        removedKeys = null;
+      }
+    }
+  }
+  for (const propKey in prevProps) {
+    if (nextProps[propKey] !== undefined) {
+      continue;
+    }
+    attributeConfig = validAttributes[propKey];
+    if (!attributeConfig) {
+      continue;
+    }
+    if (updatePayload && updatePayload[propKey] !== undefined) {
+      continue;
+    }
+    prevProp = prevProps[propKey];
+    if (prevProp === undefined) {
+      continue;
+    }
+    if (typeof attributeConfig !== "object" || typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+      (updatePayload || (updatePayload = {}))[propKey] = null;
+      if (!removedKeys) {
+        removedKeys = {};
+      }
+      if (!removedKeys[propKey]) {
+        removedKeys[propKey] = true;
+        removedKeyCount++;
+      }
+    } else {
+      updatePayload = clearNestedProperty(updatePayload, prevProp, attributeConfig);
+    }
+  }
+  return updatePayload;
+}
+function addNestedProperty(payload, props, validAttributes) {
+  if (Array.isArray(props)) {
+    for (let i = 0;i < props.length; i++) {
+      payload = addNestedProperty(payload, props[i], validAttributes);
+    }
+    return payload;
+  }
+  for (const propKey in props) {
+    const prop = props[propKey];
+    const attributeConfig = validAttributes[propKey];
+    if (attributeConfig == null) {
+      continue;
+    }
+    let newValue;
+    if (prop === undefined) {
+      if (payload && payload[propKey] !== undefined) {
+        newValue = null;
+      } else {
+        continue;
+      }
+    } else if (typeof attributeConfig === "object") {
+      if (typeof attributeConfig.process === "function") {
+        newValue = attributeConfig.process(prop);
+      } else if (typeof attributeConfig.diff === "function") {
+        newValue = prop;
+      }
+    } else {
+      if (typeof prop === "function") {
+        newValue = true;
+      } else {
+        newValue = prop;
+      }
+    }
+    if (newValue !== undefined) {
+      if (!payload) {
+        payload = {};
+      }
+      payload[propKey] = newValue;
+      continue;
+    }
+    payload = addNestedProperty(payload, prop, attributeConfig);
+  }
+  return payload;
+}
+function clearProperties(updatePayload, prevProps, validAttributes) {
+  return diffProperties(updatePayload, prevProps, emptyObject, validAttributes);
+}
+function create(props, validAttributes) {
+  return addNestedProperty(null, props, validAttributes);
+}
+function diff(prevProps, nextProps, validAttributes) {
+  return diffProperties(null, prevProps, nextProps, validAttributes);
+}
+var emptyObject, removedKeys = null, removedKeyCount = 0, deepDifferOptions;
+var init_ReactNativeAttributePayload = __esm(() => {
+  init_flattenStyle();
+  init_deepDiffer();
+  emptyObject = {};
+  deepDifferOptions = {
+    unsafelyIgnoreFunctions: true
+  };
+});
+
 // ../node_modules/react-reconciler/cjs/react-reconciler-constants.development.js
 var require_react_reconciler_constants_development = __commonJS((exports2) => {
   exports2.ConcurrentRoot = 1, exports2.ContinuousEventPriority = 8, exports2.DefaultEventPriority = 32, exports2.DiscreteEventPriority = 2, exports2.IdleEventPriority = 268435456, exports2.LegacyRoot = 0, exports2.NoEventPriority = 0;
@@ -11556,14 +11928,14 @@ var require_react_development2 = __commonJS((exports2, module2) => {
     function Component(props, context, updater) {
       this.props = props;
       this.context = context;
-      this.refs = emptyObject;
+      this.refs = emptyObject2;
       this.updater = updater || ReactNoopUpdateQueue;
     }
     function ComponentDummy() {}
     function PureComponent(props, context, updater) {
       this.props = props;
       this.context = context;
-      this.refs = emptyObject;
+      this.refs = emptyObject2;
       this.updater = updater || ReactNoopUpdateQueue;
     }
     function testStringCoercion(value) {
@@ -11928,8 +12300,8 @@ See https://react.dev/link/invalid-hook-call for tips about how to debug and fix
       enqueueSetState: function(publicInstance) {
         warnNoop(publicInstance, "setState");
       }
-    }, assign = Object.assign, emptyObject = {};
-    Object.freeze(emptyObject);
+    }, assign = Object.assign, emptyObject2 = {};
+    Object.freeze(emptyObject2);
     Component.prototype.isReactComponent = {};
     Component.prototype.setState = function(partialState, callback) {
       if (typeof partialState !== "object" && typeof partialState !== "function" && partialState != null)
@@ -12272,29 +12644,29 @@ See https://react.dev/link/invalid-hook-call for tips about how to debug and fix
     exports2.useDeferredValue = function(value, initialValue) {
       return resolveDispatcher().useDeferredValue(value, initialValue);
     };
-    exports2.useEffect = function(create, createDeps, update) {
-      create == null && console.warn("React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?");
+    exports2.useEffect = function(create2, createDeps, update) {
+      create2 == null && console.warn("React Hook useEffect requires an effect callback. Did you forget to pass a callback to the hook?");
       var dispatcher = resolveDispatcher();
       if (typeof update === "function")
         throw Error("useEffect CRUD overload is not enabled in this build of React.");
-      return dispatcher.useEffect(create, createDeps);
+      return dispatcher.useEffect(create2, createDeps);
     };
     exports2.useId = function() {
       return resolveDispatcher().useId();
     };
-    exports2.useImperativeHandle = function(ref, create, deps) {
-      return resolveDispatcher().useImperativeHandle(ref, create, deps);
+    exports2.useImperativeHandle = function(ref, create2, deps) {
+      return resolveDispatcher().useImperativeHandle(ref, create2, deps);
     };
-    exports2.useInsertionEffect = function(create, deps) {
-      create == null && console.warn("React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?");
-      return resolveDispatcher().useInsertionEffect(create, deps);
+    exports2.useInsertionEffect = function(create2, deps) {
+      create2 == null && console.warn("React Hook useInsertionEffect requires an effect callback. Did you forget to pass a callback to the hook?");
+      return resolveDispatcher().useInsertionEffect(create2, deps);
     };
-    exports2.useLayoutEffect = function(create, deps) {
-      create == null && console.warn("React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?");
-      return resolveDispatcher().useLayoutEffect(create, deps);
+    exports2.useLayoutEffect = function(create2, deps) {
+      create2 == null && console.warn("React Hook useLayoutEffect requires an effect callback. Did you forget to pass a callback to the hook?");
+      return resolveDispatcher().useLayoutEffect(create2, deps);
     };
-    exports2.useMemo = function(create, deps) {
-      return resolveDispatcher().useMemo(create, deps);
+    exports2.useMemo = function(create2, deps) {
+      return resolveDispatcher().useMemo(create2, deps);
     };
     exports2.useOptimistic = function(passthrough, reducer) {
       return resolveDispatcher().useOptimistic(passthrough, reducer);
@@ -12328,6 +12700,7 @@ var require_react2 = __commonJS((exports2, module2) => {
 
 // src/ReactFabricMirror.js
 var Reconciler = require_react_reconciler();
+var { create: createAttributePayload } = (init_ReactNativeAttributePayload(), __toCommonJS(exports_ReactNativeAttributePayload));
 global.rootHostContext = {};
 global.childHostContext = {};
 var {
@@ -12367,11 +12740,30 @@ var HostConfig = {
     const tag = global.nextReactTag;
     global.nextReactTag += 2;
     log("[createInstnace] debugB");
+    const viewConfig = new Proxy({}, {
+      get: (target, prop) => {
+        log("[createInstance] ValidAttributes proxy get for prop=", prop);
+        if (prop === "children" || prop === "ref") {
+          log("[createInstance] ValidAttributes proxy returning false for prop=", prop);
+          return;
+        }
+        if (prop === "style") {
+          return new Proxy({}, {
+            get: (target2, styleProp) => {
+              return true;
+            }
+          });
+        }
+        return true;
+      }
+    });
+    log("[createInstance] viewConfig proxy created, test, viewConfig.test=", viewConfig.test);
+    const updatePayload = createAttributePayload(newProps, viewConfig);
     let node;
     try {
       log("[createInstance] calling createNode with type=", type, "tag=", tag);
-      log("[createInstance] workInProgress=", workInProgress);
-      node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, newProps, workInProgress);
+      log("[createInstance] props=", updatePayload);
+      node = nativeFabricUIManager.createNode(tag, type, rootContainerInstance.containerTag, updatePayload, workInProgress);
       log("[createInstance] node=", node);
     } catch (e) {
       log("[createInstance] ERROR in createNode:", e.message || String(e));

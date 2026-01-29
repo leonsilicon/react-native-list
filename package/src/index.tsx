@@ -40,11 +40,48 @@ import { setupWorklet } from './ReactFabricMirror.bundle'
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
 
+const {
+  ReactNativeViewConfigRegistry,
+  // deepFreezeAndThrowOnMutationInDev,
+  // createPublicInstance,
+  // createPublicTextInstance,
+  createAttributePayload,
+  diffAttributePayloads,
+  // type PublicInstance as ReactNativePublicInstance,
+  // type PublicTextInstance,
+  // type PublicRootInstance,
+} = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface');
+
+// const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
+// scheduleOnUI(() => {
+//   'worklet'
+//   global.getViewConfigForType = getViewConfigForType // worklet copies this?
+// This doesn't do a deep copy no.
+// })
+
+// const globalViewConfigMap = (global.rnViewConfigs as Map<string, any>).entries()()
+// console.log('Registered view configs:')
+// for (const [key, value] of globalViewConfigMap) {
+//   console.log(' - ', key, value)
+// }
+
 export const uiListModule =
   NitroModules.createHybridObject<UiListModule>('UiListModule')
 export function setup() {
   uiListModule.setupExternalSurface()
-  console.log('UIListModule initialized')
+  // const map = global.rnViewConfigs as Map<string, any> | undefined
+  // if (!map) {
+  //   throw new Error('rnViewConfigs is not defined on global')
+  // }
+  // console.log(map)
+  // const copyConfigs = map.entries().reduce((acc, [key, value]) => {
+  //   acc[key] = value
+  //   return acc
+  // }, {} as Record<string, any>)
+  // scheduleOnUI(() => {
+  //   'worklet'
+  //   global.rnViewConfigs = copyConfigs
+  // })
 
   scheduleOnUI(setupWorklet)
 }

@@ -1,9 +1,12 @@
+import { stripFlowPlugin } from "./strip-flow-plugin.js";
+
 console.log('Building ReactFabricMirror worklet...')
 const res = await Bun.build({
   entrypoints: ['src/ReactFabricMirror.js'],
   outdir: './src',
   naming: 'ReactFabricMirror.bundle.js',
   format: 'cjs',
+  plugins: [stripFlowPlugin],
   banner: `export function setupWorklet() {
   "worklet";
   var IS_REACT_ACT_ENVIRONMENT = false;
