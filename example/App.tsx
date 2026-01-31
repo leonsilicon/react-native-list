@@ -69,7 +69,6 @@ export default function App() {
                   marginLeft: 10,
                   backgroundColor: colorRedProcessed,
                 },
-                // TODO: currently this causes the renderer to never finish…?
                 [
                   global.React.createElement("RCTView", {
                     key: "childid-" + global.itemId,
