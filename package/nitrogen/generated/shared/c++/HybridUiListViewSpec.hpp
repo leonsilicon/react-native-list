@@ -52,6 +52,7 @@ namespace margelo::nitro::nitrolist {
     public:
       // Methods
       virtual void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) = 0;
+      virtual void setUpdateViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<bool(double /* reactTag */, double /* index */)>& callback) = 0;
 
     protected:
       // Hybrid Setup

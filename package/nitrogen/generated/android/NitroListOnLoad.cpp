@@ -22,6 +22,7 @@
 #include "JHybridUiListModuleSpec.hpp"
 #include "JHybridUiListViewSpec.hpp"
 #include "JFunc_double.hpp"
+#include "JFunc_bool_double_double.hpp"
 #include "views/JHybridUiListViewStateUpdater.hpp"
 #include "JHybridViewHolderSpec.hpp"
 #include "views/JHybridViewHolderStateUpdater.hpp"
@@ -44,6 +45,7 @@ int initialize(JavaVM* vm) {
     margelo::nitro::nitrolist::JHybridUiListModuleSpec::registerNatives();
     margelo::nitro::nitrolist::JHybridUiListViewSpec::registerNatives();
     margelo::nitro::nitrolist::JFunc_double_cxx::registerNatives();
+    margelo::nitro::nitrolist::JFunc_bool_double_double_cxx::registerNatives();
     margelo::nitro::nitrolist::views::JHybridUiListViewStateUpdater::registerNatives();
     margelo::nitro::nitrolist::JHybridViewHolderSpec::registerNatives();
     margelo::nitro::nitrolist::views::JHybridViewHolderStateUpdater::registerNatives();

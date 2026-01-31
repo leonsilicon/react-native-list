@@ -154,7 +154,7 @@ const HostConfig = {
   },
 
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
-    log('[cloneInstance]')
+    log('[cloneInstance] tag=', instance.canonical.nativeTag)
 
     const viewConfig = instance.canonical.viewConfig
     const updatePayload = diffAttributePayloads(
@@ -162,6 +162,7 @@ const HostConfig = {
       newProps,
       viewConfig.validAttributes
     )
+    log('[cloneInstance] updatePayload=', updatePayload)
     // TODO: If the event handlers have changed, we need to update the current props
     // in the commit phase but there is no host config hook to do it yet.
     // So instead we hack it by updating it in the render phase.

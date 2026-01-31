@@ -17,6 +17,20 @@ export interface UiListViewMethods extends HybridViewMethods {
     uiListModule: UiListModule,
     callback: Sync<() => number>
   ): void
+
+  // TODO: maybe we can combine with make function?
+  setUpdateViewCallback(
+    uiListModule: UiListModule,
+    // This callback should issue update operations on the existing view!
+    callback: Sync<
+      (
+        reactTag: number,
+        index: number
+        // TODO: view type i guess
+        // TODO: data
+      ) => boolean // we have to return something to make nitro work
+    >
+  ): void
 }
 
 export type UiListView = HybridView<UiListViewProps, UiListViewMethods>

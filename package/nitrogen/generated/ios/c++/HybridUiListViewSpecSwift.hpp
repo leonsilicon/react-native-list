@@ -75,6 +75,12 @@ namespace margelo::nitro::nitrolist {
         std::rethrow_exception(__result.error());
       }
     }
+    inline void setUpdateViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<bool(double /* reactTag */, double /* index */)>& callback) override {
+      auto __result = _swiftPart.setUpdateViewCallback(uiListModule, callback);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+    }
 
   private:
     NitroList::HybridUiListViewSpec_cxx _swiftPart;

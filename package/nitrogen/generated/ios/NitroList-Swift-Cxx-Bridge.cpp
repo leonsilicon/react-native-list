@@ -41,6 +41,15 @@ namespace margelo::nitro::nitrolist::bridge::swift {
     };
   }
   
+  // pragma MARK: std::function<bool(double /* reactTag */, double /* index */)>
+  Func_bool_double_double create_Func_bool_double_double(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = NitroList::Func_bool_double_double::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](double reactTag, double index) mutable -> bool {
+      auto __result = swiftClosure.call(reactTag, index);
+      return __result;
+    };
+  }
+  
   // pragma MARK: std::shared_ptr<HybridUiListViewSpec>
   std::shared_ptr<HybridUiListViewSpec> create_std__shared_ptr_HybridUiListViewSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     NitroList::HybridUiListViewSpec_cxx swiftPart = NitroList::HybridUiListViewSpec_cxx::fromUnsafe(swiftUnsafePointer);

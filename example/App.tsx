@@ -64,6 +64,11 @@ export default function App() {
               typeof ref.setMakeNativeViewCallback
             );
 
+            const tagToArrayPosition: Record<number, number> = {};
+            global.tagToArrayPosition = tagToArrayPosition;
+            const tagToItemId: Record<number, number> = {};
+            global.tagToItemId = tagToItemId;
+
             // TODO: can we enable this somehow as a prop?
             ref.setMakeNativeViewCallback(uiListModule, () => {
               "worklet";
@@ -94,17 +99,19 @@ export default function App() {
                     [
                       global.React.createElement("RCTRawText", {
                         key: "rawtextid-" + global.itemId,
-                        text: "Item #" + global.itemId,
+                        // text: "Item #" + global.itemId,
+                        text: ""
                       }),
                     ]
                   ),
                 ]
               );
-              global.log("Test element created: ", NewElement);
+              // global.log("Test element created: ", NewElement);
               if (global.elementsRendered == null) {
                 global.elementsRendered = [];
               }
-              global.elementsRendered.push(NewElement);
+              const newLength = global.elementsRendered.push(NewElement);
+              const currentIndex = newLength - 1;
 
               const ParentContainer = global.React.createElement(
                 "RCTView",
@@ -112,8 +119,8 @@ export default function App() {
                 global.elementsRendered
               );
 
-              global.log("Render result:");
-              global.log(ParentContainer.props.children);
+              // global.log("Render result:");
+              // global.log(ParentContainer.props.children);
 
               global.Render(ParentContainer, () => {
                 global._log("Render complete");
@@ -126,6 +133,8 @@ export default function App() {
               // const shadowNode = ref.current.node; // jsi::Object NativeState ShadowNodeWrapper
               const tag = ref.current.canonical.nativeTag;
               global.log("Ref current nativeTag: ", tag);
+              tagToArrayPosition[tag] = currentIndex;
+              tagToItemId[tag] = global.itemId;
 
               // cause a sync render to create the actual native view
               const start = performance.now();
@@ -134,6 +143,82 @@ export default function App() {
 
               return tag;
             });
+
+            ref.setUpdateViewCallback(
+              uiListModule,
+              (reactTag: number, index: number) => {
+                "worklet";
+                global.log(
+                  `[JS] Update view callback called for tag ${reactTag} at index ${index}`,
+                  tagToArrayPosition
+                );
+
+                const itemId = tagToItemId[reactTag];
+                if (itemId == null) {
+                  throw new Error("No itemId for tag " + reactTag);
+                }
+
+                // "Rerender the element"
+                // this really means creating the elements with the same structure again
+                const NewElement = global.React.createElement(
+                  "RCTView",
+                  {
+                    key: "itemid-" + itemId,
+                    // ref, // TODO: i hope this is cool?
+                    collapsable: false,
+                    width: 100,
+                    height: 100,
+                    marginBottom: 10,
+                    marginLeft: 10,
+                    backgroundColor: colorRedProcessed,
+                  },
+                  [
+                    global.React.createElement(
+                      "RCTText",
+                      {
+                        key: "childid-" + itemId,
+                        backgroundColor: colorGreenProcessed,
+                      },
+                      [
+                        global.React.createElement("RCTRawText", {
+                          key: "rawtextid-" + index,
+                          text: "Item #" + index,
+                        }),
+                      ]
+                    ),
+                  ]
+                );
+
+                // Update the new element in the global array
+                const position = tagToArrayPosition[reactTag];
+                if (position == null) {
+                  throw new Error("No position for tag " + reactTag);
+                }
+                global.elementsRendered[position] = NewElement;
+
+                // Update the parent container
+                const ParentContainer = global.React.createElement(
+                  "RCTView",
+                  {},
+                  global.elementsRendered
+                );
+
+                global.Render(ParentContainer, () => {
+                  global._log("Update Render complete");
+                });
+
+                // Cause a sync render to update the actual native view
+                const start = performance.now();
+                renderSync();
+                global.log(
+                  "Update renderSync took ",
+                  performance.now() - start,
+                  "ms"
+                );
+
+                return true;
+              }
+            );
           });
         })}
       />

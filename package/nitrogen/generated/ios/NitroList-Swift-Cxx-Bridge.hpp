@@ -73,6 +73,29 @@ namespace margelo::nitro::nitrolist::bridge::swift {
     return Func_double_Wrapper(std::move(value));
   }
   
+  // pragma MARK: std::function<bool(double /* reactTag */, double /* index */)>
+  /**
+   * Specialized version of `std::function<bool(double, double)>`.
+   */
+  using Func_bool_double_double = std::function<bool(double /* reactTag */, double /* index */)>;
+  /**
+   * Wrapper class for a `std::function<bool(double / * reactTag * /, double / * index * /)>`, this can be used from Swift.
+   */
+  class Func_bool_double_double_Wrapper final {
+  public:
+    explicit Func_bool_double_double_Wrapper(std::function<bool(double /* reactTag */, double /* index */)>&& func): _function(std::make_unique<std::function<bool(double /* reactTag */, double /* index */)>>(std::move(func))) {}
+    inline bool call(double reactTag, double index) const noexcept {
+      auto __result = _function->operator()(reactTag, index);
+      return __result;
+    }
+  private:
+    std::unique_ptr<std::function<bool(double /* reactTag */, double /* index */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_bool_double_double create_Func_bool_double_double(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_bool_double_double_Wrapper wrap_Func_bool_double_double(Func_bool_double_double value) noexcept {
+    return Func_bool_double_double_Wrapper(std::move(value));
+  }
+  
   // pragma MARK: std::shared_ptr<HybridUiListViewSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridUiListViewSpec>`.

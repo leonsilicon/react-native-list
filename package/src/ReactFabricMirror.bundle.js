@@ -12785,9 +12785,10 @@ var HostConfig = {
     return false;
   },
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
-    log("[cloneInstance]");
+    log("[cloneInstance] tag=", instance.canonical.nativeTag);
     const viewConfig = instance.canonical.viewConfig;
     const updatePayload = diffAttributePayloads(oldProps, newProps, viewConfig.validAttributes);
+    log("[cloneInstance] updatePayload=", updatePayload);
     instance.canonical.currentProps = newProps;
     const node = instance.node;
     let clone;

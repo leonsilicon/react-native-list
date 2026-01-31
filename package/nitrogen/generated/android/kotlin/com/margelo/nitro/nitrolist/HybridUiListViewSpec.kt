@@ -53,6 +53,15 @@ abstract class HybridUiListViewSpec: HybridView() {
     val __result = setMakeNativeViewCallback(uiListModule, callback)
     return __result
   }
+  
+  abstract fun setUpdateViewCallback(uiListModule: HybridUiListModuleSpec, callback: (reactTag: Double, index: Double) -> Boolean): Unit
+  
+  @DoNotStrip
+  @Keep
+  private fun setUpdateViewCallback_cxx(uiListModule: HybridUiListModuleSpec, callback: Func_bool_double_double): Unit {
+    val __result = setUpdateViewCallback(uiListModule, callback)
+    return __result
+  }
 
   private external fun initHybrid(): HybridData
 

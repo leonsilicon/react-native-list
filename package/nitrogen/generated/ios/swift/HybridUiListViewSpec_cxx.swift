@@ -146,6 +146,27 @@ open class HybridUiListViewSpec_cxx {
     }
   }
   
+  @inline(__always)
+  public final func setUpdateViewCallback(uiListModule: bridge.std__shared_ptr_HybridUiListModuleSpec_, callback: bridge.Func_bool_double_double) -> bridge.Result_void_ {
+    do {
+      try self.__implementation.setUpdateViewCallback(uiListModule: { () -> HybridUiListModuleSpec in
+        let __unsafePointer = bridge.get_std__shared_ptr_HybridUiListModuleSpec_(uiListModule)
+        let __instance = HybridUiListModuleSpec_cxx.fromUnsafe(__unsafePointer)
+        return __instance.getHybridUiListModuleSpec()
+      }(), callback: { () -> (Double, Double) -> Bool in
+        let __wrappedFunction = bridge.wrap_Func_bool_double_double(callback)
+        return { (__reactTag: Double, __index: Double) -> Bool in
+          let __result = __wrappedFunction.call(__reactTag, __index)
+          return __result
+        }
+      }())
+      return bridge.create_Result_void_()
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_void_(__exceptionPtr)
+    }
+  }
+  
   public final func getView() -> UnsafeMutableRawPointer {
     return Unmanaged.passRetained(__implementation.view).toOpaque()
   }

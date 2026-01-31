@@ -4,15 +4,18 @@ import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
 
+typealias MakeViewCallbackType = () -> Double
+typealias UpdateViewCallbackType = (reactTag: Double, index: Double) -> Boolean
 class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewSpec() {
-    private var _callback: (() -> Double)? = null
+
+    private var makeViewCallback: MakeViewCallbackType? = null
+    private var updateViewCallback: UpdateViewCallbackType? = null
     private var adapter: SimpleAdapter? = null
 
     override val view: RecyclerView by lazy {
@@ -28,7 +31,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
 
     private fun makeView(): View {
         val capturedCallback =
-            this._callback ?: throw IllegalStateException("MakeNativeViewCallback is not set!")
+            this.makeViewCallback ?: throw IllegalStateException("MakeNativeViewCallback is not set!")
 
         val viewTag = capturedCallback().toInt()
 
@@ -54,12 +57,28 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
         return resolvedView
     }
 
-    override fun setMakeNativeViewCallback(uiListModule: HybridUiListModuleSpec, callback: () -> Double) {
-        this._callback = callback
+    override fun setMakeNativeViewCallback(uiListModule: HybridUiListModuleSpec, callback: MakeViewCallbackType) {
+        this.makeViewCallback = callback
+    }
 
+    override fun setUpdateViewCallback(
+        uiListModule: HybridUiListModuleSpec,
+        callback: UpdateViewCallbackType
+    ) {
+        this.updateViewCallback = callback
+
+        // Do this here, because right now in JS this is called after setMakeNativeViewCallback
+        // and we need to have both callbacks set before we can create the adapter.
+        // TODO: improve this logic
         adapter = SimpleAdapter(
-            itemCount = 30,
-            createView = { makeView() }
+            itemCount = 10_000,
+            createView = { makeView() }, // todo, we really can't pass lambdas directly? or maybe its because its nullable
+            updateView = { reactTag, index ->
+                val capturedCallback =
+                    this.updateViewCallback
+                        ?: throw IllegalStateException("UpdateViewCallback is not set!")
+                capturedCallback(reactTag, index)
+            }
         )
         view.adapter = adapter
         view.adapter?.notifyDataSetChanged()
@@ -68,13 +87,14 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
 
     private class SimpleAdapter(
         private val itemCount: Int,
-        private val createView: () -> View
+        private val createView: () -> View,
+        private val updateView: (reactTag: Double, index: Double) -> Boolean
     ) : RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            var item = createView()
+            val item = createView()
             // Ensure the view has proper RecyclerView layout params
             item.layoutParams = ViewGroup.MarginLayoutParams(
                 item.measuredWidth,
@@ -82,22 +102,16 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
             ).also {
                 it.bottomMargin = 40
             }
-//            val item = View(parent.context)
-//            item.layoutParams = RecyclerView.LayoutParams(
-//                400,
-//                400
-//            )
-//            // set blue bg color
-//            item.setBackgroundColor(Color.BLUE)
+
             Log.d("HybridUiListView", "onCreateViewHolder: view size ${item.measuredWidth}x${item.measuredHeight}, layoutParams=${item.layoutParams}")
             return ViewHolder(item)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//            holder.container.removeAllViews()
-//            val childView = createView()
-//            holder.container.addView(childView)
-            Log.d("HybridUiListView", "Bound view at position $position")
+            val view = holder.itemView
+            val reactTag = view.id
+            val success = updateView(reactTag.toDouble(), position.toDouble())
+            Log.d("HybridUiListView", "onBindViewHolder($position)=$success")
         }
 
         override fun getItemCount(): Int = itemCount
