@@ -186,11 +186,17 @@ const HostConfig = {
             updatePayload
           )
         } else {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node, newChildSet)
+          clone = nativeFabricUIManager.cloneNodeWithNewChildren(
+            node,
+            newChildSet
+          )
         }
       } else {
         if (updatePayload !== null) {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(node, updatePayload)
+          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(
+            node,
+            updatePayload
+          )
         } else {
           clone = nativeFabricUIManager.cloneNodeWithNewChildren(node)
         }
@@ -200,6 +206,27 @@ const HostConfig = {
     return {
       node: clone,
       canonical: instance.canonical,
+    }
+  },
+  createTextInstance(
+    text,
+    rootContainerInstance,
+    hostContext,
+    internalInstanceHandle
+  ) {
+    const tag = global.nextReactTag
+    global.nextReactTag += 2
+
+    const node = nativeFabricUIManager.createNode(
+      tag, // reactTag
+      'RCTRawText', // viewName
+      rootContainerInstance.containerTag, // rootTag
+      { text: text }, // props
+      internalInstanceHandle // instance handle
+    )
+
+    return {
+      node: node,
     }
   },
   createContainerChildSet() {

@@ -45,6 +45,9 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
         if (resolvedView.parent != null)
             throw IllegalStateException("View with tag $viewTag still has a parent after removing!")
 
+        // TODO: its a bit of a memory waste, that we have to create empty views here.
+        // Maybe the parent element that holds the list item can be a special view where we overwrite the
+        // addViewAt, removeViewAt updateProps, etc. methods to bind to the moved native view directly.
         parent.addView(View(reactContext), index)
 
         Log.d("HybridUiListView", "Resolved view with tag $viewTag, size ${resolvedView.measuredWidth}x${resolvedView.measuredHeight}")
@@ -55,7 +58,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
         this._callback = callback
 
         adapter = SimpleAdapter(
-            itemCount = 10_000,
+            itemCount = 30,
             createView = { makeView() }
         )
         view.adapter = adapter

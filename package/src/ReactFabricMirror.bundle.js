@@ -12817,6 +12817,14 @@ var HostConfig = {
       canonical: instance.canonical
     };
   },
+  createTextInstance(text, rootContainerInstance, hostContext, internalInstanceHandle) {
+    const tag = global.nextReactTag;
+    global.nextReactTag += 2;
+    const node = nativeFabricUIManager.createNode(tag, "RCTRawText", rootContainerInstance.containerTag, { text }, internalInstanceHandle);
+    return {
+      node
+    };
+  },
   createContainerChildSet() {
     log("[createContainerChildSet]");
     return nativeFabricUIManager.createChildSet();

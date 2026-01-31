@@ -1,5 +1,11 @@
 import { useRef } from "react";
-import { processColor, SafeAreaView, Text, useWindowDimensions, View } from "react-native";
+import {
+  processColor,
+  SafeAreaView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import {
   renderSync,
   setup,
@@ -17,6 +23,11 @@ setup(); // TODO: put that in library somewhere
 
 const colorRedProcessed = processColor("red");
 const colorGreenProcessed = processColor("green");
+
+const data = Array.from({ length: 10_000 }).map((_, index) => ({
+  id: index.toString(),
+  title: `Item #${index}`,
+}));
 
 let isSetup = false;
 export default function App() {
@@ -52,6 +63,8 @@ export default function App() {
               "Setting makeNativeViewCallback on UiListView on",
               typeof ref.setMakeNativeViewCallback
             );
+
+            // TODO: can we enable this somehow as a prop?
             ref.setMakeNativeViewCallback(uiListModule, () => {
               "worklet";
 
@@ -70,12 +83,21 @@ export default function App() {
                   backgroundColor: colorRedProcessed,
                 },
                 [
-                  global.React.createElement("RCTView", {
-                    key: "childid-" + global.itemId,
-                    width: 50,
-                    height: 50,
-                    backgroundColor: colorGreenProcessed,
-                  }),
+                  global.React.createElement(
+                    "RCTText",
+                    {
+                      key: "childid-" + global.itemId,
+                      // width: 50,
+                      // height: 50,
+                      backgroundColor: colorGreenProcessed,
+                    },
+                    [
+                      global.React.createElement("RCTRawText", {
+                        key: "rawtextid-" + global.itemId,
+                        text: "Item #" + global.itemId,
+                      }),
+                    ]
+                  ),
                 ]
               );
               global.log("Test element created: ", NewElement);
@@ -84,15 +106,13 @@ export default function App() {
               }
               global.elementsRendered.push(NewElement);
 
-
               const ParentContainer = global.React.createElement(
                 "RCTView",
-                {
-                },
+                {},
                 global.elementsRendered
               );
 
-              global.log("Render result:")
+              global.log("Render result:");
               global.log(ParentContainer.props.children);
 
               global.Render(ParentContainer, () => {
