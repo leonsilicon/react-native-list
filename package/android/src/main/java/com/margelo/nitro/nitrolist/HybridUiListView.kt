@@ -38,11 +38,18 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
         val view = fabricUiManager.resolveView(viewTag)
             ?: throw IllegalStateException("Could not resolve view with tag $viewTag!")
 
-        (view.parent as? ViewGroup)?.removeView(view)
-        if (view.parent != null) {
-            throw IllegalStateException("View with tag $viewTag still has a parent!")
-        }
+        val parent = view.parent as? ViewGroup
+            ?: throw IllegalStateException("View with tag $viewTag still has a parent!")
+        val index = parent.indexOfChild(view)
+        parent.removeViewAt(index)
+        if (view.parent != null)
+            throw IllegalStateException("View with tag $viewTag still has a parent after removing from parent!")
 
+        // Right now we render the items as a list of children in a parent view
+        // So when removing view at index 0, and then try to add a new view at index 1 it would fail
+        parent.addView(View(reactContext), index)
+
+        Log.d("HybridUiListView", "Successfully resolved view with tag $viewTag, size ${view.measuredWidth}x${view.measuredHeight}")
         // Now we can use that view on our own muhahaha
         return view
     }
@@ -53,10 +60,10 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
 
         val testView1 = makeView()
 //        Log.d("HybridUiListView", "View to insert into size ${view.measuredWidth}x${view.measuredHeight}, testView size ${testView.measuredWidth}x${testView.measuredHeight}")
-        val testView2 = makeView()
         view.addView(testView1)
 
+        val testView2 = makeView()
         // TODO: figure out how to render multiple items, right now only one works and it tries to replace that one lol
-//        view.addView(testView2)
+        view.addView(testView2)
     }
 }

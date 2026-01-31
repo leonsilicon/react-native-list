@@ -56,9 +56,11 @@ export default function App() {
               "worklet";
 
               const ref = global.React.createRef();
-              const Test = global.React.createElement(
+              global.itemId = (global.itemId ?? 0) + 1;
+              const NewElement = global.React.createElement(
                 "RCTView",
                 {
+                  key: "itemid-" + global.itemId,
                   ref,
                   collapsable: false,
                   width: 100,
@@ -68,16 +70,31 @@ export default function App() {
                 // TODO: currently this causes the renderer to never finish…?
                 [
                   global.React.createElement("RCTView", {
-                    key: "child1",
+                    key: "childid-" + global.itemId,
                     width: 50,
                     height: 50,
                     backgroundColor: colorGreenProcessed,
                   }),
                 ]
               );
-              global.log("Test element created: ", Test);
+              global.log("Test element created: ", NewElement);
+              if (global.elementsRendered == null) {
+                global.elementsRendered = [];
+              }
+              global.elementsRendered.push(NewElement);
 
-              global.Render(Test, () => {
+
+              const ParentContainer = global.React.createElement(
+                "RCTView",
+                {
+                },
+                global.elementsRendered
+              );
+
+              global.log("Render result:")
+              global.log(ParentContainer.props.children);
+
+              global.Render(ParentContainer, () => {
                 global._log("Render complete");
               });
 

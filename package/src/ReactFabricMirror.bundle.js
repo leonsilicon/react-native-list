@@ -12700,7 +12700,10 @@ var require_react2 = __commonJS((exports2, module2) => {
 
 // src/ReactFabricMirror.js
 var Reconciler = require_react_reconciler();
-var { create: createAttributePayload } = (init_ReactNativeAttributePayload(), __toCommonJS(exports_ReactNativeAttributePayload));
+var {
+  create: createAttributePayload,
+  diff: diffAttributePayloads
+} = (init_ReactNativeAttributePayload(), __toCommonJS(exports_ReactNativeAttributePayload));
 global.rootHostContext = {};
 global.childHostContext = {};
 var {
@@ -12736,15 +12739,11 @@ var HostConfig = {
   },
   supportsPersistence: true,
   createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
-    log("[createInstnace] debugA");
     const tag = global.nextReactTag;
     global.nextReactTag += 2;
-    log("[createInstnace] debugB");
     const viewConfig = new Proxy({}, {
       get: (target, prop) => {
-        log("[createInstance] ValidAttributes proxy get for prop=", prop);
         if (prop === "children" || prop === "ref") {
-          log("[createInstance] ValidAttributes proxy returning false for prop=", prop);
           return;
         }
         if (prop === "style") {
@@ -12757,7 +12756,6 @@ var HostConfig = {
         return true;
       }
     });
-    log("[createInstance] viewConfig proxy created, test, viewConfig.test=", viewConfig.test);
     const updatePayload = createAttributePayload(newProps, viewConfig);
     let node;
     try {
@@ -12774,6 +12772,7 @@ var HostConfig = {
       node,
       canonical: {
         nativeTag: tag,
+        viewConfig,
         currentProps: newProps,
         internalInstanceHandle: workInProgress,
         publicInstance: null,
@@ -12787,7 +12786,36 @@ var HostConfig = {
   },
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
     log("[cloneInstance]");
-    return instance;
+    const viewConfig = instance.canonical.viewConfig;
+    const updatePayload = diffAttributePayloads(oldProps, newProps, viewConfig.validAttributes);
+    instance.canonical.currentProps = newProps;
+    const node = instance.node;
+    let clone;
+    if (keepChildren) {
+      if (updatePayload !== null) {
+        clone = nativeFabricUIManager.cloneNodeWithNewProps(node, updatePayload);
+      } else {
+        return instance;
+      }
+    } else {
+      if (newChildSet != null) {
+        if (updatePayload !== null) {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(node, newChildSet, updatePayload);
+        } else {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node, newChildSet);
+        }
+      } else {
+        if (updatePayload !== null) {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(node, updatePayload);
+        } else {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node);
+        }
+      }
+    }
+    return {
+      node: clone,
+      canonical: instance.canonical
+    };
   },
   createContainerChildSet() {
     log("[createContainerChildSet]");

@@ -4,7 +4,10 @@ const Reconciler = require('react-reconciler')
 //   diffAttributePayloads,
 // } = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface');
 
-const {create: createAttributePayload} = require("react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload")
+const {
+  create: createAttributePayload,
+  diff: diffAttributePayloads,
+} = require('react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload')
 
 global.rootHostContext = {}
 global.childHostContext = {}
@@ -64,7 +67,7 @@ const HostConfig = {
     _currentHostContext,
     workInProgress
   ) => {
-    // try { 
+    // try {
     //   const viewConfig = global.rnViewConfigs.get(type);
     //   log('[createInstance] viewConfig=', viewConfig);
     // } catch (e) {
@@ -72,11 +75,10 @@ const HostConfig = {
     //   throw e
     // }
 
-
-    log('[createInstnace] debugA')
+    // log('[createInstnace] debugA')
     const tag = global.nextReactTag
     global.nextReactTag += 2
-    log('[createInstnace] debugB')
+    // log('[createInstnace] debugB')
 
     // TODO:
 
@@ -88,28 +90,31 @@ const HostConfig = {
     //     }
     //   }
 
-    const viewConfig = new Proxy({}, {
-          get: (target, prop) => {
-            log('[createInstance] ValidAttributes proxy get for prop=', prop)
-            if (prop === 'children' || prop === 'ref') {
-              log('[createInstance] ValidAttributes proxy returning false for prop=', prop)
-              return undefined;
-            }
-            if (prop === 'style') {
-              return new Proxy({}, {
+    const viewConfig = new Proxy(
+      {},
+      {
+        get: (target, prop) => {
+          // log('[createInstance] ValidAttributes proxy get for prop=', prop)
+          if (prop === 'children' || prop === 'ref') {
+            // log('[createInstance] ValidAttributes proxy returning false for prop=', prop)
+            return undefined
+          }
+          if (prop === 'style') {
+            return new Proxy(
+              {},
+              {
                 get: (target, styleProp) => {
-                  return true;
+                  return true
                 },
-              });
-            }
-            return true;
-          },
-        })
-        log('[createInstance] viewConfig proxy created, test, viewConfig.test=', viewConfig.test)
-      const updatePayload = createAttributePayload(
-        newProps,
-        viewConfig,
-      );
+              }
+            )
+          }
+          return true
+        },
+      }
+    )
+    // log('[createInstance] viewConfig proxy created, test, viewConfig.test=', viewConfig.test)
+    const updatePayload = createAttributePayload(newProps, viewConfig)
 
     let node
     try {
@@ -120,7 +125,6 @@ const HostConfig = {
         type, // viewName
         rootContainerInstance.containerTag, // rootTag
         updatePayload, // props
-        // TODO: problem, right now either nitro or worklets is crashing here as it tries to convert to a JSIDynamic
         workInProgress // internalInstanceHandle
       )
       log('[createInstance] node=', node)
@@ -135,7 +139,7 @@ const HostConfig = {
       node: node,
       canonical: {
         nativeTag: tag,
-        //   viewConfig, // TODO: is this needed? for what
+        viewConfig, // TODO: is this needed? for what
         currentProps: newProps, // funny, react is passing here props instead of updatePayload, is this okay?
         internalInstanceHandle: workInProgress,
         publicInstance: null,
@@ -151,9 +155,52 @@ const HostConfig = {
 
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
     log('[cloneInstance]')
-    // TODO: implement
 
-    return instance
+    const viewConfig = instance.canonical.viewConfig
+    const updatePayload = diffAttributePayloads(
+      oldProps,
+      newProps,
+      viewConfig.validAttributes
+    )
+    // TODO: If the event handlers have changed, we need to update the current props
+    // in the commit phase but there is no host config hook to do it yet.
+    // So instead we hack it by updating it in the render phase.
+    instance.canonical.currentProps = newProps
+
+    const node = instance.node
+    let clone
+    if (keepChildren) {
+      if (updatePayload !== null) {
+        clone = nativeFabricUIManager.cloneNodeWithNewProps(node, updatePayload)
+      } else {
+        // No changes
+        return instance
+      }
+    } else {
+      // If passChildrenWhenCloningPersistedNodes is enabled, children will be non-null
+      if (newChildSet != null) {
+        if (updatePayload !== null) {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(
+            node,
+            newChildSet,
+            updatePayload
+          )
+        } else {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node, newChildSet)
+        }
+      } else {
+        if (updatePayload !== null) {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(node, updatePayload)
+        } else {
+          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node)
+        }
+      }
+    }
+
+    return {
+      node: clone,
+      canonical: instance.canonical,
+    }
   },
   createContainerChildSet() {
     log('[createContainerChildSet]')
@@ -337,4 +384,7 @@ global.Render = function (element, callback) {
   Renderer.flushSyncWork()
   log('[ReactFabricMirror] updateContainer finished')
 }
-log('[ReactFabricMirror] ReactFabricMirror initialized', typeof global.React.createRef)
+log(
+  '[ReactFabricMirror] ReactFabricMirror initialized',
+  typeof global.React.createRef
+)
