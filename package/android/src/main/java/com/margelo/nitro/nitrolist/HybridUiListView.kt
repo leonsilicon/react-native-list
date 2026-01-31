@@ -4,66 +4,99 @@ import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.core.view.marginBottom
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
 
 class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewSpec() {
     private var _callback: (() -> Double)? = null
+    private var adapter: SimpleAdapter? = null
 
-    // TODO: implement the actual view
-    override val view: LinearLayout by lazy {
-            // Create a new LinearLayout with MATCH_PARENT params
-            LinearLayout(reactContext).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                setBackgroundColor(Color.BLUE)
-            }
+    override val view: RecyclerView by lazy {
+        RecyclerView(reactContext).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            layoutManager = LinearLayoutManager(reactContext)
+            setBackgroundColor(Color.GRAY)
         }
+    }
 
-    fun makeView(): View {
+    private fun makeView(): View {
         val capturedCallback =
             this._callback ?: throw IllegalStateException("MakeNativeViewCallback is not set!")
 
-        // The callback will render a view to our custom surface
         val viewTag = capturedCallback().toInt()
 
-        // We can now get it from there (i think, lets see)
         val fabricUiManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC)
             ?: throw IllegalStateException("Fabric UIManager is null! Is the Fabric architecture enabled?")
 
-        val view = fabricUiManager.resolveView(viewTag)
+        val resolvedView = fabricUiManager.resolveView(viewTag)
             ?: throw IllegalStateException("Could not resolve view with tag $viewTag!")
 
-        val parent = view.parent as? ViewGroup
-            ?: throw IllegalStateException("View with tag $viewTag still has a parent!")
-        val index = parent.indexOfChild(view)
+        val parent = resolvedView.parent as? ViewGroup
+            ?: throw IllegalStateException("View with tag $viewTag has no parent!")
+        val index = parent.indexOfChild(resolvedView)
         parent.removeViewAt(index)
-        if (view.parent != null)
-            throw IllegalStateException("View with tag $viewTag still has a parent after removing from parent!")
+        if (resolvedView.parent != null)
+            throw IllegalStateException("View with tag $viewTag still has a parent after removing!")
 
-        // Right now we render the items as a list of children in a parent view
-        // So when removing view at index 0, and then try to add a new view at index 1 it would fail
         parent.addView(View(reactContext), index)
 
-        Log.d("HybridUiListView", "Successfully resolved view with tag $viewTag, size ${view.measuredWidth}x${view.measuredHeight}")
-        // Now we can use that view on our own muhahaha
-        return view
+        Log.d("HybridUiListView", "Resolved view with tag $viewTag, size ${resolvedView.measuredWidth}x${resolvedView.measuredHeight}")
+        return resolvedView
     }
 
-    // Note: to be called on the UI thread
     override fun setMakeNativeViewCallback(uiListModule: HybridUiListModuleSpec, callback: () -> Double) {
         this._callback = callback
 
-        val testView1 = makeView()
-//        Log.d("HybridUiListView", "View to insert into size ${view.measuredWidth}x${view.measuredHeight}, testView size ${testView.measuredWidth}x${testView.measuredHeight}")
-        view.addView(testView1)
+        adapter = SimpleAdapter(
+            itemCount = 10_000,
+            createView = { makeView() }
+        )
+        view.adapter = adapter
+        view.adapter?.notifyDataSetChanged()
+        Log.d("HybridUiListView", "Set MakeNativeViewCallback and updated adapter")
+    }
 
-        val testView2 = makeView()
-        // TODO: figure out how to render multiple items, right now only one works and it tries to replace that one lol
-        view.addView(testView2)
+    private class SimpleAdapter(
+        private val itemCount: Int,
+        private val createView: () -> View
+    ) : RecyclerView.Adapter<SimpleAdapter.ViewHolder>() {
+
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            var item = createView()
+            // Ensure the view has proper RecyclerView layout params
+            item.layoutParams = ViewGroup.MarginLayoutParams(
+                item.measuredWidth,
+                item.measuredHeight
+            ).also {
+                it.bottomMargin = 40
+            }
+//            val item = View(parent.context)
+//            item.layoutParams = RecyclerView.LayoutParams(
+//                400,
+//                400
+//            )
+//            // set blue bg color
+//            item.setBackgroundColor(Color.BLUE)
+            Log.d("HybridUiListView", "onCreateViewHolder: view size ${item.measuredWidth}x${item.measuredHeight}, layoutParams=${item.layoutParams}")
+            return ViewHolder(item)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+//            holder.container.removeAllViews()
+//            val childView = createView()
+//            holder.container.addView(childView)
+            Log.d("HybridUiListView", "Bound view at position $position")
+        }
+
+        override fun getItemCount(): Int = itemCount
     }
 }

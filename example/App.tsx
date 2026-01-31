@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { processColor, Text, useWindowDimensions, View } from "react-native";
+import { processColor, SafeAreaView, Text, useWindowDimensions, View } from "react-native";
 import {
   renderSync,
   setup,
@@ -33,7 +33,7 @@ export default function App() {
         alignItems: "center",
       }}
     >
-      <Text>Worklet Test</Text>
+      {/* <Text>Worklet Test</Text> */}
       <UiList
         style={{
           flex: 1,
@@ -65,6 +65,8 @@ export default function App() {
                   collapsable: false,
                   width: 100,
                   height: 100,
+                  marginBottom: 10,
+                  marginLeft: 10,
                   backgroundColor: colorRedProcessed,
                 },
                 // TODO: currently this causes the renderer to never finish…?

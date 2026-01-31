@@ -144,5 +144,8 @@ dependencies {
 
   // Add a dependency on NitroModules
   implementation project(":react-native-nitro-modules")
+
+  // RecyclerView
+  implementation "androidx.recyclerview:recyclerview:1.4.0"
 }
 
