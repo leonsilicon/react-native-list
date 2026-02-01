@@ -38,6 +38,8 @@ export { ViewHolder } from './specs/ViewHolder.nitro'
 
 // @ts-expect-error shrug
 import { setupWorklet } from './ReactFabricMirror.bundle'
+import { BoxedHybridObject, NitroModules } from 'react-native-nitro-modules'
+import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 
 // const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
 // scheduleOnUI(() => {
@@ -68,17 +70,19 @@ export function setup() {
   //   global.rnViewConfigs = copyConfigs
   // })
 
-  console.log(setupWorklet)
   scheduleOnUI(setupWorklet)
 }
 
+// TODO: this import doesn't work right now in bundle mode :/
 // @ts-expect-error
 const capturedOnJS = global.nativeFabricUIManager
+let uiManagerHelperBoxed: BoxedHybridObject<UiManagerHelper> = NitroModules.box(uiManagerHelper)
 export function renderSync() {
   // todo: we might have to pass uiManagerHelper here, or consume from global?
   'worklet'
 
-  uiManagerHelper.renderSync(capturedOnJS)
+  const uiManagerHelperUnboxed = uiManagerHelperBoxed.unbox()
+  uiManagerHelperUnboxed.renderSync(capturedOnJS)
 }
 
 export { uiListModule, uiManagerHelper, UiList }

@@ -7,8 +7,12 @@ const res = await Bun.build({
   naming: 'ReactFabricMirror.bundle.js',
   format: 'cjs',
   plugins: [stripFlowPlugin],
-  banner: `export function setupWorklet() {
-  "worklet";
+  banner: `
+  const capturedManager = nativeFabricUIManager;
+  
+  export function setupWorklet() {
+    "worklet";
+  global.nativeFabricUIManager = capturedManager;
   var IS_REACT_ACT_ENVIRONMENT = false;
   var reportError = console.error;
   var MessageChannel = undefined;

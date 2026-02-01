@@ -1,20 +1,29 @@
 import React, { useRef } from "react";
+import { processColor, useWindowDimensions, View } from "react-native";
 import {
-  processColor,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import {
-  renderSync,
+  // renderSync,
   setup,
   UiList,
   uiListModule,
+  uiManagerHelper,
 } from "react-native-nitro-list";
-import {
-  type UiListView,
-} from "react-native-nitro-list/src/specs/UiListView.nitro";
-import { callback } from "react-native-nitro-modules";
+import { type UiListView } from "react-native-nitro-list/src/specs/UiListView.nitro";
+import { callback, NitroModules } from "react-native-nitro-modules";
 import { scheduleOnUI } from "react-native-worklets";
+
+// TODO: in bundle mode i can't move this to an import, as it would try
+// to import the whole file, which tries to use NitroModules., which will
+// crash as nitro modules can't init.
+// Either I have to fix this, _or_, actually create NitroModules on the UI runtime.
+const uiListModuleBoxed = NitroModules.box(uiListModule);
+const capturedOnJS = global.nativeFabricUIManager;
+const uiManagerHelperBoxed = NitroModules.box(uiManagerHelper);
+
+function renderSync() {
+  "worklet";
+  const uiManagerHelperUnboxed = uiManagerHelperBoxed.unbox();
+  uiManagerHelperUnboxed.renderSync(capturedOnJS);
+}
 
 setup(); // TODO: put that in library somewhere
 
@@ -66,8 +75,10 @@ export default function App() {
             const tagToItemId: Record<number, number> = {};
             global.tagToItemId = tagToItemId;
 
+            const uiListModuleUnboxed = uiListModuleBoxed.unbox();
+
             // TODO: can we enable this somehow as a prop?
-            ref.setMakeNativeViewCallback(uiListModule, () => {
+            ref.setMakeNativeViewCallback(uiListModuleUnboxed, () => {
               "worklet";
 
               const ref = global.React.createRef();
@@ -97,7 +108,7 @@ export default function App() {
                       global.React.createElement("RCTRawText", {
                         key: "rawtextid-" + global.itemId,
                         // text: "Item #" + global.itemId,
-                        text: ""
+                        text: "",
                       }),
                     ]
                   ),
@@ -140,10 +151,10 @@ export default function App() {
 
               return tag;
             });
-            log ("[JS] Setting updateViewCallback on UiListView");
+            global.log("[JS] Setting updateViewCallback on UiListView");
 
             ref.setUpdateViewCallback(
-              uiListModule,
+              uiListModuleUnboxed,
               (reactTag: number, index: number) => {
                 "worklet";
                 global.log(
@@ -218,7 +229,7 @@ export default function App() {
               }
             );
 
-            log("[JS] UiListView setup complete.");
+            global.log("[JS] UiListView setup complete.");
           });
         })}
       />

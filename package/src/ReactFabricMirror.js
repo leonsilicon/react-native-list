@@ -1,4 +1,11 @@
 const Reconciler = require('react-reconciler')
+
+// FabricUIManager is basically a wrapper around global.nativeFabricUIManager
+// but caches each function to avoid recreating a jsi::HostFunction on each call.
+const {getFabricUIManager} = require('react-native/Libraries/ReactNative/FabricUIManager')
+const uiManager = getFabricUIManager()
+console.log('[ReactFabricMirror] got FabricUIManager:', uiManager)
+
 // const {
 //   createAttributePayload,
 //   diffAttributePayloads,
@@ -120,7 +127,7 @@ const HostConfig = {
     try {
       log('[createInstance] calling createNode with type=', type, 'tag=', tag)
       log('[createInstance] props=', updatePayload)
-      node = nativeFabricUIManager.createNode(
+      node = uiManager.createNode(
         tag, // reactTag
         type, // viewName
         rootContainerInstance.containerTag, // rootTag
@@ -172,7 +179,7 @@ const HostConfig = {
     let clone
     if (keepChildren) {
       if (updatePayload !== null) {
-        clone = nativeFabricUIManager.cloneNodeWithNewProps(node, updatePayload)
+        clone = uiManager.cloneNodeWithNewProps(node, updatePayload)
       } else {
         // No changes
         return instance
@@ -181,25 +188,25 @@ const HostConfig = {
       // If passChildrenWhenCloningPersistedNodes is enabled, children will be non-null
       if (newChildSet != null) {
         if (updatePayload !== null) {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(
+          clone = uiManager.cloneNodeWithNewChildrenAndProps(
             node,
             newChildSet,
             updatePayload
           )
         } else {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildren(
+          clone = uiManager.cloneNodeWithNewChildren(
             node,
             newChildSet
           )
         }
       } else {
         if (updatePayload !== null) {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildrenAndProps(
+          clone = uiManager.cloneNodeWithNewChildrenAndProps(
             node,
             updatePayload
           )
         } else {
-          clone = nativeFabricUIManager.cloneNodeWithNewChildren(node)
+          clone = uiManager.cloneNodeWithNewChildren(node)
         }
       }
     }
@@ -218,7 +225,7 @@ const HostConfig = {
     const tag = global.nextReactTag
     global.nextReactTag += 2
 
-    const node = nativeFabricUIManager.createNode(
+    const node = uiManager.createNode(
       tag, // reactTag
       'RCTRawText', // viewName
       rootContainerInstance.containerTag, // rootTag
@@ -232,11 +239,11 @@ const HostConfig = {
   },
   createContainerChildSet() {
     log('[createContainerChildSet]')
-    return nativeFabricUIManager.createChildSet()
+    return uiManager.createChildSet()
   },
   appendChildToContainerChildSet(childSet, child) {
     log('[appendChildToContainerChildSet]')
-    nativeFabricUIManager.appendChildToSet(childSet, child.node)
+    uiManager.appendChildToSet(childSet, child.node)
   },
   finalizeContainerChildren(container, newChildren) {
     // Noop - children will be replaced in replaceContainerChildren
@@ -244,11 +251,11 @@ const HostConfig = {
   },
   appendInitialChild(parentInstance, child) {
     log('[appendInitialChild]')
-    nativeFabricUIManager.appendChild(parentInstance.node, child.node)
+    uiManager.appendChild(parentInstance.node, child.node)
   },
   replaceContainerChildren(container, newChildren) {
     log('[replaceContainerChildren]')
-    nativeFabricUIManager.completeRoot(container.containerTag, newChildren)
+    uiManager.completeRoot(container.containerTag, newChildren)
   },
 
   // TODO: hm, this could get problematic, to share event priorities between the fabric ui manager.
