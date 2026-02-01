@@ -38,5 +38,11 @@
       ]
     }
   },
+  "worklets": {
+    "staticFeatureFlags": {
+      "BUNDLE_MODE_ENABLED": true,
+      "FETCH_PREVIEW_ENABLED": true
+    }
+  },
   "private": true
 }

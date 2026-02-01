@@ -34,6 +34,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
             this.makeViewCallback ?: throw IllegalStateException("MakeNativeViewCallback is not set!")
 
         val viewTag = capturedCallback().toInt()
+        Log.d("HannoDebug", "makeView() stacktrace: ", Throwable())
 
         val fabricUiManager = UIManagerHelper.getUIManager(reactContext, UIManagerType.FABRIC)
             ?: throw IllegalStateException("Fabric UIManager is null! Is the Fabric architecture enabled?")
@@ -81,8 +82,8 @@ class HybridUiListView(val reactContext: ThemedReactContext) : HybridUiListViewS
             }
         )
         view.adapter = adapter
-        view.adapter?.notifyDataSetChanged()
-        Log.d("HybridUiListView", "Set MakeNativeViewCallback and updated adapter")
+        view.adapter!!.notifyDataSetChanged()
+//        view.requestLayout()
     }
 
     private class SimpleAdapter(

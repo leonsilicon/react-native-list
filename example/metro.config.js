@@ -14,8 +14,23 @@ const config = {
         blockList: [
             /..\/package\/node_modules\/.*/,
         ],
+    },
+    transformer: {
+        getTransformOptions: async () => ({
+            transform: {
+                experimentalImportSupport: true,
+                // Bundle mode only works with inline support
+                // See: https://github.com/software-mansion/react-native-reanimated/issues/8904
+                inlineRequires: true,
+            }
+        })
     }
 }
 
+const {
+    bundleModeMetroConfig,
+} = require('react-native-worklets/bundleMode');
 
-module.exports = mergeConfig(defaultConfig, config);
+
+module.exports = mergeConfig(defaultConfig, bundleModeMetroConfig, config);
+module.exports.transformer.getTransformOptions().then(console.log)

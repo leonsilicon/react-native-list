@@ -17,6 +17,7 @@ namespace margelo::nitro::nitrolist {
         static react::SurfaceId surfaceId = 3;
         uiManager.getShadowTreeRegistry().visit(surfaceId, [](const react::ShadowTree& shadowTree) {
             // This will immediately cause all queued mounting transactions to be processed
+            __android_log_print(ANDROID_LOG_INFO, "HybridUiManagerHelper", "Notifying delegates of updates for surfaceId %d", surfaceId);
             shadowTree.notifyDelegatesOfUpdates();
         });
     }

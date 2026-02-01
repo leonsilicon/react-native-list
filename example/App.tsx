@@ -1,8 +1,6 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import {
   processColor,
-  SafeAreaView,
-  Text,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -13,11 +11,10 @@ import {
   uiListModule,
 } from "react-native-nitro-list";
 import {
-  UiListView,
-  UiListViewMethods,
+  type UiListView,
 } from "react-native-nitro-list/src/specs/UiListView.nitro";
 import { callback } from "react-native-nitro-modules";
-import { runOnUI, scheduleOnUI } from "react-native-worklets";
+import { scheduleOnUI } from "react-native-worklets";
 
 setup(); // TODO: put that in library somewhere
 
@@ -59,7 +56,7 @@ export default function App() {
           scheduleOnUI(() => {
             "worklet";
 
-            console.log(
+            global.log(
               "Setting makeNativeViewCallback on UiListView on",
               typeof ref.setMakeNativeViewCallback
             );
@@ -143,6 +140,7 @@ export default function App() {
 
               return tag;
             });
+            log ("[JS] Setting updateViewCallback on UiListView");
 
             ref.setUpdateViewCallback(
               uiListModule,
@@ -219,6 +217,8 @@ export default function App() {
                 return true;
               }
             );
+
+            log("[JS] UiListView setup complete.");
           });
         })}
       />

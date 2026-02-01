@@ -28,29 +28,16 @@
  *
  */
 
-import { getHostComponent, NitroModules } from 'react-native-nitro-modules'
-import { UiListModule } from './specs/UIListModule.nitro'
-import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
-import { UiListViewMethods, UiListViewProps } from './specs/UiListView.nitro'
-import UiListViewConfig from '../nitrogen/generated/shared/json/UiListViewConfig.json'
 import { scheduleOnUI } from 'react-native-worklets'
-// @ts-expect-error shrug
-import { setupWorklet } from './ReactFabricMirror.bundle'
+import { uiListModule } from './UiListModule'
+import { uiManagerHelper } from './UiManagerHelper'
+import { UiList } from './UiList'
 
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
 
-const {
-  ReactNativeViewConfigRegistry,
-  // deepFreezeAndThrowOnMutationInDev,
-  // createPublicInstance,
-  // createPublicTextInstance,
-  createAttributePayload,
-  diffAttributePayloads,
-  // type PublicInstance as ReactNativePublicInstance,
-  // type PublicTextInstance,
-  // type PublicRootInstance,
-} = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface');
+// @ts-expect-error shrug
+import { setupWorklet } from './ReactFabricMirror.bundle'
 
 // const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
 // scheduleOnUI(() => {
@@ -65,8 +52,6 @@ const {
 //   console.log(' - ', key, value)
 // }
 
-export const uiListModule =
-  NitroModules.createHybridObject<UiListModule>('UiListModule')
 export function setup() {
   uiListModule.setupExternalSurface()
   // const map = global.rnViewConfigs as Map<string, any> | undefined
@@ -83,21 +68,17 @@ export function setup() {
   //   global.rnViewConfigs = copyConfigs
   // })
 
+  console.log(setupWorklet)
   scheduleOnUI(setupWorklet)
 }
 
-const uiManagerHelper =
-  NitroModules.createHybridObject<UiManagerHelper>('UiManagerHelper')
-
 // @ts-expect-error
-const captured = nativeFabricUIManager
+const capturedOnJS = global.nativeFabricUIManager
 export function renderSync() {
+  // todo: we might have to pass uiManagerHelper here, or consume from global?
   'worklet'
 
-  uiManagerHelper.renderSync(captured)
+  uiManagerHelper.renderSync(capturedOnJS)
 }
 
-export const UiList = getHostComponent<UiListViewProps, UiListViewMethods>(
-  'UiListView',
-  () => UiListViewConfig
-)
+export { uiListModule, uiManagerHelper, UiList }
