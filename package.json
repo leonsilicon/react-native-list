@@ -7,7 +7,11 @@
     "package.json"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "react-native-worklets": "bundle-mode-preview"
+  },
+  "overrides": {
+    "react-native-worklets": "$react-native-worklets"
   },
   "peerDependencies": {
     "typescript": "^5"
