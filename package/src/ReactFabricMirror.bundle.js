@@ -11422,6 +11422,7 @@ var HostConfig = {
   isPrimaryRenderer: false
 };
 var Renderer = Reconciler(HostConfig);
+global.React = require("react");
 global.Render = function(element, callback) {
   if (!global.rootContainer) {
     global.rootContainer = Renderer.createContainer(global.rootInstance, 0, null, false, null, "ui-renderer", function onUncaughtError(error, info) {
