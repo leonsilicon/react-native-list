@@ -2,7 +2,9 @@ const Reconciler = require('react-reconciler')
 
 // FabricUIManager is basically a wrapper around global.nativeFabricUIManager
 // but caches each function to avoid recreating a jsi::HostFunction on each call.
-const {getFabricUIManager} = require('react-native/Libraries/ReactNative/FabricUIManager')
+const {
+  getFabricUIManager,
+} = require('react-native/Libraries/ReactNative/FabricUIManager')
 const uiManager = getFabricUIManager()
 console.log('[ReactFabricMirror] got FabricUIManager:', uiManager)
 
@@ -35,7 +37,7 @@ global.rootInstance = {
 
 function log(...args) {
   // log('[ReactFabricMirror]', ...args)
-  global._log(
+  global._log?.(
     '[ReactFabricMirror] ' +
       args
         .map((a) => {
@@ -194,10 +196,7 @@ const HostConfig = {
             updatePayload
           )
         } else {
-          clone = uiManager.cloneNodeWithNewChildren(
-            node,
-            newChildSet
-          )
+          clone = uiManager.cloneNodeWithNewChildren(node, newChildSet)
         }
       } else {
         if (updatePayload !== null) {
@@ -375,7 +374,7 @@ const HostConfig = {
 }
 
 const Renderer = Reconciler(HostConfig)
-global.React = require('react')
+// global.React = require('react')
 
 global.Render = function (element, callback) {
   if (!global.rootContainer) {
@@ -419,7 +418,4 @@ global.Render = function (element, callback) {
   Renderer.flushSyncWork()
   log('[ReactFabricMirror] updateContainer finished')
 }
-log(
-  '[ReactFabricMirror] ReactFabricMirror initialized',
-  typeof global.React.createRef
-)
+log('[ReactFabricMirror] ReactFabricMirror initialized')

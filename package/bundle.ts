@@ -7,6 +7,7 @@ const res = await Bun.build({
   naming: 'ReactFabricMirror.bundle.js',
   format: 'cjs',
   plugins: [stripFlowPlugin],
+  external: ['react'],
   banner: `
   const capturedManager = nativeFabricUIManager;
   

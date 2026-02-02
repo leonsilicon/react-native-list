@@ -7,6 +7,7 @@ const workletsPluginOptions = {
     "react-native-reanimated",
     "react-native-worklets",
     "react-native",
+    "_reactNative",
     "react-native-nitro-modules",
     "expo-modules-core",
     "expo",
