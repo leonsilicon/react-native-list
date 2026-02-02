@@ -1,7 +1,7 @@
 import React from "react";
-import { Button, processColor, Text, useWindowDimensions } from "react-native";
+import { Button, processColor, View, Text, useWindowDimensions } from "react-native";
 // TODO: right now in worklets trying to import from 'react-native' fails, and its undefined
-import View from "react-native/Libraries/Components/View/View";
+// import View from "react-native/Libraries/Components/View/View";
 // const { View } = require("react-native/Libraries/Components/View/View");
 import { scheduleOnUI } from "react-native-worklets";
 import {
@@ -13,6 +13,11 @@ import {
 import { callback, NitroModules } from "react-native-nitro-modules";
 
 setup();
+
+scheduleOnUI(() => {
+  "worklet";
+  console.log("text:", Text)
+});
 
 const colorRedProcessed = processColor("red");
 const colorGreenProcessed = processColor("green");
@@ -33,40 +38,6 @@ function renderSync() {
   uiManagerHelperUnboxed.renderSync(capturedOnJS);
 }
 
-// const capturedOnJS = global.__nativeComponentRegistry__hasComponent
-// scheduleOnUI(() => {
-//   "worklet";
-
-//   const ref = global.React.createRef();
-//   global.itemId = (global.itemId ?? 0) + 1;
-//   const NewElement = (
-//     <View
-//       key={"itemid-" + global.itemId}
-//       ref={ref}
-//       collapsable={false}
-//       style={{
-//         width: 100,
-//         height: 100,
-//         backgroundColor: colorRedProcessed,
-//       }}
-//     ></View>
-//   );
-
-//   if (global.elementsRendered == null) {
-//     global.elementsRendered = [];
-//   }
-//   const newLength = global.elementsRendered.push(NewElement);
-//   const currentIndex = newLength - 1;
-
-//   const ParentContainer = <View>{global.elementsRendered}</View>;
-
-//   global.Render(ParentContainer, () => {
-//     global._log("Render complete");
-//   });
-
-//   renderSync();
-// });
-
 export default function App() {
   const { height, width } = useWindowDimensions();
   const [count, setCount] = React.useState(0);
@@ -78,25 +49,6 @@ export default function App() {
         alignItems: "center",
       }}
     >
-      {/* <Text>React Native Nitro List Example App</Text>
-      <Button title={"Press me " + count} onPress={() => setCount(count + 1)}></Button> */}
-      {/* <UiList
-        style={{
-          flex: 1,
-          height,
-          width,
-        }}
-        hybridRef={callback((ref) => {
-          if (isSetup) return;
-          isSetup = true;
-
-          scheduleOnUI(() => {
-            "worklet";
-            const uiListModuleUnboxed = uiListModuleBoxed.unbox();
-            console.log(uiListModuleUnboxed);
-          });
-        })}
-      /> */}
       <UiList
         style={{
           flex: 1,
@@ -139,7 +91,9 @@ export default function App() {
                     height: 100,
                     backgroundColor: colorRedProcessed,
                   }}
-                ></View>
+                >
+                  <Text>Test</Text>
+                </View>
               );
 
               if (global.elementsRendered == null) {
@@ -228,7 +182,9 @@ export default function App() {
                       height: 100,
                       backgroundColor: colorRedProcessed,
                     }}
-                  ></View>
+                  >
+                    <Text>Item #{index}</Text>
+                  </View>
                 );
 
                 // Update the new element in the global array
