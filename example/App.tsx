@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, processColor, View, Text, useWindowDimensions } from "react-native";
+import { View, Text, useWindowDimensions } from "react-native";
 // TODO: right now in worklets trying to import from 'react-native' fails, and its undefined
 // import View from "react-native/Libraries/Components/View/View";
 // const { View } = require("react-native/Libraries/Components/View/View");
@@ -13,14 +13,6 @@ import {
 import { callback, NitroModules } from "react-native-nitro-modules";
 
 setup();
-
-scheduleOnUI(() => {
-  "worklet";
-  console.log("text:", Text)
-});
-
-const colorRedProcessed = processColor("red");
-const colorGreenProcessed = processColor("green");
 
 let isSetup = false;
 
@@ -89,10 +81,11 @@ export default function App() {
                   style={{
                     width: 100,
                     height: 100,
-                    backgroundColor: colorRedProcessed,
+                    backgroundColor: "red",
                   }}
                 >
                   <Text>Test</Text>
+                  {/* <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} /> */}
                 </View>
               );
 
@@ -144,35 +137,6 @@ export default function App() {
                 }
 
                 // "Rerender the element"
-                // this really means creating the elements with the same structure again
-                // const NewElement = global.React.createElement(
-                //   "RCTView",
-                //   {
-                //     key: "itemid-" + itemId,
-                //     // ref, // TODO: i hope this is cool?
-                //     collapsable: false,
-                //     width: 100,
-                //     height: 100,
-                //     marginBottom: 10,
-                //     marginLeft: 10,
-                //     backgroundColor: colorRedProcessed,
-                //   },
-                //   [
-                //     global.React.createElement(
-                //       "RCTText",
-                //       {
-                //         key: "childid-" + itemId,
-                //         backgroundColor: colorGreenProcessed,
-                //       },
-                //       [
-                //         global.React.createElement("RCTRawText", {
-                //           key: "rawtextid-" + index,
-                //           text: "Item #" + index,
-                //         }),
-                //       ]
-                //     ),
-                //   ]
-                // );
                 const NewElement = (
                   <View
                     key={"itemid-" + itemId}
@@ -180,10 +144,11 @@ export default function App() {
                     style={{
                       width: 100,
                       height: 100,
-                      backgroundColor: colorRedProcessed,
+                      backgroundColor: "red",
                     }}
                   >
                     <Text>Item #{index}</Text>
+                    {/* <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} /> */}
                   </View>
                 );
 
@@ -195,11 +160,6 @@ export default function App() {
                 global.elementsRendered[position] = NewElement;
 
                 // Update the parent container
-                // const ParentContainer = global.React.createElement(
-                //   "RCTView",
-                //   {},
-                //   global.elementsRendered
-                // );
                 const ParentContainer = <View>{global.elementsRendered}</View>;
 
                 global.Render(ParentContainer, () => {

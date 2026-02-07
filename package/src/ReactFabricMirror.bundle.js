@@ -11,35 +11,7 @@
   var AbortController = undefined;
 
     
-var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __moduleCache = /* @__PURE__ */ new WeakMap;
-var __toCommonJS = (from) => {
-  var entry = __moduleCache.get(from), desc;
-  if (entry)
-    return entry;
-  entry = __defProp({}, "__esModule", { value: true });
-  if (from && typeof from === "object" || typeof from === "function")
-    __getOwnPropNames(from).map((key) => !__hasOwnProp.call(entry, key) && __defProp(entry, key, {
-      get: () => from[key],
-      enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
-    }));
-  __moduleCache.set(from, entry);
-  return entry;
-};
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, {
-      get: all[name],
-      enumerable: true,
-      configurable: true,
-      set: (newValue) => all[name] = () => newValue
-    });
-};
-var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 
 // ../node_modules/scheduler/cjs/scheduler.development.js
 var require_scheduler_development = __commonJS((exports2) => {
@@ -10758,438 +10730,419 @@ var require_react_reconciler = __commonJS((exports2, module2) => {
   }
 });
 
+// ../node_modules/@babel/runtime/helpers/interopRequireDefault.js
+var require_interopRequireDefault = __commonJS((exports2, module2) => {
+  function _interopRequireDefault(e) {
+    return e && e.__esModule ? e : {
+      default: e
+    };
+  }
+  module2.exports = _interopRequireDefault, module2.exports.__esModule = true, module2.exports["default"] = module2.exports;
+});
+
 // ../node_modules/react-native/Libraries/Utilities/defineLazyObjectProperty.js
-function defineLazyObjectProperty(object, name, descriptor) {
-  const { get } = descriptor;
-  const enumerable = descriptor.enumerable !== false;
-  const writable = descriptor.writable !== false;
-  let value;
-  let valueSet = false;
-  function getValue() {
-    if (!valueSet) {
-      valueSet = true;
-      setValue(get());
+var require_defineLazyObjectProperty = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  function defineLazyObjectProperty(object, name, descriptor) {
+    var get = descriptor.get;
+    var enumerable = descriptor.enumerable !== false;
+    var writable = descriptor.writable !== false;
+    var value;
+    var valueSet = false;
+    function getValue() {
+      if (!valueSet) {
+        valueSet = true;
+        setValue(get());
+      }
+      return value;
     }
-    return value;
+    function setValue(newValue) {
+      value = newValue;
+      valueSet = true;
+      Object.defineProperty(object, name, { value: newValue, configurable: true, enumerable, writable });
+    }
+    Object.defineProperty(object, name, { get: getValue, set: setValue, configurable: true, enumerable });
   }
-  function setValue(newValue) {
-    value = newValue;
-    valueSet = true;
-    Object.defineProperty(object, name, {
-      value: newValue,
-      configurable: true,
-      enumerable,
-      writable
-    });
-  }
-  Object.defineProperty(object, name, {
-    get: getValue,
-    set: setValue,
-    configurable: true,
-    enumerable
-  });
-}
-var defineLazyObjectProperty_default;
-var init_defineLazyObjectProperty = __esm(() => {
-  defineLazyObjectProperty_default = defineLazyObjectProperty;
+  var _default = exports2.default = defineLazyObjectProperty;
 });
 
 // ../node_modules/react-native/Libraries/ReactNative/FabricUIManager.js
-var exports_FabricUIManager = {};
-__export(exports_FabricUIManager, {
-  getFabricUIManager: () => getFabricUIManager
-});
-function getFabricUIManager() {
-  if (global.nativeFabricUIManager == null) {
-    throw new Error("FabricUIManager is undefined.");
+var require_FabricUIManager = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.getFabricUIManager = getFabricUIManager;
+  var _defineLazyObjectProperty = _interopRequireDefault(require_defineLazyObjectProperty());
+  var nativeFabricUIManagerProxy;
+  var CACHED_PROPERTIES = ["createNode", "cloneNode", "cloneNodeWithNewChildren", "cloneNodeWithNewProps", "cloneNodeWithNewChildrenAndProps", "createChildSet", "appendChild", "appendChildToSet", "completeRoot", "measure", "measureInWindow", "measureLayout", "configureNextLayoutAnimation", "sendAccessibilityEvent", "findShadowNodeByTag_DEPRECATED", "setNativeProps", "dispatchCommand", "compareDocumentPosition", "getBoundingClientRect", "unstable_DefaultEventPriority", "unstable_DiscreteEventPriority", "unstable_ContinuousEventPriority", "unstable_IdleEventPriority", "unstable_getCurrentEventPriority"];
+  function getFabricUIManager() {
+    if (global.nativeFabricUIManager == null) {
+      throw new Error("FabricUIManager is undefined.");
+    }
+    if (nativeFabricUIManagerProxy == null && global.nativeFabricUIManager != null) {
+      nativeFabricUIManagerProxy = createProxyWithCachedProperties(global.nativeFabricUIManager, CACHED_PROPERTIES);
+    }
+    return nativeFabricUIManagerProxy;
   }
-  if (nativeFabricUIManagerProxy == null && global.nativeFabricUIManager != null) {
-    nativeFabricUIManagerProxy = createProxyWithCachedProperties(global.nativeFabricUIManager, CACHED_PROPERTIES);
+  function createProxyWithCachedProperties(implementation, propertiesToCache) {
+    var proxy = Object.create(implementation);
+    var _loop = function _loop(propertyName2) {
+      (0, _defineLazyObjectProperty.default)(proxy, propertyName2, { get: function get() {
+        return implementation[propertyName2];
+      } });
+    };
+    for (var propertyName of propertiesToCache) {
+      _loop(propertyName);
+    }
+    return proxy;
   }
-  return nativeFabricUIManagerProxy;
-}
-function createProxyWithCachedProperties(implementation, propertiesToCache) {
-  const proxy = Object.create(implementation);
-  for (const propertyName of propertiesToCache) {
-    defineLazyObjectProperty_default(proxy, propertyName, {
-      get: () => implementation[propertyName]
-    });
-  }
-  return proxy;
-}
-var nativeFabricUIManagerProxy, CACHED_PROPERTIES;
-var init_FabricUIManager = __esm(() => {
-  init_defineLazyObjectProperty();
-  CACHED_PROPERTIES = [
-    "createNode",
-    "cloneNode",
-    "cloneNodeWithNewChildren",
-    "cloneNodeWithNewProps",
-    "cloneNodeWithNewChildrenAndProps",
-    "createChildSet",
-    "appendChild",
-    "appendChildToSet",
-    "completeRoot",
-    "measure",
-    "measureInWindow",
-    "measureLayout",
-    "configureNextLayoutAnimation",
-    "sendAccessibilityEvent",
-    "findShadowNodeByTag_DEPRECATED",
-    "setNativeProps",
-    "dispatchCommand",
-    "compareDocumentPosition",
-    "getBoundingClientRect",
-    "unstable_DefaultEventPriority",
-    "unstable_DiscreteEventPriority",
-    "unstable_ContinuousEventPriority",
-    "unstable_IdleEventPriority",
-    "unstable_getCurrentEventPriority"
-  ];
 });
 
 // ../node_modules/react-native/Libraries/StyleSheet/flattenStyle.js
-function flattenStyle(style) {
-  if (style === null || typeof style !== "object") {
-    return;
-  }
-  if (!Array.isArray(style)) {
-    return style;
-  }
-  const result = {};
-  for (let i = 0, styleLength = style.length;i < styleLength; ++i) {
-    const computedStyle = flattenStyle(style[i]);
-    if (computedStyle) {
-      for (const key in computedStyle) {
-        result[key] = computedStyle[key];
-      }
+var require_flattenStyle = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  function flattenStyle(style) {
+    if (style === null || typeof style !== "object") {
+      return;
     }
-  }
-  return result;
-}
-var flattenStyle_default;
-var init_flattenStyle = __esm(() => {
-  flattenStyle_default = flattenStyle;
-});
-
-// ../node_modules/react-native/Libraries/Utilities/differ/deepDiffer.js
-function unstable_setLogListeners(listeners) {
-  logListeners = listeners;
-}
-function deepDiffer(one, two, maxDepthOrOptions = -1, maybeOptions) {
-  const options = typeof maxDepthOrOptions === "number" ? maybeOptions : maxDepthOrOptions;
-  const maxDepth = typeof maxDepthOrOptions === "number" ? maxDepthOrOptions : -1;
-  if (maxDepth === 0) {
-    return true;
-  }
-  if (one === two) {
-    return false;
-  }
-  if (typeof one === "function" && typeof two === "function") {
-    let unsafelyIgnoreFunctions = options?.unsafelyIgnoreFunctions;
-    if (unsafelyIgnoreFunctions == null) {
-      if (logListeners && logListeners.onDifferentFunctionsIgnored && (!options || !("unsafelyIgnoreFunctions" in options))) {
-        logListeners.onDifferentFunctionsIgnored(one.name, two.name);
-      }
-      unsafelyIgnoreFunctions = true;
+    if (!Array.isArray(style)) {
+      return style;
     }
-    return !unsafelyIgnoreFunctions;
-  }
-  if (typeof one !== "object" || one === null) {
-    return one !== two;
-  }
-  if (typeof two !== "object" || two === null) {
-    return true;
-  }
-  if (one.constructor !== two.constructor) {
-    return true;
-  }
-  if (Array.isArray(one)) {
-    const len = one.length;
-    if (two.length !== len) {
-      return true;
-    }
-    for (let ii = 0;ii < len; ii++) {
-      if (deepDiffer(one[ii], two[ii], maxDepth - 1, options)) {
-        return true;
-      }
-    }
-  } else {
-    for (const key in one) {
-      if (deepDiffer(one[key], two[key], maxDepth - 1, options)) {
-        return true;
-      }
-    }
-    for (const twoKey in two) {
-      if (one[twoKey] === undefined && two[twoKey] !== undefined) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-var logListeners, deepDiffer_default;
-var init_deepDiffer = __esm(() => {
-  deepDiffer.unstable_setLogListeners = unstable_setLogListeners;
-  deepDiffer_default = deepDiffer;
-});
-
-// ../node_modules/react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload.js
-var exports_ReactNativeAttributePayload = {};
-__export(exports_ReactNativeAttributePayload, {
-  diff: () => diff,
-  create: () => create
-});
-function defaultDiffer(prevProp, nextProp) {
-  if (typeof nextProp !== "object" || nextProp === null) {
-    return true;
-  } else {
-    return deepDiffer_default(prevProp, nextProp, deepDifferOptions);
-  }
-}
-function restoreDeletedValuesInNestedArray(updatePayload, node, validAttributes) {
-  if (Array.isArray(node)) {
-    let i = node.length;
-    while (i-- && removedKeyCount > 0) {
-      restoreDeletedValuesInNestedArray(updatePayload, node[i], validAttributes);
-    }
-  } else if (node && removedKeyCount > 0) {
-    const obj = node;
-    for (const propKey in removedKeys) {
-      if (!removedKeys[propKey]) {
-        continue;
-      }
-      let nextProp = obj[propKey];
-      if (nextProp === undefined) {
-        continue;
-      }
-      const attributeConfig = validAttributes[propKey];
-      if (!attributeConfig) {
-        continue;
-      }
-      if (typeof nextProp === "function") {
-        nextProp = true;
-      }
-      if (typeof nextProp === "undefined") {
-        nextProp = null;
-      }
-      if (typeof attributeConfig !== "object") {
-        updatePayload[propKey] = nextProp;
-      } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
-        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
-        updatePayload[propKey] = nextValue;
-      }
-      removedKeys[propKey] = false;
-      removedKeyCount--;
-    }
-  }
-}
-function diffNestedArrayProperty(updatePayload, prevArray, nextArray, validAttributes) {
-  const minLength = prevArray.length < nextArray.length ? prevArray.length : nextArray.length;
-  let i;
-  for (i = 0;i < minLength; i++) {
-    updatePayload = diffNestedProperty(updatePayload, prevArray[i], nextArray[i], validAttributes);
-  }
-  for (;i < prevArray.length; i++) {
-    updatePayload = clearNestedProperty(updatePayload, prevArray[i], validAttributes);
-  }
-  for (;i < nextArray.length; i++) {
-    const nextProp = nextArray[i];
-    if (!nextProp) {
-      continue;
-    }
-    updatePayload = addNestedProperty(updatePayload, nextProp, validAttributes);
-  }
-  return updatePayload;
-}
-function diffNestedProperty(updatePayload, prevProp, nextProp, validAttributes) {
-  if (!updatePayload && prevProp === nextProp) {
-    return updatePayload;
-  }
-  if (!prevProp || !nextProp) {
-    if (nextProp) {
-      return addNestedProperty(updatePayload, nextProp, validAttributes);
-    }
-    if (prevProp) {
-      return clearNestedProperty(updatePayload, prevProp, validAttributes);
-    }
-    return updatePayload;
-  }
-  if (!Array.isArray(prevProp) && !Array.isArray(nextProp)) {
-    return diffProperties(updatePayload, prevProp, nextProp, validAttributes);
-  }
-  if (Array.isArray(prevProp) && Array.isArray(nextProp)) {
-    return diffNestedArrayProperty(updatePayload, prevProp, nextProp, validAttributes);
-  }
-  if (Array.isArray(prevProp)) {
-    return diffProperties(updatePayload, flattenStyle_default(prevProp), nextProp, validAttributes);
-  }
-  return diffProperties(updatePayload, prevProp, flattenStyle_default(nextProp), validAttributes);
-}
-function clearNestedProperty(updatePayload, prevProp, validAttributes) {
-  if (!prevProp) {
-    return updatePayload;
-  }
-  if (!Array.isArray(prevProp)) {
-    return clearProperties(updatePayload, prevProp, validAttributes);
-  }
-  for (let i = 0;i < prevProp.length; i++) {
-    updatePayload = clearNestedProperty(updatePayload, prevProp[i], validAttributes);
-  }
-  return updatePayload;
-}
-function diffProperties(updatePayload, prevProps, nextProps, validAttributes) {
-  let attributeConfig;
-  let nextProp;
-  let prevProp;
-  for (const propKey in nextProps) {
-    attributeConfig = validAttributes[propKey];
-    if (!attributeConfig) {
-      continue;
-    }
-    prevProp = prevProps[propKey];
-    nextProp = nextProps[propKey];
-    if (typeof nextProp === "function") {
-      const attributeConfigHasProcess = typeof attributeConfig === "object" && typeof attributeConfig.process === "function";
-      if (!attributeConfigHasProcess) {
-        nextProp = true;
-        if (typeof prevProp === "function") {
-          prevProp = true;
+    var result = {};
+    for (var i = 0, styleLength = style.length;i < styleLength; ++i) {
+      var computedStyle = flattenStyle(style[i]);
+      if (computedStyle) {
+        for (var key in computedStyle) {
+          result[key] = computedStyle[key];
         }
       }
     }
-    if (typeof nextProp === "undefined") {
-      nextProp = null;
-      if (typeof prevProp === "undefined") {
-        prevProp = null;
+    return result;
+  }
+  var _default = exports2.default = flattenStyle;
+});
+
+// ../node_modules/react-native/Libraries/Utilities/differ/deepDiffer.js
+var require_deepDiffer = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var logListeners;
+  function unstable_setLogListeners(listeners) {
+    logListeners = listeners;
+  }
+  function deepDiffer(one, two) {
+    var maxDepthOrOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+    var maybeOptions = arguments.length > 3 ? arguments[3] : undefined;
+    var options = typeof maxDepthOrOptions === "number" ? maybeOptions : maxDepthOrOptions;
+    var maxDepth = typeof maxDepthOrOptions === "number" ? maxDepthOrOptions : -1;
+    if (maxDepth === 0) {
+      return true;
+    }
+    if (one === two) {
+      return false;
+    }
+    if (typeof one === "function" && typeof two === "function") {
+      var unsafelyIgnoreFunctions = options == null ? undefined : options.unsafelyIgnoreFunctions;
+      if (unsafelyIgnoreFunctions == null) {
+        if (logListeners && logListeners.onDifferentFunctionsIgnored && (!options || !("unsafelyIgnoreFunctions" in options))) {
+          logListeners.onDifferentFunctionsIgnored(one.name, two.name);
+        }
+        unsafelyIgnoreFunctions = true;
+      }
+      return !unsafelyIgnoreFunctions;
+    }
+    if (typeof one !== "object" || one === null) {
+      return one !== two;
+    }
+    if (typeof two !== "object" || two === null) {
+      return true;
+    }
+    if (one.constructor !== two.constructor) {
+      return true;
+    }
+    if (Array.isArray(one)) {
+      var len = one.length;
+      if (two.length !== len) {
+        return true;
+      }
+      for (var ii = 0;ii < len; ii++) {
+        if (deepDiffer(one[ii], two[ii], maxDepth - 1, options)) {
+          return true;
+        }
+      }
+    } else {
+      for (var key in one) {
+        if (deepDiffer(one[key], two[key], maxDepth - 1, options)) {
+          return true;
+        }
+      }
+      for (var twoKey in two) {
+        if (one[twoKey] === undefined && two[twoKey] !== undefined) {
+          return true;
+        }
       }
     }
-    if (removedKeys) {
-      removedKeys[propKey] = false;
+    return false;
+  }
+  deepDiffer.unstable_setLogListeners = unstable_setLogListeners;
+  var _default = exports2.default = deepDiffer;
+});
+
+// ../node_modules/react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload.js
+var require_ReactNativeAttributePayload = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.create = create;
+  exports2.diff = diff;
+  var _flattenStyle = _interopRequireDefault(require_flattenStyle());
+  var _deepDiffer = _interopRequireDefault(require_deepDiffer());
+  var emptyObject = {};
+  var removedKeys = null;
+  var removedKeyCount = 0;
+  var deepDifferOptions = { unsafelyIgnoreFunctions: true };
+  function defaultDiffer(prevProp, nextProp) {
+    if (typeof nextProp !== "object" || nextProp === null) {
+      return true;
+    } else {
+      return (0, _deepDiffer.default)(prevProp, nextProp, deepDifferOptions);
     }
-    if (updatePayload && updatePayload[propKey] !== undefined) {
+  }
+  function restoreDeletedValuesInNestedArray(updatePayload, node, validAttributes) {
+    if (Array.isArray(node)) {
+      var i = node.length;
+      while (i-- && removedKeyCount > 0) {
+        restoreDeletedValuesInNestedArray(updatePayload, node[i], validAttributes);
+      }
+    } else if (node && removedKeyCount > 0) {
+      var obj = node;
+      for (var propKey in removedKeys) {
+        if (!removedKeys[propKey]) {
+          continue;
+        }
+        var nextProp = obj[propKey];
+        if (nextProp === undefined) {
+          continue;
+        }
+        var attributeConfig = validAttributes[propKey];
+        if (!attributeConfig) {
+          continue;
+        }
+        if (typeof nextProp === "function") {
+          nextProp = true;
+        }
+        if (typeof nextProp === "undefined") {
+          nextProp = null;
+        }
+        if (typeof attributeConfig !== "object") {
+          updatePayload[propKey] = nextProp;
+        } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+          var nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+          updatePayload[propKey] = nextValue;
+        }
+        removedKeys[propKey] = false;
+        removedKeyCount--;
+      }
+    }
+  }
+  function diffNestedArrayProperty(updatePayload, prevArray, nextArray, validAttributes) {
+    var minLength = prevArray.length < nextArray.length ? prevArray.length : nextArray.length;
+    var i;
+    for (i = 0;i < minLength; i++) {
+      updatePayload = diffNestedProperty(updatePayload, prevArray[i], nextArray[i], validAttributes);
+    }
+    for (;i < prevArray.length; i++) {
+      updatePayload = clearNestedProperty(updatePayload, prevArray[i], validAttributes);
+    }
+    for (;i < nextArray.length; i++) {
+      var nextProp = nextArray[i];
+      if (!nextProp) {
+        continue;
+      }
+      updatePayload = addNestedProperty(updatePayload, nextProp, validAttributes);
+    }
+    return updatePayload;
+  }
+  function diffNestedProperty(updatePayload, prevProp, nextProp, validAttributes) {
+    if (!updatePayload && prevProp === nextProp) {
+      return updatePayload;
+    }
+    if (!prevProp || !nextProp) {
+      if (nextProp) {
+        return addNestedProperty(updatePayload, nextProp, validAttributes);
+      }
+      if (prevProp) {
+        return clearNestedProperty(updatePayload, prevProp, validAttributes);
+      }
+      return updatePayload;
+    }
+    if (!Array.isArray(prevProp) && !Array.isArray(nextProp)) {
+      return diffProperties(updatePayload, prevProp, nextProp, validAttributes);
+    }
+    if (Array.isArray(prevProp) && Array.isArray(nextProp)) {
+      return diffNestedArrayProperty(updatePayload, prevProp, nextProp, validAttributes);
+    }
+    if (Array.isArray(prevProp)) {
+      return diffProperties(updatePayload, (0, _flattenStyle.default)(prevProp), nextProp, validAttributes);
+    }
+    return diffProperties(updatePayload, prevProp, (0, _flattenStyle.default)(nextProp), validAttributes);
+  }
+  function clearNestedProperty(updatePayload, prevProp, validAttributes) {
+    if (!prevProp) {
+      return updatePayload;
+    }
+    if (!Array.isArray(prevProp)) {
+      return clearProperties(updatePayload, prevProp, validAttributes);
+    }
+    for (var i = 0;i < prevProp.length; i++) {
+      updatePayload = clearNestedProperty(updatePayload, prevProp[i], validAttributes);
+    }
+    return updatePayload;
+  }
+  function diffProperties(updatePayload, prevProps, nextProps, validAttributes) {
+    var attributeConfig;
+    var nextProp;
+    var prevProp;
+    for (var propKey in nextProps) {
+      attributeConfig = validAttributes[propKey];
+      if (!attributeConfig) {
+        continue;
+      }
+      prevProp = prevProps[propKey];
+      nextProp = nextProps[propKey];
+      if (typeof nextProp === "function") {
+        var attributeConfigHasProcess = typeof attributeConfig === "object" && typeof attributeConfig.process === "function";
+        if (!attributeConfigHasProcess) {
+          nextProp = true;
+          if (typeof prevProp === "function") {
+            prevProp = true;
+          }
+        }
+      }
+      if (typeof nextProp === "undefined") {
+        nextProp = null;
+        if (typeof prevProp === "undefined") {
+          prevProp = null;
+        }
+      }
+      if (removedKeys) {
+        removedKeys[propKey] = false;
+      }
+      if (updatePayload && updatePayload[propKey] !== undefined) {
+        if (typeof attributeConfig !== "object") {
+          updatePayload[propKey] = nextProp;
+        } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+          var nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+          updatePayload[propKey] = nextValue;
+        }
+        continue;
+      }
+      if (prevProp === nextProp) {
+        continue;
+      }
       if (typeof attributeConfig !== "object") {
-        updatePayload[propKey] = nextProp;
+        if (defaultDiffer(prevProp, nextProp)) {
+          (updatePayload || (updatePayload = {}))[propKey] = nextProp;
+        }
       } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
-        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
-        updatePayload[propKey] = nextValue;
-      }
-      continue;
-    }
-    if (prevProp === nextProp) {
-      continue;
-    }
-    if (typeof attributeConfig !== "object") {
-      if (defaultDiffer(prevProp, nextProp)) {
-        (updatePayload || (updatePayload = {}))[propKey] = nextProp;
-      }
-    } else if (typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
-      const shouldUpdate = prevProp === undefined || (typeof attributeConfig.diff === "function" ? attributeConfig.diff(prevProp, nextProp) : defaultDiffer(prevProp, nextProp));
-      if (shouldUpdate) {
-        const nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
-        (updatePayload || (updatePayload = {}))[propKey] = nextValue;
-      }
-    } else {
-      removedKeys = null;
-      removedKeyCount = 0;
-      updatePayload = diffNestedProperty(updatePayload, prevProp, nextProp, attributeConfig);
-      if (removedKeyCount > 0 && updatePayload) {
-        restoreDeletedValuesInNestedArray(updatePayload, nextProp, attributeConfig);
+        var shouldUpdate = prevProp === undefined || (typeof attributeConfig.diff === "function" ? attributeConfig.diff(prevProp, nextProp) : defaultDiffer(prevProp, nextProp));
+        if (shouldUpdate) {
+          var _nextValue = typeof attributeConfig.process === "function" ? attributeConfig.process(nextProp) : nextProp;
+          (updatePayload || (updatePayload = {}))[propKey] = _nextValue;
+        }
+      } else {
         removedKeys = null;
+        removedKeyCount = 0;
+        updatePayload = diffNestedProperty(updatePayload, prevProp, nextProp, attributeConfig);
+        if (removedKeyCount > 0 && updatePayload) {
+          restoreDeletedValuesInNestedArray(updatePayload, nextProp, attributeConfig);
+          removedKeys = null;
+        }
       }
     }
+    for (var _propKey in prevProps) {
+      if (nextProps[_propKey] !== undefined) {
+        continue;
+      }
+      attributeConfig = validAttributes[_propKey];
+      if (!attributeConfig) {
+        continue;
+      }
+      if (updatePayload && updatePayload[_propKey] !== undefined) {
+        continue;
+      }
+      prevProp = prevProps[_propKey];
+      if (prevProp === undefined) {
+        continue;
+      }
+      if (typeof attributeConfig !== "object" || typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
+        (updatePayload || (updatePayload = {}))[_propKey] = null;
+        if (!removedKeys) {
+          removedKeys = {};
+        }
+        if (!removedKeys[_propKey]) {
+          removedKeys[_propKey] = true;
+          removedKeyCount++;
+        }
+      } else {
+        updatePayload = clearNestedProperty(updatePayload, prevProp, attributeConfig);
+      }
+    }
+    return updatePayload;
   }
-  for (const propKey in prevProps) {
-    if (nextProps[propKey] !== undefined) {
-      continue;
-    }
-    attributeConfig = validAttributes[propKey];
-    if (!attributeConfig) {
-      continue;
-    }
-    if (updatePayload && updatePayload[propKey] !== undefined) {
-      continue;
-    }
-    prevProp = prevProps[propKey];
-    if (prevProp === undefined) {
-      continue;
-    }
-    if (typeof attributeConfig !== "object" || typeof attributeConfig.diff === "function" || typeof attributeConfig.process === "function") {
-      (updatePayload || (updatePayload = {}))[propKey] = null;
-      if (!removedKeys) {
-        removedKeys = {};
+  function addNestedProperty(payload, props, validAttributes) {
+    if (Array.isArray(props)) {
+      for (var i = 0;i < props.length; i++) {
+        payload = addNestedProperty(payload, props[i], validAttributes);
       }
-      if (!removedKeys[propKey]) {
-        removedKeys[propKey] = true;
-        removedKeyCount++;
-      }
-    } else {
-      updatePayload = clearNestedProperty(updatePayload, prevProp, attributeConfig);
+      return payload;
     }
-  }
-  return updatePayload;
-}
-function addNestedProperty(payload, props, validAttributes) {
-  if (Array.isArray(props)) {
-    for (let i = 0;i < props.length; i++) {
-      payload = addNestedProperty(payload, props[i], validAttributes);
+    for (var propKey in props) {
+      var prop = props[propKey];
+      var attributeConfig = validAttributes[propKey];
+      if (attributeConfig == null) {
+        continue;
+      }
+      var newValue = undefined;
+      if (prop === undefined) {
+        if (payload && payload[propKey] !== undefined) {
+          newValue = null;
+        } else {
+          continue;
+        }
+      } else if (typeof attributeConfig === "object") {
+        if (typeof attributeConfig.process === "function") {
+          newValue = attributeConfig.process(prop);
+        } else if (typeof attributeConfig.diff === "function") {
+          newValue = prop;
+        }
+      } else {
+        if (typeof prop === "function") {
+          newValue = true;
+        } else {
+          newValue = prop;
+        }
+      }
+      if (newValue !== undefined) {
+        if (!payload) {
+          payload = {};
+        }
+        payload[propKey] = newValue;
+        continue;
+      }
+      payload = addNestedProperty(payload, prop, attributeConfig);
     }
     return payload;
   }
-  for (const propKey in props) {
-    const prop = props[propKey];
-    const attributeConfig = validAttributes[propKey];
-    if (attributeConfig == null) {
-      continue;
-    }
-    let newValue;
-    if (prop === undefined) {
-      if (payload && payload[propKey] !== undefined) {
-        newValue = null;
-      } else {
-        continue;
-      }
-    } else if (typeof attributeConfig === "object") {
-      if (typeof attributeConfig.process === "function") {
-        newValue = attributeConfig.process(prop);
-      } else if (typeof attributeConfig.diff === "function") {
-        newValue = prop;
-      }
-    } else {
-      if (typeof prop === "function") {
-        newValue = true;
-      } else {
-        newValue = prop;
-      }
-    }
-    if (newValue !== undefined) {
-      if (!payload) {
-        payload = {};
-      }
-      payload[propKey] = newValue;
-      continue;
-    }
-    payload = addNestedProperty(payload, prop, attributeConfig);
+  function clearProperties(updatePayload, prevProps, validAttributes) {
+    return diffProperties(updatePayload, prevProps, emptyObject, validAttributes);
   }
-  return payload;
-}
-function clearProperties(updatePayload, prevProps, validAttributes) {
-  return diffProperties(updatePayload, prevProps, emptyObject, validAttributes);
-}
-function create(props, validAttributes) {
-  return addNestedProperty(null, props, validAttributes);
-}
-function diff(prevProps, nextProps, validAttributes) {
-  return diffProperties(null, prevProps, nextProps, validAttributes);
-}
-var emptyObject, removedKeys = null, removedKeyCount = 0, deepDifferOptions;
-var init_ReactNativeAttributePayload = __esm(() => {
-  init_flattenStyle();
-  init_deepDiffer();
-  emptyObject = {};
-  deepDifferOptions = {
-    unsafelyIgnoreFunctions: true
-  };
+  function create(props, validAttributes) {
+    return addNestedProperty(null, props, validAttributes);
+  }
+  function diff(prevProps, nextProps, validAttributes) {
+    return diffProperties(null, prevProps, nextProps, validAttributes);
+  }
 });
 
 // ../node_modules/react-reconciler/cjs/react-reconciler-constants.development.js
@@ -11207,14 +11160,15 @@ var require_constants = __commonJS((exports2, module2) => {
 // src/ReactFabricMirror.js
 var Reconciler = require_react_reconciler();
 var {
-  getFabricUIManager: getFabricUIManager2
-} = (init_FabricUIManager(), __toCommonJS(exports_FabricUIManager));
-var uiManager = getFabricUIManager2();
+  getFabricUIManager
+} = require_FabricUIManager();
+var uiManager = getFabricUIManager();
 console.log("[ReactFabricMirror] got FabricUIManager:", uiManager);
 var {
   create: createAttributePayload,
   diff: diffAttributePayloads
-} = (init_ReactNativeAttributePayload(), __toCommonJS(exports_ReactNativeAttributePayload));
+} = require_ReactNativeAttributePayload();
+var ReactNativeViewConfigRegistry = require("react-native/Libraries/Renderer/shims/ReactNativeViewConfigRegistry");
 global.rootHostContext = {};
 global.childHostContext = {};
 var {
@@ -11249,30 +11203,18 @@ var HostConfig = {
     return global.childHostContext;
   },
   supportsPersistence: true,
-  createInstance: (type, newProps, rootContainerInstance, _currentHostContext, workInProgress) => {
+  createInstance: (type, props, rootContainerInstance, _currentHostContext, workInProgress) => {
     const tag = global.nextReactTag;
     global.nextReactTag += 2;
-    const viewConfig = new Proxy({}, {
-      get: (target, prop) => {
-        if (prop === "children" || prop === "ref") {
-          return;
-        }
-        if (prop === "style") {
-          return new Proxy({}, {
-            get: (target2, styleProp) => {
-              return true;
-            }
-          });
-        }
-        return true;
-      }
-    });
-    const updatePayload = createAttributePayload(newProps, viewConfig);
+    const viewConfig = ReactNativeViewConfigRegistry.get(type);
+    const updatePayload = createAttributePayload(props, viewConfig.validAttributes);
+    log("[createInstance] rawProps=", props);
+    log("[createInstance] viewConfig.validAttributes=", viewConfig.validAttributes);
     let node;
     try {
       log("[createInstance] calling createNode with type=", type, "tag=", tag);
       log("[createInstance] props=", updatePayload);
-      node = uiManager.createNode(tag, type, rootContainerInstance.containerTag, updatePayload, workInProgress);
+      node = uiManager.createNode(tag, viewConfig.uiViewClassName, rootContainerInstance.containerTag, updatePayload, workInProgress);
       log("[createInstance] node=", node);
     } catch (e) {
       log("[createInstance] ERROR in createNode:", e.message || String(e));
@@ -11284,7 +11226,7 @@ var HostConfig = {
       canonical: {
         nativeTag: tag,
         viewConfig,
-        currentProps: newProps,
+        currentProps: props,
         internalInstanceHandle: workInProgress,
         publicInstance: null,
         publicRootInstance: rootContainerInstance.publicInstance

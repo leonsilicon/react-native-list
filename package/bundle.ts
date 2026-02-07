@@ -1,4 +1,4 @@
-import { stripFlowPlugin } from "./strip-flow-plugin.js";
+import { stripFlowPlugin } from './strip-flow-plugin.js'
 
 console.log('Building ReactFabricMirror worklet...')
 const res = await Bun.build({
@@ -7,7 +7,10 @@ const res = await Bun.build({
   naming: 'ReactFabricMirror.bundle.js',
   format: 'cjs',
   plugins: [stripFlowPlugin],
-  external: ['react'],
+  external: [
+    'react',
+    'react-native/Libraries/Renderer/shims/ReactNativeViewConfigRegistry',
+  ],
   banner: `
   const capturedManager = nativeFabricUIManager;
   
@@ -22,6 +25,5 @@ const res = await Bun.build({
 
     `,
   footer: `}`,
-  
 })
 console.log('ReactFabricMirror worklet built.', res)

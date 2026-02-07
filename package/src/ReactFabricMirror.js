@@ -18,6 +18,8 @@ const {
   diff: diffAttributePayloads,
 } = require('react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactNativeAttributePayload')
 
+const ReactNativeViewConfigRegistry = require('react-native/Libraries/Renderer/shims/ReactNativeViewConfigRegistry')
+
 global.rootHostContext = {}
 global.childHostContext = {}
 
@@ -71,7 +73,7 @@ const HostConfig = {
   supportsPersistence: true,
   createInstance: (
     type,
-    newProps,
+    props,
     rootContainerInstance,
     _currentHostContext,
     workInProgress
@@ -99,31 +101,10 @@ const HostConfig = {
     //     }
     //   }
 
-    const viewConfig = new Proxy(
-      {},
-      {
-        get: (target, prop) => {
-          // log('[createInstance] ValidAttributes proxy get for prop=', prop)
-          if (prop === 'children' || prop === 'ref') {
-            // log('[createInstance] ValidAttributes proxy returning false for prop=', prop)
-            return undefined
-          }
-          if (prop === 'style') {
-            return new Proxy(
-              {},
-              {
-                get: (target, styleProp) => {
-                  return true
-                },
-              }
-            )
-          }
-          return true
-        },
-      }
-    )
-    // log('[createInstance] viewConfig proxy created, test, viewConfig.test=', viewConfig.test)
-    const updatePayload = createAttributePayload(newProps, viewConfig)
+    const viewConfig = ReactNativeViewConfigRegistry.get(type)
+    const updatePayload = createAttributePayload(props, viewConfig.validAttributes)
+    log('[createInstance] rawProps=', props)
+    log('[createInstance] viewConfig.validAttributes=', viewConfig.validAttributes)
 
     let node
     try {
@@ -131,7 +112,7 @@ const HostConfig = {
       log('[createInstance] props=', updatePayload)
       node = uiManager.createNode(
         tag, // reactTag
-        type, // viewName
+        viewConfig.uiViewClassName, // viewName
         rootContainerInstance.containerTag, // rootTag
         updatePayload, // props
         workInProgress // internalInstanceHandle
@@ -149,7 +130,7 @@ const HostConfig = {
       canonical: {
         nativeTag: tag,
         viewConfig, // TODO: is this needed? for what
-        currentProps: newProps, // funny, react is passing here props instead of updatePayload, is this okay?
+        currentProps: props, // funny, react is passing here props instead of updatePayload, is this okay?
         internalInstanceHandle: workInProgress,
         publicInstance: null,
         publicRootInstance: rootContainerInstance.publicInstance,

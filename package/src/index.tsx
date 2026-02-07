@@ -1,5 +1,4 @@
 /**
- *
  * interface Adapter<ViewTypes extends enum> {
  *  create(
  *      createViewHolder: (viewType: ViewTypes) => ViewHolder,
@@ -25,7 +24,6 @@
  * <RecyclerView
  *  adapter={Adapter}
  * />
- *
  */
 
 import { scheduleOnUI } from 'react-native-worklets'
@@ -70,13 +68,31 @@ export function setup() {
   //   global.rnViewConfigs = copyConfigs
   // })
 
+  // TODO: right now we manually fill the objects we need so they become available through `NativeModule.XXX`
+  // This should be automatic and work for all modules?
+  console.log('nativeModuleProxy:', Object.keys(global.nativeModuleProxy))
+  const nativeModuleProxyJS = global.nativeModuleProxy
+  const NativeReactNativeFeatureFlagsCxx =
+    nativeModuleProxyJS.NativeReactNativeFeatureFlagsCxx
+  const PlatformConstants = nativeModuleProxyJS.PlatformConstants
+
+  scheduleOnUI(() => {
+    'worklet'
+
+    global.nativeModuleProxy = {
+      PlatformConstants,
+      NativeReactNativeFeatureFlagsCxx,
+    }
+  })
+
   scheduleOnUI(setupWorklet)
 }
 
 // TODO: this import doesn't work right now in bundle mode :/
 // @ts-expect-error
 const capturedOnJS = global.nativeFabricUIManager
-let uiManagerHelperBoxed: BoxedHybridObject<UiManagerHelper> = NitroModules.box(uiManagerHelper)
+let uiManagerHelperBoxed: BoxedHybridObject<UiManagerHelper> =
+  NitroModules.box(uiManagerHelper)
 export function renderSync() {
   // todo: we might have to pass uiManagerHelper here, or consume from global?
   'worklet'
@@ -85,4 +101,4 @@ export function renderSync() {
   uiManagerHelperUnboxed.renderSync(capturedOnJS)
 }
 
-export { uiListModule, uiManagerHelper, UiList }
+export { UiList, uiListModule, uiManagerHelper }
