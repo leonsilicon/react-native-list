@@ -43,7 +43,7 @@ using namespace margelo::nitro::nitrolist::views;
 
 - (instancetype) init {
   if (self = [super init]) {
-    std::shared_ptr<HybridUiListViewSpec> hybridView = NitroList::NitroListAutolinking::UiListView::create();
+    std::shared_ptr<HybridUiListViewSpec> hybridView = NitroList::NitroListAutolinking::createUiListView();
     _hybridView = std::dynamic_pointer_cast<HybridUiListViewSpecSwift>(hybridView);
     [self updateView];
   }
@@ -91,7 +91,7 @@ using namespace margelo::nitro::nitrolist::views;
 }
 
 + (BOOL)shouldBeRecycled {
-  return NitroList::NitroListAutolinking::UiListView::isRecyclableHybridView();
+  return NitroList::NitroListAutolinking::isUiListViewRecyclable();
 }
 
 - (void)prepareForRecycle {

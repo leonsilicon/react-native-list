@@ -44,38 +44,27 @@ export function setup() {
 
   // TODO: right now we manually fill the objects we need so they become available through `NativeModule.XXX`
   // This should be automatic and work for all modules?
-  console.log('nativeModuleProxy:', Object.keys(global.nativeModuleProxy))
-  const nativeModuleProxyJS = global.nativeModuleProxy
+  // console.log('nativeModuleProxy:', Object.keys(global.nativeModuleProxy))
+  // const nativeModuleProxyJS = global.nativeModuleProxy
 
-  // Note: These module seem to be easily reusable across threads
-  const NativeReactNativeFeatureFlagsCxx =
-    nativeModuleProxyJS.NativeReactNativeFeatureFlagsCxx
-  const PlatformConstants = nativeModuleProxyJS.PlatformConstants
+  // // Note: These module seem to be easily reusable across threads
+  // const NativeReactNativeFeatureFlagsCxx =
+  //   nativeModuleProxyJS.NativeReactNativeFeatureFlagsCxx
+  // const PlatformConstants = nativeModuleProxyJS.PlatformConstants
 
-  const DeviceInfo = nativeModuleProxyJS.DeviceInfo
-  const DeviceInfoConstants = DeviceInfo.getConstants()
+  // const DeviceInfo = nativeModuleProxyJS.DeviceInfo
+  // const DeviceInfoConstants = DeviceInfo.getConstants()
 
-  const ImageLoader = nativeModuleProxyJS.ImageLoader
-  const SourceCode = nativeModuleProxyJS.SourceCode //what kind of module is that lol
+  // const ImageLoader = nativeModuleProxyJS.ImageLoader
+  // const SourceCode = nativeModuleProxyJS.SourceCode //what kind of module is that lol
+
+  scheduleOnUI(setupWorklet)
 
   scheduleOnUI(() => {
     'worklet'
 
-    global.nativeModuleProxy = {
-      PlatformConstants,
-      NativeReactNativeFeatureFlagsCxx,
-      DeviceInfo: {
-        getConstants() {
-          // TODO: this specific use case causes a crash, needs to be fixed
-          return DeviceInfoConstants
-        },
-      },
-      ImageLoader,
-      SourceCode,
-    }
+    global.log('global.nativeModuleProxy:', global.nativeModuleProxy)
   })
-
-  scheduleOnUI(setupWorklet)
 }
 
 // TODO: this import doesn't work right now in bundle mode :/
