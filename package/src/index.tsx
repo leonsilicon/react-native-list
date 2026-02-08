@@ -39,34 +39,8 @@ import { setupWorklet } from './ReactFabricMirror.bundle'
 import { BoxedHybridObject, NitroModules } from 'react-native-nitro-modules'
 import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 
-// const {get: getViewConfigForType} = ReactNativeViewConfigRegistry;
-// scheduleOnUI(() => {
-//   'worklet'
-//   global.getViewConfigForType = getViewConfigForType // worklet copies this?
-// This doesn't do a deep copy no.
-// })
-
-// const globalViewConfigMap = (global.rnViewConfigs as Map<string, any>).entries()()
-// console.log('Registered view configs:')
-// for (const [key, value] of globalViewConfigMap) {
-//   console.log(' - ', key, value)
-// }
-
 export function setup() {
   uiListModule.setupExternalSurface()
-  // const map = global.rnViewConfigs as Map<string, any> | undefined
-  // if (!map) {
-  //   throw new Error('rnViewConfigs is not defined on global')
-  // }
-  // console.log(map)
-  // const copyConfigs = map.entries().reduce((acc, [key, value]) => {
-  //   acc[key] = value
-  //   return acc
-  // }, {} as Record<string, any>)
-  // scheduleOnUI(() => {
-  //   'worklet'
-  //   global.rnViewConfigs = copyConfigs
-  // })
 
   // TODO: right now we manually fill the objects we need so they become available through `NativeModule.XXX`
   // This should be automatic and work for all modules?
