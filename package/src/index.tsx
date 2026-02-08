@@ -72,9 +72,17 @@ export function setup() {
   // This should be automatic and work for all modules?
   console.log('nativeModuleProxy:', Object.keys(global.nativeModuleProxy))
   const nativeModuleProxyJS = global.nativeModuleProxy
+
+  // Note: These module seem to be easily reusable across threads
   const NativeReactNativeFeatureFlagsCxx =
     nativeModuleProxyJS.NativeReactNativeFeatureFlagsCxx
   const PlatformConstants = nativeModuleProxyJS.PlatformConstants
+
+  const DeviceInfo = nativeModuleProxyJS.DeviceInfo
+  const DeviceInfoConstants = DeviceInfo.getConstants()
+
+  const ImageLoader = nativeModuleProxyJS.ImageLoader
+  const SourceCode = nativeModuleProxyJS.SourceCode //what kind of module is that lol
 
   scheduleOnUI(() => {
     'worklet'
@@ -82,6 +90,14 @@ export function setup() {
     global.nativeModuleProxy = {
       PlatformConstants,
       NativeReactNativeFeatureFlagsCxx,
+      DeviceInfo: {
+        getConstants() {
+          // TODO: this specific use case causes a crash, needs to be fixed
+          return DeviceInfoConstants
+        },
+      },
+      ImageLoader,
+      SourceCode,
     }
   })
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, useWindowDimensions } from "react-native";
+import { View, Text, useWindowDimensions, Image } from "react-native";
 // TODO: right now in worklets trying to import from 'react-native' fails, and its undefined
 // import View from "react-native/Libraries/Components/View/View";
 // const { View } = require("react-native/Libraries/Components/View/View");
@@ -85,7 +85,7 @@ export default function App() {
                   }}
                 >
                   <Text>Test</Text>
-                  {/* <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} /> */}
+                  <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} />
                 </View>
               );
 
@@ -148,7 +148,7 @@ export default function App() {
                     }}
                   >
                     <Text>Item #{index}</Text>
-                    {/* <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} /> */}
+                    <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} />
                   </View>
                 );
 
