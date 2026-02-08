@@ -42,29 +42,7 @@ import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 export function setup() {
   uiListModule.setupExternalSurface()
 
-  // TODO: right now we manually fill the objects we need so they become available through `NativeModule.XXX`
-  // This should be automatic and work for all modules?
-  // console.log('nativeModuleProxy:', Object.keys(global.nativeModuleProxy))
-  // const nativeModuleProxyJS = global.nativeModuleProxy
-
-  // // Note: These module seem to be easily reusable across threads
-  // const NativeReactNativeFeatureFlagsCxx =
-  //   nativeModuleProxyJS.NativeReactNativeFeatureFlagsCxx
-  // const PlatformConstants = nativeModuleProxyJS.PlatformConstants
-
-  // const DeviceInfo = nativeModuleProxyJS.DeviceInfo
-  // const DeviceInfoConstants = DeviceInfo.getConstants()
-
-  // const ImageLoader = nativeModuleProxyJS.ImageLoader
-  // const SourceCode = nativeModuleProxyJS.SourceCode //what kind of module is that lol
-
   scheduleOnUI(setupWorklet)
-
-  scheduleOnUI(() => {
-    'worklet'
-
-    global.log('global.nativeModuleProxy:', global.nativeModuleProxy)
-  })
 }
 
 // TODO: this import doesn't work right now in bundle mode :/
