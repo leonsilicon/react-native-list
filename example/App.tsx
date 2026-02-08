@@ -1,8 +1,5 @@
 import React from "react";
-import { View, Text, useWindowDimensions, Image } from "react-native";
-// TODO: right now in worklets trying to import from 'react-native' fails, and its undefined
-// import View from "react-native/Libraries/Components/View/View";
-// const { View } = require("react-native/Libraries/Components/View/View");
+import { View, Text, useWindowDimensions, Image, Pressable } from "react-native";
 import { scheduleOnUI } from "react-native-worklets";
 import {
   setup,
@@ -84,8 +81,27 @@ export default function App() {
                     backgroundColor: "red",
                   }}
                 >
-                  <Text>Test</Text>
-                  <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} />
+                  <Pressable
+                    style={{
+                      flex: 1,
+                    }}
+                    onPressIn={() => {
+                      "worklet"
+                      global.log("Pressed item with id ", global.itemId);
+                    }}
+                  >
+                    <Text>Test</Text>
+                    <Image
+                      source={{
+                        uri: "https://reactnative.dev/img/tiny_logo.png",
+                      }}
+                      onLoadEnd={() => {
+                        "worklet"
+                        global.log(`Image loaded for item id ${global.itemId}`)
+                      }}
+                      style={{ width: 50, height: 50 }}
+                    />
+                  </Pressable>
                 </View>
               );
 
@@ -147,8 +163,26 @@ export default function App() {
                       backgroundColor: "red",
                     }}
                   >
-                    <Text>Item #{index}</Text>
-                    <Image source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }} style={{ width: 50, height: 50 }} />
+                    <Pressable
+                      style={{
+                        flex: 1,
+                      }}
+                      onPressIn={() => {
+                        global.log("Pressed item with index", index);
+                      }}
+                    >
+                      <Text>Item #{index}</Text>
+                      <Image
+                        source={{
+                          uri: "https://reactnative.dev/img/tiny_logo.png",
+                        }}
+                        onLoadEnd={() => {
+                          "worklet"
+                          global.log(`Image loaded for item id ${global.itemId}, index ${index}`)
+                        }}
+                        style={{ width: 50, height: 50 }}
+                      />
+                    </Pressable>
                   </View>
                 );
 
@@ -184,3 +218,11 @@ export default function App() {
     </View>
   );
 }
+
+// export default function App() {
+//   return (
+//     <GestureHandlerRootView>
+//       <AppInner />
+//     </GestureHandlerRootView>
+//   );
+// }

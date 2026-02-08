@@ -1,10 +1,14 @@
 #include "JHybridUiListModule.h"
 
 #include <android/log.h>
+#include <react/renderer/scheduler/Scheduler.h>
+#include <react/renderer/core/EventTarget.h>
+#include <react/fabric/FabricUIManagerBinding.h>
 
 namespace margelo::nitro::nitrolist {
 
     std::shared_ptr<react::CallInvoker> JHybridUiListModule::uiCallInvoker_ = nullptr;
+    std::shared_ptr<const react::EventListener> JHybridUiListModule::eventInterceptor_ = nullptr;
 
     class WorkletsUiCallInvoker : public facebook::react::CallInvoker {
     public:
@@ -37,6 +41,8 @@ namespace margelo::nitro::nitrolist {
                                                                     getUiCallInvokerHolder),
                                                    makeNativeMethod("getUiRuntimeExecutor",
                                                                     getUiRuntimeExecutor),
+                                                   makeNativeMethod("setupEventInterceptor",
+                                                                    setupEventInterceptor),
                                            });
     }
 
@@ -90,6 +96,35 @@ namespace margelo::nitro::nitrolist {
         };
 
         return react::JRuntimeExecutor::newObjectCxxArgs(uiRuntimeExecutor);
+    }
+
+    void JHybridUiListModule::setupEventInterceptor(
+            jni::alias_ref<JHybridUiListModule> jThis,
+            jni::alias_ref<JFabricUIManager::javaobject> fabricUIManager) {
+        if (!fabricUIManager) {
+            throw std::runtime_error("FabricUIManager reference is null");
+        }
+        std::shared_ptr<react::Scheduler> scheduler = fabricUIManager->getBinding()->getScheduler();
+
+        if (!scheduler) {
+            throw std::runtime_error("Failed to get Scheduler from FabricUIManager");
+        }
+
+        eventInterceptor_ = std::make_shared<react::EventListener>([scheduler](const react::RawEvent &event) {
+            // Intercept all events and trigger a transaction to ensure the UI thread is processing updates.
+            auto eventSurfaceId = event.eventTarget->getSurfaceId();
+            if (eventSurfaceId == 3) {
+                // This is an event from a view we manage, special handling needded
+                __android_log_print(ANDROID_LOG_INFO, "JHybridUiListModule", "[HannoDebug] Intercepted event from surface 3!");
+                // TODO: setup weird JS event system on the JS side!
+                return true;
+            }
+
+            return false;
+        });
+
+        // TODO: unregister
+        scheduler->addEventListener(eventInterceptor_);
     }
 
 } // namespace margelo::nitro::nitrolist

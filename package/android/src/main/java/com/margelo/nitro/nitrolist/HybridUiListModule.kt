@@ -7,6 +7,7 @@ import com.facebook.react.bridge.RuntimeExecutor
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.common.annotations.FrameworkAPI
 import com.facebook.react.common.annotations.UnstableReactNativeAPI
+import com.facebook.react.fabric.FabricUIManager
 import com.facebook.react.internal.turbomodule.core.TurboModuleManager
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler
 import com.facebook.react.runtime.ReactHostDelegate
@@ -32,28 +33,29 @@ class HybridUiListModule : HybridUiListModuleSpec() {
         // Obtain the fabric ui manager
         val uiManager = UIManagerHelper.getUIManager(context, UIManagerType.FABRIC)
             ?: throw IllegalStateException("Fabric UIManager is null! Is the Fabric architecture enabled?")
-
         val reactActivity = context.currentActivity as? ReactActivity
             ?: throw IllegalStateException("Current activity is not a ReactActivity!")
         val reactHost = reactActivity.reactActivityDelegate.reactHost
             ?: throw IllegalStateException("ReactNativeHost is null!")
 
-        // TODO: where do i pass the surface id?!
         val surface = reactHost.createSurface(context, "", null)
         val surfaceView = surface.view as? ReactSurfaceView
             ?: throw IllegalStateException("Surface view is not a ReactSurfaceView!")
-        surfaceView.rootViewTag = 3
+        surfaceView.setRootViewTag(3)
 
         uiManager.startSurface(
             surfaceView,
             "",
             null,
-            //measuredWidth and height, puhh
             surfaceView.measuredWidth,
             surfaceView.measuredHeight
         )
 
         reactSurfaceView = surfaceView
+
+        val fabricUIManager = uiManager as? FabricUIManager
+            ?: throw IllegalStateException("UIManager is not a FabricUIManager! Is the Fabric architecture enabled?")
+        setupEventInterceptor(fabricUIManager)
 
         // Next: Create a TurboModuleManager for the UI runtime, which will set global.nativeModuleProxy
         // This is whats being used when doing NativeModule.MyNativeModule in JS!
@@ -113,6 +115,8 @@ class HybridUiListModule : HybridUiListModuleSpec() {
     private external fun getUiCallInvokerHolder(workletsModule: WorkletsModule): CallInvokerHolderImpl
 
     private external fun getUiRuntimeExecutor(workletsModule: WorkletsModule): RuntimeExecutor
+
+    private external fun setupEventInterceptor(fabricUIManager: FabricUIManager)
 
     @Volatile
     private lateinit var uiTurboModuleManager: TurboModuleManager

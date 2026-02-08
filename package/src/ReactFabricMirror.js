@@ -9,9 +9,9 @@ const uiManager = getFabricUIManager()
 console.log('[ReactFabricMirror] got FabricUIManager:', uiManager)
 
 // const {
-//   createAttributePayload,
-//   diffAttributePayloads,
-// } = require('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface');
+//   createPublicInstance,
+//   createPublicTextInstance,
+// } = require('react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactFabricPublicInstance');
 
 const {
   create: createAttributePayload,
@@ -78,33 +78,14 @@ const HostConfig = {
     _currentHostContext,
     workInProgress
   ) => {
-    // try {
-    //   const viewConfig = global.rnViewConfigs.get(type);
-    //   log('[createInstance] viewConfig=', viewConfig);
-    // } catch (e) {
-    //   log('[createInstance] ERROR getting view config for type=', type, ' error=', e.message || String(e))
-    //   throw e
-    // }
-
-    // log('[createInstnace] debugA')
     const tag = global.nextReactTag
     global.nextReactTag += 2
-    // log('[createInstnace] debugB')
-
-    // TODO:
-
-    //   if (__DEV__) {
-    //     for (const key in viewConfig.validAttributes) {
-    //       if (props.hasOwnProperty(key)) {
-    //         deepFreezeAndThrowOnMutationInDev(props[key]);
-    //       }
-    //     }
-    //   }
 
     const viewConfig = ReactNativeViewConfigRegistry.get(type)
-    const updatePayload = createAttributePayload(props, viewConfig.validAttributes)
-    log('[createInstance] rawProps=', props)
-    log('[createInstance] viewConfig.validAttributes=', viewConfig.validAttributes)
+    const updatePayload = createAttributePayload(
+      props,
+      viewConfig.validAttributes
+    )
 
     let node
     try {
@@ -117,14 +98,12 @@ const HostConfig = {
         updatePayload, // props
         workInProgress // internalInstanceHandle
       )
-      log('[createInstance] node=', node)
     } catch (e) {
       log('[createInstance] ERROR in createNode:', e.message || String(e))
       log('Stack:', new Error().stack)
       throw e
     }
 
-    // I think react is using getPublicInstance here
     return {
       node: node,
       canonical: {
@@ -279,6 +258,65 @@ const HostConfig = {
     // TODO: implement returning react element
     return instance
   },
+  // getPublicInstance(instance) {
+  //   if (instance.canonical != null) {
+  //     if (instance.canonical.publicInstance == null) {
+  //       instance.canonical.publicInstance = createPublicInstance(
+  //         instance.canonical.nativeTag,
+  //         instance.canonical.viewConfig,
+  //         instance.canonical.internalInstanceHandle,
+  //         instance.canonical.publicRootInstance ?? null
+  //       )
+  //       // This was only necessary to create the public instance.
+  //       instance.canonical.publicRootInstance = null
+  //     }
+
+  //     return instance.canonical.publicInstance
+  //   }
+
+  //   // Handle root containers
+  //   if (instance.containerInfo != null) {
+  //     if (instance.containerInfo.publicInstance != null) {
+  //       return instance.containerInfo.publicInstance
+  //     }
+  //   }
+
+  //   // For compatibility with the legacy renderer, in case it's used with Fabric
+  //   // in the same app.
+  //   // $FlowExpectedError[prop-missing]
+  //   if (instance._nativeTag != null) {
+  //     // $FlowExpectedError[incompatible-return]
+  //     return instance
+  //   }
+
+  //   return null
+  // },
+
+  // getPublicTextInstance(textInstance, internalInstanceHandle) {
+  //   if (textInstance.publicInstance == null) {
+  //     textInstance.publicInstance = createPublicTextInstance(
+  //       internalInstanceHandle
+  //     )
+  //   }
+  //   return textInstance.publicInstance
+  // },
+  // getPublicInstanceFromInternalInstanceHandle(internalInstanceHandle) {
+  //   const instance = internalInstanceHandle.stateNode
+
+  //   // React resets all the fields in the fiber when the component is unmounted
+  //   // to prevent memory leaks.
+  //   if (instance == null) {
+  //     return null
+  //   }
+
+  //   if (internalInstanceHandle.tag === HostText) {
+  //     const textInstance = instance
+  //     return this.getPublicTextInstance(textInstance, internalInstanceHandle)
+  //   }
+
+  //   const elementInstance = internalInstanceHandle.stateNode
+  //   return this.getPublicInstance(elementInstance)
+  // },
 
   prepareForCommit(containerInfo) {
     return null

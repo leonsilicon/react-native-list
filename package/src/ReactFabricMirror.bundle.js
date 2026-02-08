@@ -11208,14 +11208,11 @@ var HostConfig = {
     global.nextReactTag += 2;
     const viewConfig = ReactNativeViewConfigRegistry.get(type);
     const updatePayload = createAttributePayload(props, viewConfig.validAttributes);
-    log("[createInstance] rawProps=", props);
-    log("[createInstance] viewConfig.validAttributes=", viewConfig.validAttributes);
     let node;
     try {
       log("[createInstance] calling createNode with type=", type, "tag=", tag);
       log("[createInstance] props=", updatePayload);
       node = uiManager.createNode(tag, viewConfig.uiViewClassName, rootContainerInstance.containerTag, updatePayload, workInProgress);
-      log("[createInstance] node=", node);
     } catch (e) {
       log("[createInstance] ERROR in createNode:", e.message || String(e));
       log("Stack:", new Error().stack);

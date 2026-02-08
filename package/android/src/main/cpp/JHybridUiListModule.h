@@ -4,6 +4,8 @@
 #include <react/jni/JRuntimeExecutor.h>
 #include <fbjni/fbjni.h>
 #include <worklets/android/WorkletsModule.h>
+#include <react/fabric/JFabricUIManager.h>
+#include <react/renderer/core/EventListener.h>
 
 namespace margelo::nitro::nitrolist {
 
@@ -26,10 +28,15 @@ private:
             jni::alias_ref<JHybridUiListModule> jThis,
             jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule);
 
+    static void setupEventInterceptor(
+            jni::alias_ref<JHybridUiListModule> jThis,
+            jni::alias_ref<JFabricUIManager::javaobject> fabricUIManager);
+
     static std::shared_ptr<react::CallInvoker> getOrInitCallInvoker(jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule);
 
 private:
     static std::shared_ptr<react::CallInvoker> uiCallInvoker_;
+    static std::shared_ptr<const react::EventListener> eventInterceptor_;
 };
 
 } // namespace margelo::nitro::nitrolist
