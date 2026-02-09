@@ -37,11 +37,77 @@ global.rootInstance = {
   publicInstance: null,
 }
 
-const {dispatchEvent} = require("../../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter")
-// This will be retrieved on the native side in JSI … hm or we call and set it?
-global.handleEvent = dispatchEvent;
-
 const {getPublicInstance} = require('../shims/react-fiber-config-fabric.js')
+
+//#region Setup event system
+const { setComponentTree } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginUtils')
+const {
+  injectEventPluginOrder,
+  injectEventPluginsByName,
+} = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginRegistry')
+const ReactNativeBridgeEventPluginModule = require('../../third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin')
+const ResponderEventPluginModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderEventPlugin')
+const ReactNativeEventPluginOrderModule = require('../../third_party/react/packages/react-native-renderer/src/ReactNativeEventPluginOrder')
+const ReactFabricGlobalResponderHandlerModule = require('../../third_party/react/packages/react-native-renderer/src/ReactFabricGlobalResponderHandler')
+
+const ReactNativeBridgeEventPlugin =
+  ReactNativeBridgeEventPluginModule.default ?? ReactNativeBridgeEventPluginModule
+const ResponderEventPlugin =
+  ResponderEventPluginModule.default ?? ResponderEventPluginModule
+const ReactNativeEventPluginOrder =
+  ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule
+const ReactFabricGlobalResponderHandler =
+  ReactFabricGlobalResponderHandlerModule.default ?? ReactFabricGlobalResponderHandlerModule
+
+function ensureLegacyEventPluginsInjected() {
+  try {
+    injectEventPluginOrder(ReactNativeEventPluginOrder)
+  } catch (error) {
+    // The plugin order can only be injected once for a given registry instance.
+    if (!String(error).includes('Cannot inject event plugin ordering more than once')) {
+      throw error
+    }
+  }
+
+  injectEventPluginsByName({
+    ResponderEventPlugin,
+    ReactNativeBridgeEventPlugin,
+  })
+
+  setComponentTree(
+    // Equivalent to ReactFabricComponentTree.getFiberCurrentPropsFromNode
+    (instance) => instance?.canonical?.currentProps ?? null,
+    // Equivalent to ReactFabricComponentTree.getInstanceFromNode
+    (node) => {
+      if (
+        node?.canonical != null &&
+        node.canonical.internalInstanceHandle != null
+      ) {
+        return node.canonical.internalInstanceHandle
+      }
+      return node ?? null
+    },
+    // Equivalent to ReactFabricComponentTree.getNodeFromInstance
+    (fiber) => {
+      const publicInstance = getPublicInstance(fiber.stateNode)
+      if (publicInstance == null) {
+        throw new Error('Could not find host instance from fiber')
+      }
+      return publicInstance
+    }
+  )
+
+  ResponderEventPlugin.injection.injectGlobalResponderHandler(
+    ReactFabricGlobalResponderHandler
+  )
+}
+
+ensureLegacyEventPluginsInjected()
+
+const {dispatchEvent} = require('../../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter')
+// This will be retrieved on the native side in JSI ... hm or we call and set it?
+global.handleEvent = dispatchEvent
+//#endregion
 
 function log(...args) {
   // log('[ReactFabricMirror]', ...args)

@@ -428,144 +428,28 @@ var require_ReactNativeAttributePayload = __commonJS((exports2) => {
   }
 });
 
-// ../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginRegistry.js
-var require_EventPluginRegistry = __commonJS((exports2) => {
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.eventNameDispatchConfigs = undefined;
-  exports2.injectEventPluginOrder = injectEventPluginOrder;
-  exports2.injectEventPluginsByName = injectEventPluginsByName;
-  exports2.registrationNameModules = exports2.registrationNameDependencies = exports2.possibleRegistrationNames = exports2.plugins = undefined;
-  var eventPluginOrder = null;
-  var namesToPlugins = {};
-  function recomputePluginOrdering() {
-    if (!eventPluginOrder) {
-      return;
+// shims/react-fiber-config-fabric.js
+var require_react_fiber_config_fabric = __commonJS((exports2, module2) => {
+  var ReactNativeElement = require("react-native/src/private/webapis/dom/nodes/ReactNativeElement").default;
+  function getPublicInstance(instance) {
+    if (instance?.canonical != null) {
+      if (instance.canonical.publicInstance == null) {
+        instance.canonical.publicInstance = new ReactNativeElement(instance.canonical.nativeTag, instance.canonical.viewConfig, instance.canonical.internalInstanceHandle, instance.canonical.publicRootInstance ?? null);
+        instance.canonical.publicRootInstance = null;
+      }
+      return instance.canonical.publicInstance;
     }
-    for (var pluginName in namesToPlugins) {
-      var pluginModule = namesToPlugins[pluginName];
-      var pluginIndex = eventPluginOrder.indexOf(pluginName);
-      if (pluginIndex <= -1) {
-        throw new Error("EventPluginRegistry: Cannot inject event plugins that do not exist in " + `the plugin ordering, \`${pluginName}\`.`);
-      }
-      if (plugins[pluginIndex]) {
-        continue;
-      }
-      if (!pluginModule.extractEvents) {
-        throw new Error("EventPluginRegistry: Event plugins must implement an `extractEvents` " + `method, but \`${pluginName}\` does not.`);
-      }
-      plugins[pluginIndex] = pluginModule;
-      var publishedEvents = pluginModule.eventTypes;
-      for (var _eventName in publishedEvents) {
-        if (!publishEventForPlugin(publishedEvents[_eventName], pluginModule, _eventName)) {
-          throw new Error(`EventPluginRegistry: Failed to publish event \`${_eventName}\` for plugin \`${pluginName}\`.`);
-        }
-      }
+    if (instance?.containerInfo?.publicInstance != null) {
+      return instance.containerInfo.publicInstance;
     }
+    if (instance?._nativeTag != null) {
+      return instance;
+    }
+    return null;
   }
-  function publishEventForPlugin(dispatchConfig, pluginModule, eventName) {
-    if (eventNameDispatchConfigs.hasOwnProperty(eventName)) {
-      throw new Error("EventPluginRegistry: More than one plugin attempted to publish the same " + `event name, \`${eventName}\`.`);
-    }
-    eventNameDispatchConfigs[eventName] = dispatchConfig;
-    var phasedRegistrationNames = dispatchConfig.phasedRegistrationNames;
-    if (phasedRegistrationNames) {
-      for (var phaseName in phasedRegistrationNames) {
-        if (phasedRegistrationNames.hasOwnProperty(phaseName)) {
-          var phasedRegistrationName = phasedRegistrationNames[phaseName];
-          publishRegistrationName(phasedRegistrationName, pluginModule, eventName);
-        }
-      }
-      return true;
-    } else if (dispatchConfig.registrationName) {
-      publishRegistrationName(dispatchConfig.registrationName, pluginModule, eventName);
-      return true;
-    }
-    return false;
-  }
-  function publishRegistrationName(registrationName, pluginModule, eventName) {
-    if (registrationNameModules[registrationName]) {
-      throw new Error("EventPluginRegistry: More than one plugin attempted to publish the same " + `registration name, \`${registrationName}\`.`);
-    }
-    registrationNameModules[registrationName] = pluginModule;
-    registrationNameDependencies[registrationName] = pluginModule.eventTypes[eventName].dependencies;
-    if (__DEV__) {
-      var _lowerCasedName = registrationName.toLowerCase();
-      possibleRegistrationNames[_lowerCasedName] = registrationName;
-      if (registrationName === "onDoubleClick") {
-        possibleRegistrationNames.ondblclick = registrationName;
-      }
-    }
-  }
-  var plugins = exports2.plugins = [];
-  var eventNameDispatchConfigs = exports2.eventNameDispatchConfigs = {};
-  var registrationNameModules = exports2.registrationNameModules = {};
-  var registrationNameDependencies = exports2.registrationNameDependencies = {};
-  var possibleRegistrationNames = exports2.possibleRegistrationNames = __DEV__ ? {} : null;
-  function injectEventPluginOrder(injectedEventPluginOrder) {
-    if (eventPluginOrder) {
-      throw new Error("EventPluginRegistry: Cannot inject event plugin ordering more than " + "once. You are likely trying to load more than one copy of React.");
-    }
-    eventPluginOrder = Array.prototype.slice.call(injectedEventPluginOrder);
-    recomputePluginOrdering();
-  }
-  function injectEventPluginsByName(injectedNamesToPlugins) {
-    var isOrderingDirty = false;
-    for (var pluginName in injectedNamesToPlugins) {
-      if (!injectedNamesToPlugins.hasOwnProperty(pluginName)) {
-        continue;
-      }
-      var pluginModule = injectedNamesToPlugins[pluginName];
-      if (!namesToPlugins.hasOwnProperty(pluginName) || namesToPlugins[pluginName] !== pluginModule) {
-        if (namesToPlugins[pluginName]) {
-          throw new Error("EventPluginRegistry: Cannot inject two different event plugins " + `using the same name, \`${pluginName}\`.`);
-        }
-        namesToPlugins[pluginName] = pluginModule;
-        isOrderingDirty = true;
-      }
-    }
-    if (isOrderingDirty) {
-      recomputePluginOrdering();
-    }
-  }
-});
-
-// ../third_party/react/packages/react-native-renderer/src/legacy-events/ReactGenericBatching.js
-var require_ReactGenericBatching = __commonJS((exports2) => {
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.batchedUpdates = batchedUpdates;
-  exports2.discreteUpdates = discreteUpdates;
-  exports2.setBatchingImplementation = setBatchingImplementation;
-  var batchedUpdatesImpl = function batchedUpdatesImpl(fn, bookkeeping) {
-    return fn(bookkeeping);
+  module2.exports = {
+    getPublicInstance
   };
-  var discreteUpdatesImpl = function discreteUpdatesImpl(fn, a, b, c, d) {
-    return fn(a, b, c, d);
-  };
-  var isInsideEventHandler = false;
-  function batchedUpdates(fn, bookkeeping) {
-    if (isInsideEventHandler) {
-      return fn(bookkeeping);
-    }
-    isInsideEventHandler = true;
-    try {
-      return batchedUpdatesImpl(fn, bookkeeping);
-    } finally {
-      isInsideEventHandler = false;
-    }
-  }
-  function discreteUpdates(fn, a, b, c, d) {
-    var prevIsInsideEventHandler = isInsideEventHandler;
-    isInsideEventHandler = true;
-    try {
-      return discreteUpdatesImpl(fn, a, b, c, d);
-    } finally {
-      isInsideEventHandler = prevIsInsideEventHandler;
-    }
-  }
-  function setBatchingImplementation(_batchedUpdatesImpl, _discreteUpdatesImpl) {
-    batchedUpdatesImpl = _batchedUpdatesImpl;
-    discreteUpdatesImpl = _discreteUpdatesImpl;
-  }
 });
 
 // ../third_party/react/packages/shared/isArray.js
@@ -577,35 +461,6 @@ var require_isArray = __commonJS((exports2) => {
     return isArrayImpl(a);
   }
   var _default = exports2.default = isArray;
-});
-
-// ../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto.js
-var require_accumulateInto = __commonJS((exports2) => {
-  var _interopRequireDefault = require_interopRequireDefault();
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.default = undefined;
-  var _isArray = _interopRequireDefault(require_isArray());
-  function accumulateInto(current, next) {
-    if (next == null) {
-      throw new Error("Accumulated items must not be null or undefined.");
-    }
-    if (current == null) {
-      return next;
-    }
-    if ((0, _isArray.default)(current)) {
-      if ((0, _isArray.default)(next)) {
-        current.push.apply(current, next);
-        return current;
-      }
-      current.push(next);
-      return current;
-    }
-    if ((0, _isArray.default)(next)) {
-      return [current].concat(next);
-    }
-    return [current, next];
-  }
-  var _default = exports2.default = accumulateInto;
 });
 
 // shims/react-current-fiber.js
@@ -760,6 +615,317 @@ var require_EventPluginUtils = __commonJS((exports2) => {
   }
 });
 
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginRegistry.js
+var require_EventPluginRegistry = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.eventNameDispatchConfigs = undefined;
+  exports2.injectEventPluginOrder = injectEventPluginOrder;
+  exports2.injectEventPluginsByName = injectEventPluginsByName;
+  exports2.registrationNameModules = exports2.registrationNameDependencies = exports2.possibleRegistrationNames = exports2.plugins = undefined;
+  var eventPluginOrder = null;
+  var namesToPlugins = {};
+  function recomputePluginOrdering() {
+    if (!eventPluginOrder) {
+      return;
+    }
+    for (var pluginName in namesToPlugins) {
+      var pluginModule = namesToPlugins[pluginName];
+      var pluginIndex = eventPluginOrder.indexOf(pluginName);
+      if (pluginIndex <= -1) {
+        throw new Error("EventPluginRegistry: Cannot inject event plugins that do not exist in " + `the plugin ordering, \`${pluginName}\`.`);
+      }
+      if (plugins[pluginIndex]) {
+        continue;
+      }
+      if (!pluginModule.extractEvents) {
+        throw new Error("EventPluginRegistry: Event plugins must implement an `extractEvents` " + `method, but \`${pluginName}\` does not.`);
+      }
+      plugins[pluginIndex] = pluginModule;
+      var publishedEvents = pluginModule.eventTypes;
+      for (var _eventName in publishedEvents) {
+        if (!publishEventForPlugin(publishedEvents[_eventName], pluginModule, _eventName)) {
+          throw new Error(`EventPluginRegistry: Failed to publish event \`${_eventName}\` for plugin \`${pluginName}\`.`);
+        }
+      }
+    }
+  }
+  function publishEventForPlugin(dispatchConfig, pluginModule, eventName) {
+    if (eventNameDispatchConfigs.hasOwnProperty(eventName)) {
+      throw new Error("EventPluginRegistry: More than one plugin attempted to publish the same " + `event name, \`${eventName}\`.`);
+    }
+    eventNameDispatchConfigs[eventName] = dispatchConfig;
+    var phasedRegistrationNames = dispatchConfig.phasedRegistrationNames;
+    if (phasedRegistrationNames) {
+      for (var phaseName in phasedRegistrationNames) {
+        if (phasedRegistrationNames.hasOwnProperty(phaseName)) {
+          var phasedRegistrationName = phasedRegistrationNames[phaseName];
+          publishRegistrationName(phasedRegistrationName, pluginModule, eventName);
+        }
+      }
+      return true;
+    } else if (dispatchConfig.registrationName) {
+      publishRegistrationName(dispatchConfig.registrationName, pluginModule, eventName);
+      return true;
+    }
+    return false;
+  }
+  function publishRegistrationName(registrationName, pluginModule, eventName) {
+    if (registrationNameModules[registrationName]) {
+      throw new Error("EventPluginRegistry: More than one plugin attempted to publish the same " + `registration name, \`${registrationName}\`.`);
+    }
+    registrationNameModules[registrationName] = pluginModule;
+    registrationNameDependencies[registrationName] = pluginModule.eventTypes[eventName].dependencies;
+    if (__DEV__) {
+      var _lowerCasedName = registrationName.toLowerCase();
+      possibleRegistrationNames[_lowerCasedName] = registrationName;
+      if (registrationName === "onDoubleClick") {
+        possibleRegistrationNames.ondblclick = registrationName;
+      }
+    }
+  }
+  var plugins = exports2.plugins = [];
+  var eventNameDispatchConfigs = exports2.eventNameDispatchConfigs = {};
+  var registrationNameModules = exports2.registrationNameModules = {};
+  var registrationNameDependencies = exports2.registrationNameDependencies = {};
+  var possibleRegistrationNames = exports2.possibleRegistrationNames = __DEV__ ? {} : null;
+  function injectEventPluginOrder(injectedEventPluginOrder) {
+    if (eventPluginOrder) {
+      throw new Error("EventPluginRegistry: Cannot inject event plugin ordering more than " + "once. You are likely trying to load more than one copy of React.");
+    }
+    eventPluginOrder = Array.prototype.slice.call(injectedEventPluginOrder);
+    recomputePluginOrdering();
+  }
+  function injectEventPluginsByName(injectedNamesToPlugins) {
+    var isOrderingDirty = false;
+    for (var pluginName in injectedNamesToPlugins) {
+      if (!injectedNamesToPlugins.hasOwnProperty(pluginName)) {
+        continue;
+      }
+      var pluginModule = injectedNamesToPlugins[pluginName];
+      if (!namesToPlugins.hasOwnProperty(pluginName) || namesToPlugins[pluginName] !== pluginModule) {
+        if (namesToPlugins[pluginName]) {
+          throw new Error("EventPluginRegistry: Cannot inject two different event plugins " + `using the same name, \`${pluginName}\`.`);
+        }
+        namesToPlugins[pluginName] = pluginModule;
+        isOrderingDirty = true;
+      }
+    }
+    if (isOrderingDirty) {
+      recomputePluginOrdering();
+    }
+  }
+});
+
+// ../third_party/react/packages/shared/assign.js
+var require_assign = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var assign = Object.assign;
+  var _default = exports2.default = assign;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/SyntheticEvent.js
+var require_SyntheticEvent = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _assign = _interopRequireDefault(require_assign());
+  var EVENT_POOL_SIZE = 10;
+  var EventInterface = { type: null, target: null, currentTarget: function currentTarget() {
+    return null;
+  }, eventPhase: null, bubbles: null, cancelable: null, timeStamp: function timeStamp(event) {
+    return event.timeStamp || Date.now();
+  }, defaultPrevented: null, isTrusted: null };
+  function functionThatReturnsTrue() {
+    return true;
+  }
+  function functionThatReturnsFalse() {
+    return false;
+  }
+  function SyntheticEvent(dispatchConfig, targetInst, nativeEvent, nativeEventTarget) {
+    if (__DEV__) {
+      delete this.nativeEvent;
+      delete this.preventDefault;
+      delete this.stopPropagation;
+      delete this.isDefaultPrevented;
+      delete this.isPropagationStopped;
+    }
+    this.dispatchConfig = dispatchConfig;
+    this._targetInst = targetInst;
+    this.nativeEvent = nativeEvent;
+    this._dispatchListeners = null;
+    this._dispatchInstances = null;
+    var Interface = this.constructor.Interface;
+    for (var propName in Interface) {
+      if (!Interface.hasOwnProperty(propName)) {
+        continue;
+      }
+      if (__DEV__) {
+        delete this[propName];
+      }
+      var normalize = Interface[propName];
+      if (normalize) {
+        this[propName] = normalize(nativeEvent);
+      } else {
+        if (propName === "target") {
+          this.target = nativeEventTarget;
+        } else {
+          this[propName] = nativeEvent[propName];
+        }
+      }
+    }
+    var defaultPrevented = nativeEvent.defaultPrevented != null ? nativeEvent.defaultPrevented : nativeEvent.returnValue === false;
+    if (defaultPrevented) {
+      this.isDefaultPrevented = functionThatReturnsTrue;
+    } else {
+      this.isDefaultPrevented = functionThatReturnsFalse;
+    }
+    this.isPropagationStopped = functionThatReturnsFalse;
+    return this;
+  }
+  (0, _assign.default)(SyntheticEvent.prototype, { preventDefault: function preventDefault() {
+    this.defaultPrevented = true;
+    var event = this.nativeEvent;
+    if (!event) {
+      return;
+    }
+    if (event.preventDefault) {
+      event.preventDefault();
+    } else if (typeof event.returnValue !== "unknown") {
+      event.returnValue = false;
+    }
+    this.isDefaultPrevented = functionThatReturnsTrue;
+  }, stopPropagation: function stopPropagation() {
+    var event = this.nativeEvent;
+    if (!event) {
+      return;
+    }
+    if (event.stopPropagation) {
+      event.stopPropagation();
+    } else if (typeof event.cancelBubble !== "unknown") {
+      event.cancelBubble = true;
+    }
+    this.isPropagationStopped = functionThatReturnsTrue;
+  }, persist: function persist() {
+    this.isPersistent = functionThatReturnsTrue;
+  }, isPersistent: functionThatReturnsFalse, destructor: function destructor() {
+    var Interface = this.constructor.Interface;
+    for (var propName in Interface) {
+      if (__DEV__) {
+        Object.defineProperty(this, propName, getPooledWarningPropertyDefinition(propName, Interface[propName]));
+      } else {
+        this[propName] = null;
+      }
+    }
+    this.dispatchConfig = null;
+    this._targetInst = null;
+    this.nativeEvent = null;
+    this.isDefaultPrevented = functionThatReturnsFalse;
+    this.isPropagationStopped = functionThatReturnsFalse;
+    this._dispatchListeners = null;
+    this._dispatchInstances = null;
+    if (__DEV__) {
+      Object.defineProperty(this, "nativeEvent", getPooledWarningPropertyDefinition("nativeEvent", null));
+      Object.defineProperty(this, "isDefaultPrevented", getPooledWarningPropertyDefinition("isDefaultPrevented", functionThatReturnsFalse));
+      Object.defineProperty(this, "isPropagationStopped", getPooledWarningPropertyDefinition("isPropagationStopped", functionThatReturnsFalse));
+      Object.defineProperty(this, "preventDefault", getPooledWarningPropertyDefinition("preventDefault", function() {}));
+      Object.defineProperty(this, "stopPropagation", getPooledWarningPropertyDefinition("stopPropagation", function() {}));
+    }
+  } });
+  SyntheticEvent.Interface = EventInterface;
+  SyntheticEvent.extend = function(Interface) {
+    var Super = this;
+    var E = function E() {};
+    E.prototype = Super.prototype;
+    var prototype = new E;
+    function Class() {
+      return Super.apply(this, arguments);
+    }
+    (0, _assign.default)(prototype, Class.prototype);
+    Class.prototype = prototype;
+    Class.prototype.constructor = Class;
+    Class.Interface = (0, _assign.default)({}, Super.Interface, Interface);
+    Class.extend = Super.extend;
+    addEventPoolingTo(Class);
+    return Class;
+  };
+  addEventPoolingTo(SyntheticEvent);
+  function getPooledWarningPropertyDefinition(propName, getVal) {
+    function set(val) {
+      var action = isFunction ? "setting the method" : "setting the property";
+      warn(action, "This is effectively a no-op");
+      return val;
+    }
+    function get() {
+      var action = isFunction ? "accessing the method" : "accessing the property";
+      var result = isFunction ? "This is a no-op function" : "This is set to null";
+      warn(action, result);
+      return getVal;
+    }
+    function warn(action, result) {
+      if (__DEV__) {
+        console.error("This synthetic event is reused for performance reasons. If you're seeing this, " + "you're %s `%s` on a released/nullified synthetic event. %s. " + "If you must keep the original synthetic event around, use event.persist(). " + "See https://react.dev/link/event-pooling for more information.", action, propName, result);
+      }
+    }
+    var isFunction = typeof getVal === "function";
+    return { configurable: true, set, get };
+  }
+  function createOrGetPooledEvent(dispatchConfig, targetInst, nativeEvent, nativeInst) {
+    var EventConstructor = this;
+    if (EventConstructor.eventPool.length) {
+      var instance = EventConstructor.eventPool.pop();
+      EventConstructor.call(instance, dispatchConfig, targetInst, nativeEvent, nativeInst);
+      return instance;
+    }
+    return new EventConstructor(dispatchConfig, targetInst, nativeEvent, nativeInst);
+  }
+  function releasePooledEvent(event) {
+    var EventConstructor = this;
+    if (!(event instanceof EventConstructor)) {
+      throw new Error("Trying to release an event instance into a pool of a different type.");
+    }
+    event.destructor();
+    if (EventConstructor.eventPool.length < EVENT_POOL_SIZE) {
+      EventConstructor.eventPool.push(event);
+    }
+  }
+  function addEventPoolingTo(EventConstructor) {
+    EventConstructor.getPooled = createOrGetPooledEvent;
+    EventConstructor.eventPool = [];
+    EventConstructor.release = releasePooledEvent;
+  }
+  var _default = exports2.default = SyntheticEvent;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto.js
+var require_accumulateInto = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _isArray = _interopRequireDefault(require_isArray());
+  function accumulateInto(current, next) {
+    if (next == null) {
+      throw new Error("Accumulated items must not be null or undefined.");
+    }
+    if (current == null) {
+      return next;
+    }
+    if ((0, _isArray.default)(current)) {
+      if ((0, _isArray.default)(next)) {
+        current.push.apply(current, next);
+        return current;
+      }
+      current.push(next);
+      return current;
+    }
+    if ((0, _isArray.default)(next)) {
+      return [current].concat(next);
+    }
+    return [current, next];
+  }
+  var _default = exports2.default = accumulateInto;
+});
+
 // ../third_party/react/packages/react-native-renderer/src/ReactNativeGetListener.js
 var require_ReactNativeGetListener = __commonJS((exports2) => {
   Object.defineProperty(exports2, "__esModule", { value: true });
@@ -794,6 +960,653 @@ var require_forEachAccumulated = __commonJS((exports2) => {
     }
   }
   var _default = exports2.default = forEachAccumulated;
+});
+
+// shims/react-work-tags.js
+var require_react_work_tags = __commonJS((exports2, module2) => {
+  var HostComponent = 5;
+  module2.exports = {
+    HostComponent
+  };
+});
+
+// ../third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin.js
+var require_ReactNativeBridgeEventPlugin = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  exports2.traverseTwoPhase = traverseTwoPhase;
+  var _SyntheticEvent = _interopRequireDefault(require_SyntheticEvent());
+  var _ReactNativePrivateInterface = require("react-native/Libraries/ReactPrivate/ReactNativePrivateInterface");
+  var _accumulateInto = _interopRequireDefault(require_accumulateInto());
+  var _ReactNativeGetListener = _interopRequireDefault(require_ReactNativeGetListener());
+  var _forEachAccumulated = _interopRequireDefault(require_forEachAccumulated());
+  var _ReactWorkTags = require_react_work_tags();
+  var customBubblingEventTypes = _ReactNativePrivateInterface.ReactNativeViewConfigRegistry.customBubblingEventTypes;
+  var customDirectEventTypes = _ReactNativePrivateInterface.ReactNativeViewConfigRegistry.customDirectEventTypes;
+  function listenerAtPhase(inst, event, propagationPhase) {
+    var registrationName = event.dispatchConfig.phasedRegistrationNames[propagationPhase];
+    return (0, _ReactNativeGetListener.default)(inst, registrationName);
+  }
+  function accumulateDirectionalDispatches(inst, phase, event) {
+    if (__DEV__) {
+      if (!inst) {
+        console.error("Dispatching inst must not be null");
+      }
+    }
+    var listener = listenerAtPhase(inst, event, phase);
+    if (listener) {
+      event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
+      event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
+    }
+  }
+  function getParent(inst) {
+    do {
+      inst = inst.return;
+    } while (inst && inst.tag !== _ReactWorkTags.HostComponent);
+    if (inst) {
+      return inst;
+    }
+    return null;
+  }
+  function traverseTwoPhase(inst, fn, arg, skipBubbling) {
+    var path = [];
+    while (inst) {
+      path.push(inst);
+      inst = getParent(inst);
+    }
+    var i;
+    for (i = path.length;i-- > 0; ) {
+      fn(path[i], "captured", arg);
+    }
+    if (skipBubbling) {
+      fn(path[0], "bubbled", arg);
+    } else {
+      for (i = 0;i < path.length; i++) {
+        fn(path[i], "bubbled", arg);
+      }
+    }
+  }
+  function accumulateTwoPhaseDispatchesSingle(event) {
+    if (event && event.dispatchConfig.phasedRegistrationNames) {
+      traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, false);
+    }
+  }
+  function accumulateTwoPhaseDispatches(events) {
+    (0, _forEachAccumulated.default)(events, accumulateTwoPhaseDispatchesSingle);
+  }
+  function accumulateCapturePhaseDispatches(event) {
+    if (event && event.dispatchConfig.phasedRegistrationNames) {
+      traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, true);
+    }
+  }
+  function accumulateDispatches(inst, ignoredDirection, event) {
+    if (inst && event && event.dispatchConfig.registrationName) {
+      var registrationName = event.dispatchConfig.registrationName;
+      var listener = (0, _ReactNativeGetListener.default)(inst, registrationName);
+      if (listener) {
+        event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
+        event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
+      }
+    }
+  }
+  function accumulateDirectDispatchesSingle(event) {
+    if (event && event.dispatchConfig.registrationName) {
+      accumulateDispatches(event._targetInst, null, event);
+    }
+  }
+  function accumulateDirectDispatches(events) {
+    (0, _forEachAccumulated.default)(events, accumulateDirectDispatchesSingle);
+  }
+  var ReactNativeBridgeEventPlugin = { eventTypes: {}, extractEvents: function extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+    if (targetInst == null) {
+      return null;
+    }
+    var bubbleDispatchConfig = customBubblingEventTypes[topLevelType];
+    var directDispatchConfig = customDirectEventTypes[topLevelType];
+    if (!bubbleDispatchConfig && !directDispatchConfig) {
+      throw new Error(`Unsupported top level event type "${topLevelType}" dispatched`);
+    }
+    var event = _SyntheticEvent.default.getPooled(bubbleDispatchConfig || directDispatchConfig, targetInst, nativeEvent, nativeEventTarget);
+    if (bubbleDispatchConfig) {
+      var skipBubbling = event != null && event.dispatchConfig.phasedRegistrationNames != null && event.dispatchConfig.phasedRegistrationNames.skipBubbling;
+      if (skipBubbling) {
+        accumulateCapturePhaseDispatches(event);
+      } else {
+        accumulateTwoPhaseDispatches(event);
+      }
+    } else if (directDispatchConfig) {
+      accumulateDirectDispatches(event);
+    } else {
+      return null;
+    }
+    return event;
+  } };
+  var _default = exports2.default = ReactNativeBridgeEventPlugin;
+  console.warn("Deep imports from the 'react-native' package are deprecated ('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface'). Source: /Users/hannogodecke/Documents/react-native-nitro-list/third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin.js 19:0");
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderSyntheticEvent.js
+var require_ResponderSyntheticEvent = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _SyntheticEvent = _interopRequireDefault(require_SyntheticEvent());
+  var ResponderSyntheticEvent = _SyntheticEvent.default.extend({ touchHistory: function touchHistory(nativeEvent) {
+    return null;
+  } });
+  var _default = exports2.default = ResponderSyntheticEvent;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderTopLevelEventTypes.js
+var require_ResponderTopLevelEventTypes = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.endDependencies = exports2.TOP_TOUCH_START = exports2.TOP_TOUCH_MOVE = exports2.TOP_TOUCH_END = exports2.TOP_TOUCH_CANCEL = exports2.TOP_SELECTION_CHANGE = exports2.TOP_SCROLL = undefined;
+  exports2.isEndish = isEndish;
+  exports2.isMoveish = isMoveish;
+  exports2.isStartish = isStartish;
+  exports2.startDependencies = exports2.moveDependencies = undefined;
+  var TOP_TOUCH_START = exports2.TOP_TOUCH_START = "topTouchStart";
+  var TOP_TOUCH_MOVE = exports2.TOP_TOUCH_MOVE = "topTouchMove";
+  var TOP_TOUCH_END = exports2.TOP_TOUCH_END = "topTouchEnd";
+  var TOP_TOUCH_CANCEL = exports2.TOP_TOUCH_CANCEL = "topTouchCancel";
+  var TOP_SCROLL = exports2.TOP_SCROLL = "topScroll";
+  var TOP_SELECTION_CHANGE = exports2.TOP_SELECTION_CHANGE = "topSelectionChange";
+  function isStartish(topLevelType) {
+    return topLevelType === TOP_TOUCH_START;
+  }
+  function isMoveish(topLevelType) {
+    return topLevelType === TOP_TOUCH_MOVE;
+  }
+  function isEndish(topLevelType) {
+    return topLevelType === TOP_TOUCH_END || topLevelType === TOP_TOUCH_CANCEL;
+  }
+  var startDependencies = exports2.startDependencies = [TOP_TOUCH_START];
+  var moveDependencies = exports2.moveDependencies = [TOP_TOUCH_MOVE];
+  var endDependencies = exports2.endDependencies = [TOP_TOUCH_CANCEL, TOP_TOUCH_END];
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderTouchHistoryStore.js
+var require_ResponderTouchHistoryStore = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _ResponderTopLevelEventTypes = require_ResponderTopLevelEventTypes();
+  var MAX_TOUCH_BANK = 20;
+  var touchBank = [];
+  var touchHistory = { touchBank, numberActiveTouches: 0, indexOfSingleActiveTouch: -1, mostRecentTimeStamp: 0 };
+  function timestampForTouch(touch) {
+    return touch.timeStamp || touch.timestamp;
+  }
+  function createTouchRecord(touch) {
+    return { touchActive: true, startPageX: touch.pageX, startPageY: touch.pageY, startTimeStamp: timestampForTouch(touch), currentPageX: touch.pageX, currentPageY: touch.pageY, currentTimeStamp: timestampForTouch(touch), previousPageX: touch.pageX, previousPageY: touch.pageY, previousTimeStamp: timestampForTouch(touch) };
+  }
+  function resetTouchRecord(touchRecord, touch) {
+    touchRecord.touchActive = true;
+    touchRecord.startPageX = touch.pageX;
+    touchRecord.startPageY = touch.pageY;
+    touchRecord.startTimeStamp = timestampForTouch(touch);
+    touchRecord.currentPageX = touch.pageX;
+    touchRecord.currentPageY = touch.pageY;
+    touchRecord.currentTimeStamp = timestampForTouch(touch);
+    touchRecord.previousPageX = touch.pageX;
+    touchRecord.previousPageY = touch.pageY;
+    touchRecord.previousTimeStamp = timestampForTouch(touch);
+  }
+  function getTouchIdentifier(_ref) {
+    var identifier = _ref.identifier;
+    if (identifier == null) {
+      throw new Error("Touch object is missing identifier.");
+    }
+    if (__DEV__) {
+      if (identifier > MAX_TOUCH_BANK) {
+        console.error("Touch identifier %s is greater than maximum supported %s which causes " + "performance issues backfilling array locations for all of the indices.", identifier, MAX_TOUCH_BANK);
+      }
+    }
+    return identifier;
+  }
+  function recordTouchStart(touch) {
+    var identifier = getTouchIdentifier(touch);
+    var touchRecord = touchBank[identifier];
+    if (touchRecord) {
+      resetTouchRecord(touchRecord, touch);
+    } else {
+      touchBank[identifier] = createTouchRecord(touch);
+    }
+    touchHistory.mostRecentTimeStamp = timestampForTouch(touch);
+  }
+  function recordTouchMove(touch) {
+    var touchRecord = touchBank[getTouchIdentifier(touch)];
+    if (touchRecord) {
+      touchRecord.touchActive = true;
+      touchRecord.previousPageX = touchRecord.currentPageX;
+      touchRecord.previousPageY = touchRecord.currentPageY;
+      touchRecord.previousTimeStamp = touchRecord.currentTimeStamp;
+      touchRecord.currentPageX = touch.pageX;
+      touchRecord.currentPageY = touch.pageY;
+      touchRecord.currentTimeStamp = timestampForTouch(touch);
+      touchHistory.mostRecentTimeStamp = timestampForTouch(touch);
+    } else {
+      if (__DEV__) {
+        console.warn(`Cannot record touch move without a touch start.
+` + `Touch Move: %s
+` + "Touch Bank: %s", printTouch(touch), printTouchBank());
+      }
+    }
+  }
+  function recordTouchEnd(touch) {
+    var touchRecord = touchBank[getTouchIdentifier(touch)];
+    if (touchRecord) {
+      touchRecord.touchActive = false;
+      touchRecord.previousPageX = touchRecord.currentPageX;
+      touchRecord.previousPageY = touchRecord.currentPageY;
+      touchRecord.previousTimeStamp = touchRecord.currentTimeStamp;
+      touchRecord.currentPageX = touch.pageX;
+      touchRecord.currentPageY = touch.pageY;
+      touchRecord.currentTimeStamp = timestampForTouch(touch);
+      touchHistory.mostRecentTimeStamp = timestampForTouch(touch);
+    } else {
+      if (__DEV__) {
+        console.warn(`Cannot record touch end without a touch start.
+` + `Touch End: %s
+` + "Touch Bank: %s", printTouch(touch), printTouchBank());
+      }
+    }
+  }
+  function printTouch(touch) {
+    return JSON.stringify({ identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY, timestamp: timestampForTouch(touch) });
+  }
+  function printTouchBank() {
+    var printed = JSON.stringify(touchBank.slice(0, MAX_TOUCH_BANK));
+    if (touchBank.length > MAX_TOUCH_BANK) {
+      printed += " (original size: " + touchBank.length + ")";
+    }
+    return printed;
+  }
+  var instrumentationCallback;
+  var ResponderTouchHistoryStore = { instrument: function instrument(callback) {
+    instrumentationCallback = callback;
+  }, recordTouchTrack: function recordTouchTrack(topLevelType, nativeEvent) {
+    if (instrumentationCallback != null) {
+      instrumentationCallback(topLevelType, nativeEvent);
+    }
+    if ((0, _ResponderTopLevelEventTypes.isMoveish)(topLevelType)) {
+      nativeEvent.changedTouches.forEach(recordTouchMove);
+    } else if ((0, _ResponderTopLevelEventTypes.isStartish)(topLevelType)) {
+      nativeEvent.changedTouches.forEach(recordTouchStart);
+      touchHistory.numberActiveTouches = nativeEvent.touches.length;
+      if (touchHistory.numberActiveTouches === 1) {
+        touchHistory.indexOfSingleActiveTouch = nativeEvent.touches[0].identifier;
+      }
+    } else if ((0, _ResponderTopLevelEventTypes.isEndish)(topLevelType)) {
+      nativeEvent.changedTouches.forEach(recordTouchEnd);
+      touchHistory.numberActiveTouches = nativeEvent.touches.length;
+      if (touchHistory.numberActiveTouches === 1) {
+        for (var i = 0;i < touchBank.length; i++) {
+          var touchTrackToCheck = touchBank[i];
+          if (touchTrackToCheck != null && touchTrackToCheck.touchActive) {
+            touchHistory.indexOfSingleActiveTouch = i;
+            break;
+          }
+        }
+        if (__DEV__) {
+          var activeRecord = touchBank[touchHistory.indexOfSingleActiveTouch];
+          if (activeRecord == null || !activeRecord.touchActive) {
+            console.error("Cannot find single active touch.");
+          }
+        }
+      }
+    }
+  }, touchHistory };
+  var _default = exports2.default = ResponderTouchHistoryStore;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/accumulate.js
+var require_accumulate = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _isArray = _interopRequireDefault(require_isArray());
+  function accumulate(current, next) {
+    if (next == null) {
+      throw new Error("Accumulated items must not be null or undefined.");
+    }
+    if (current == null) {
+      return next;
+    }
+    if ((0, _isArray.default)(current)) {
+      return current.concat(next);
+    }
+    if ((0, _isArray.default)(next)) {
+      return [current].concat(next);
+    }
+    return [current, next];
+  }
+  var _default = exports2.default = accumulate;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderEventPlugin.js
+var require_ResponderEventPlugin = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  exports2.getLowestCommonAncestor = getLowestCommonAncestor;
+  var _EventPluginUtils = require_EventPluginUtils();
+  var _ResponderSyntheticEvent = _interopRequireDefault(require_ResponderSyntheticEvent());
+  var _ResponderTouchHistoryStore = _interopRequireDefault(require_ResponderTouchHistoryStore());
+  var _accumulate = _interopRequireDefault(require_accumulate());
+  var _ResponderTopLevelEventTypes = require_ResponderTopLevelEventTypes();
+  var _accumulateInto = _interopRequireDefault(require_accumulateInto());
+  var _forEachAccumulated = _interopRequireDefault(require_forEachAccumulated());
+  var _ReactWorkTags = require_react_work_tags();
+  var responderInst = null;
+  var trackedTouchCount = 0;
+  function changeResponder(nextResponderInst, blockHostResponder) {
+    var oldResponderInst = responderInst;
+    responderInst = nextResponderInst;
+    if (ResponderEventPlugin.GlobalResponderHandler !== null) {
+      ResponderEventPlugin.GlobalResponderHandler.onChange(oldResponderInst, nextResponderInst, blockHostResponder);
+    }
+  }
+  var eventTypes = { startShouldSetResponder: { phasedRegistrationNames: { bubbled: "onStartShouldSetResponder", captured: "onStartShouldSetResponderCapture" }, dependencies: _ResponderTopLevelEventTypes.startDependencies }, scrollShouldSetResponder: { phasedRegistrationNames: { bubbled: "onScrollShouldSetResponder", captured: "onScrollShouldSetResponderCapture" }, dependencies: [_ResponderTopLevelEventTypes.TOP_SCROLL] }, selectionChangeShouldSetResponder: { phasedRegistrationNames: { bubbled: "onSelectionChangeShouldSetResponder", captured: "onSelectionChangeShouldSetResponderCapture" }, dependencies: [_ResponderTopLevelEventTypes.TOP_SELECTION_CHANGE] }, moveShouldSetResponder: { phasedRegistrationNames: { bubbled: "onMoveShouldSetResponder", captured: "onMoveShouldSetResponderCapture" }, dependencies: _ResponderTopLevelEventTypes.moveDependencies }, responderStart: { registrationName: "onResponderStart", dependencies: _ResponderTopLevelEventTypes.startDependencies }, responderMove: { registrationName: "onResponderMove", dependencies: _ResponderTopLevelEventTypes.moveDependencies }, responderEnd: { registrationName: "onResponderEnd", dependencies: _ResponderTopLevelEventTypes.endDependencies }, responderRelease: { registrationName: "onResponderRelease", dependencies: _ResponderTopLevelEventTypes.endDependencies }, responderTerminationRequest: { registrationName: "onResponderTerminationRequest", dependencies: [] }, responderGrant: { registrationName: "onResponderGrant", dependencies: [] }, responderReject: { registrationName: "onResponderReject", dependencies: [] }, responderTerminate: { registrationName: "onResponderTerminate", dependencies: [] } };
+  function getParent(inst) {
+    do {
+      inst = inst.return;
+    } while (inst && inst.tag !== _ReactWorkTags.HostComponent);
+    if (inst) {
+      return inst;
+    }
+    return null;
+  }
+  function getLowestCommonAncestor(instA, instB) {
+    var depthA = 0;
+    for (var tempA = instA;tempA; tempA = getParent(tempA)) {
+      depthA++;
+    }
+    var depthB = 0;
+    for (var tempB = instB;tempB; tempB = getParent(tempB)) {
+      depthB++;
+    }
+    while (depthA - depthB > 0) {
+      instA = getParent(instA);
+      depthA--;
+    }
+    while (depthB - depthA > 0) {
+      instB = getParent(instB);
+      depthB--;
+    }
+    var depth = depthA;
+    while (depth--) {
+      if (instA === instB || instA === instB.alternate) {
+        return instA;
+      }
+      instA = getParent(instA);
+      instB = getParent(instB);
+    }
+    return null;
+  }
+  function isAncestor(instA, instB) {
+    while (instB) {
+      if (instA === instB || instA === instB.alternate) {
+        return true;
+      }
+      instB = getParent(instB);
+    }
+    return false;
+  }
+  function traverseTwoPhase(inst, fn, arg) {
+    var path = [];
+    while (inst) {
+      path.push(inst);
+      inst = getParent(inst);
+    }
+    var i;
+    for (i = path.length;i-- > 0; ) {
+      fn(path[i], "captured", arg);
+    }
+    for (i = 0;i < path.length; i++) {
+      fn(path[i], "bubbled", arg);
+    }
+  }
+  function getListener(inst, registrationName) {
+    var stateNode = inst.stateNode;
+    if (stateNode === null) {
+      return null;
+    }
+    var props = (0, _EventPluginUtils.getFiberCurrentPropsFromNode)(stateNode);
+    if (props === null) {
+      return null;
+    }
+    var listener = props[registrationName];
+    if (listener && typeof listener !== "function") {
+      throw new Error(`Expected \`${registrationName}\` listener to be a function, instead got a value of \`${typeof listener}\` type.`);
+    }
+    return listener;
+  }
+  function listenerAtPhase(inst, event, propagationPhase) {
+    var registrationName = event.dispatchConfig.phasedRegistrationNames[propagationPhase];
+    return getListener(inst, registrationName);
+  }
+  function accumulateDirectionalDispatches(inst, phase, event) {
+    if (__DEV__) {
+      if (!inst) {
+        console.error("Dispatching inst must not be null");
+      }
+    }
+    var listener = listenerAtPhase(inst, event, phase);
+    if (listener) {
+      event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
+      event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
+    }
+  }
+  function accumulateDispatches(inst, ignoredDirection, event) {
+    if (inst && event && event.dispatchConfig.registrationName) {
+      var registrationName = event.dispatchConfig.registrationName;
+      var listener = getListener(inst, registrationName);
+      if (listener) {
+        event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
+        event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
+      }
+    }
+  }
+  function accumulateDirectDispatchesSingle(event) {
+    if (event && event.dispatchConfig.registrationName) {
+      accumulateDispatches(event._targetInst, null, event);
+    }
+  }
+  function accumulateDirectDispatches(events) {
+    (0, _forEachAccumulated.default)(events, accumulateDirectDispatchesSingle);
+  }
+  function accumulateTwoPhaseDispatchesSingleSkipTarget(event) {
+    if (event && event.dispatchConfig.phasedRegistrationNames) {
+      var targetInst = event._targetInst;
+      var parentInst = targetInst ? getParent(targetInst) : null;
+      traverseTwoPhase(parentInst, accumulateDirectionalDispatches, event);
+    }
+  }
+  function accumulateTwoPhaseDispatchesSkipTarget(events) {
+    (0, _forEachAccumulated.default)(events, accumulateTwoPhaseDispatchesSingleSkipTarget);
+  }
+  function accumulateTwoPhaseDispatchesSingle(event) {
+    if (event && event.dispatchConfig.phasedRegistrationNames) {
+      traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event);
+    }
+  }
+  function accumulateTwoPhaseDispatches(events) {
+    (0, _forEachAccumulated.default)(events, accumulateTwoPhaseDispatchesSingle);
+  }
+  function setResponderAndExtractTransfer(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+    var shouldSetEventType = (0, _ResponderTopLevelEventTypes.isStartish)(topLevelType) ? eventTypes.startShouldSetResponder : (0, _ResponderTopLevelEventTypes.isMoveish)(topLevelType) ? eventTypes.moveShouldSetResponder : topLevelType === _ResponderTopLevelEventTypes.TOP_SELECTION_CHANGE ? eventTypes.selectionChangeShouldSetResponder : eventTypes.scrollShouldSetResponder;
+    var bubbleShouldSetFrom = !responderInst ? targetInst : getLowestCommonAncestor(responderInst, targetInst);
+    var skipOverBubbleShouldSetFrom = bubbleShouldSetFrom === responderInst;
+    var shouldSetEvent = _ResponderSyntheticEvent.default.getPooled(shouldSetEventType, bubbleShouldSetFrom, nativeEvent, nativeEventTarget);
+    shouldSetEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+    if (skipOverBubbleShouldSetFrom) {
+      accumulateTwoPhaseDispatchesSkipTarget(shouldSetEvent);
+    } else {
+      accumulateTwoPhaseDispatches(shouldSetEvent);
+    }
+    var wantsResponderInst = (0, _EventPluginUtils.executeDispatchesInOrderStopAtTrue)(shouldSetEvent);
+    if (!shouldSetEvent.isPersistent()) {
+      shouldSetEvent.constructor.release(shouldSetEvent);
+    }
+    if (!wantsResponderInst || wantsResponderInst === responderInst) {
+      return null;
+    }
+    var extracted;
+    var grantEvent = _ResponderSyntheticEvent.default.getPooled(eventTypes.responderGrant, wantsResponderInst, nativeEvent, nativeEventTarget);
+    grantEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+    accumulateDirectDispatches(grantEvent);
+    var blockHostResponder = (0, _EventPluginUtils.executeDirectDispatch)(grantEvent) === true;
+    if (responderInst) {
+      var terminationRequestEvent = _ResponderSyntheticEvent.default.getPooled(eventTypes.responderTerminationRequest, responderInst, nativeEvent, nativeEventTarget);
+      terminationRequestEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+      accumulateDirectDispatches(terminationRequestEvent);
+      var shouldSwitch = !(0, _EventPluginUtils.hasDispatches)(terminationRequestEvent) || (0, _EventPluginUtils.executeDirectDispatch)(terminationRequestEvent);
+      if (!terminationRequestEvent.isPersistent()) {
+        terminationRequestEvent.constructor.release(terminationRequestEvent);
+      }
+      if (shouldSwitch) {
+        var terminateEvent = _ResponderSyntheticEvent.default.getPooled(eventTypes.responderTerminate, responderInst, nativeEvent, nativeEventTarget);
+        terminateEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+        accumulateDirectDispatches(terminateEvent);
+        extracted = (0, _accumulate.default)(extracted, [grantEvent, terminateEvent]);
+        changeResponder(wantsResponderInst, blockHostResponder);
+      } else {
+        var rejectEvent = _ResponderSyntheticEvent.default.getPooled(eventTypes.responderReject, wantsResponderInst, nativeEvent, nativeEventTarget);
+        rejectEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+        accumulateDirectDispatches(rejectEvent);
+        extracted = (0, _accumulate.default)(extracted, rejectEvent);
+      }
+    } else {
+      extracted = (0, _accumulate.default)(extracted, grantEvent);
+      changeResponder(wantsResponderInst, blockHostResponder);
+    }
+    return extracted;
+  }
+  function canTriggerTransfer(topLevelType, topLevelInst, nativeEvent) {
+    return topLevelInst && (topLevelType === _ResponderTopLevelEventTypes.TOP_SCROLL && !nativeEvent.responderIgnoreScroll || trackedTouchCount > 0 && topLevelType === _ResponderTopLevelEventTypes.TOP_SELECTION_CHANGE || (0, _ResponderTopLevelEventTypes.isStartish)(topLevelType) || (0, _ResponderTopLevelEventTypes.isMoveish)(topLevelType));
+  }
+  function noResponderTouches(nativeEvent) {
+    var touches = nativeEvent.touches;
+    if (!touches || touches.length === 0) {
+      return true;
+    }
+    for (var i = 0;i < touches.length; i++) {
+      var activeTouch = touches[i];
+      var target = activeTouch.target;
+      if (target !== null && target !== undefined && target !== 0) {
+        var targetInst = (0, _EventPluginUtils.getInstanceFromNode)(target);
+        if (isAncestor(responderInst, targetInst)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  var ResponderEventPlugin = { _getResponder: function _getResponder() {
+    return responderInst;
+  }, eventTypes, extractEvents: function extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget, eventSystemFlags) {
+    if ((0, _ResponderTopLevelEventTypes.isStartish)(topLevelType)) {
+      trackedTouchCount += 1;
+    } else if ((0, _ResponderTopLevelEventTypes.isEndish)(topLevelType)) {
+      if (trackedTouchCount >= 0) {
+        trackedTouchCount -= 1;
+      } else {
+        if (__DEV__) {
+          console.warn("Ended a touch event which was not counted in `trackedTouchCount`.");
+        }
+        return null;
+      }
+    }
+    _ResponderTouchHistoryStore.default.recordTouchTrack(topLevelType, nativeEvent);
+    var extracted = canTriggerTransfer(topLevelType, targetInst, nativeEvent) ? setResponderAndExtractTransfer(topLevelType, targetInst, nativeEvent, nativeEventTarget) : null;
+    var isResponderTouchStart = responderInst && (0, _ResponderTopLevelEventTypes.isStartish)(topLevelType);
+    var isResponderTouchMove = responderInst && (0, _ResponderTopLevelEventTypes.isMoveish)(topLevelType);
+    var isResponderTouchEnd = responderInst && (0, _ResponderTopLevelEventTypes.isEndish)(topLevelType);
+    var incrementalTouch = isResponderTouchStart ? eventTypes.responderStart : isResponderTouchMove ? eventTypes.responderMove : isResponderTouchEnd ? eventTypes.responderEnd : null;
+    if (incrementalTouch) {
+      var gesture = _ResponderSyntheticEvent.default.getPooled(incrementalTouch, responderInst, nativeEvent, nativeEventTarget);
+      gesture.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+      accumulateDirectDispatches(gesture);
+      extracted = (0, _accumulate.default)(extracted, gesture);
+    }
+    var isResponderTerminate = responderInst && topLevelType === _ResponderTopLevelEventTypes.TOP_TOUCH_CANCEL;
+    var isResponderRelease = responderInst && !isResponderTerminate && (0, _ResponderTopLevelEventTypes.isEndish)(topLevelType) && noResponderTouches(nativeEvent);
+    var finalTouch = isResponderTerminate ? eventTypes.responderTerminate : isResponderRelease ? eventTypes.responderRelease : null;
+    if (finalTouch) {
+      var finalEvent = _ResponderSyntheticEvent.default.getPooled(finalTouch, responderInst, nativeEvent, nativeEventTarget);
+      finalEvent.touchHistory = _ResponderTouchHistoryStore.default.touchHistory;
+      accumulateDirectDispatches(finalEvent);
+      extracted = (0, _accumulate.default)(extracted, finalEvent);
+      changeResponder(null);
+    }
+    return extracted;
+  }, GlobalResponderHandler: null, injection: { injectGlobalResponderHandler: function injectGlobalResponderHandler(GlobalResponderHandler) {
+    ResponderEventPlugin.GlobalResponderHandler = GlobalResponderHandler;
+  } } };
+  var _default = exports2.default = ResponderEventPlugin;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/ReactNativeEventPluginOrder.js
+var require_ReactNativeEventPluginOrder = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var ReactNativeEventPluginOrder = ["ResponderEventPlugin", "ReactNativeBridgeEventPlugin"];
+  var _default = exports2.default = ReactNativeEventPluginOrder;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/ReactFabricGlobalResponderHandler.js
+var require_ReactFabricGlobalResponderHandler = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var ReactFabricGlobalResponderHandler = { onChange: function onChange(from, to, blockNativeResponder) {
+    if (from && from.stateNode) {
+      nativeFabricUIManager.setIsJSResponder(from.stateNode.node, false, blockNativeResponder || false);
+    }
+    if (to && to.stateNode) {
+      nativeFabricUIManager.setIsJSResponder(to.stateNode.node, true, blockNativeResponder || false);
+    }
+  } };
+  var _default = exports2.default = ReactFabricGlobalResponderHandler;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/ReactGenericBatching.js
+var require_ReactGenericBatching = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.batchedUpdates = batchedUpdates;
+  exports2.discreteUpdates = discreteUpdates;
+  exports2.setBatchingImplementation = setBatchingImplementation;
+  var batchedUpdatesImpl = function batchedUpdatesImpl(fn, bookkeeping) {
+    return fn(bookkeeping);
+  };
+  var discreteUpdatesImpl = function discreteUpdatesImpl(fn, a, b, c, d) {
+    return fn(a, b, c, d);
+  };
+  var isInsideEventHandler = false;
+  function batchedUpdates(fn, bookkeeping) {
+    if (isInsideEventHandler) {
+      return fn(bookkeeping);
+    }
+    isInsideEventHandler = true;
+    try {
+      return batchedUpdatesImpl(fn, bookkeeping);
+    } finally {
+      isInsideEventHandler = false;
+    }
+  }
+  function discreteUpdates(fn, a, b, c, d) {
+    var prevIsInsideEventHandler = isInsideEventHandler;
+    isInsideEventHandler = true;
+    try {
+      return discreteUpdatesImpl(fn, a, b, c, d);
+    } finally {
+      isInsideEventHandler = prevIsInsideEventHandler;
+    }
+  }
+  function setBatchingImplementation(_batchedUpdatesImpl, _discreteUpdatesImpl) {
+    batchedUpdatesImpl = _batchedUpdatesImpl;
+    discreteUpdatesImpl = _discreteUpdatesImpl;
+  }
 });
 
 // ../third_party/react/packages/react-native-renderer/src/legacy-events/EventBatching.js
@@ -831,31 +1644,6 @@ var require_EventBatching = __commonJS((exports2) => {
     }
     (0, _EventPluginUtils.rethrowCaughtError)();
   }
-});
-
-// shims/react-fiber-config-fabric.js
-var require_react_fiber_config_fabric = __commonJS((exports2, module2) => {
-  var ReactNativeElementModule = require("react-native/src/private/webapis/dom/nodes/ReactNativeElement");
-  var ReactNativeElement = ReactNativeElementModule?.default ?? ReactNativeElementModule;
-  function getPublicInstance(instance) {
-    if (instance?.canonical != null) {
-      if (instance.canonical.publicInstance == null) {
-        instance.canonical.publicInstance = new ReactNativeElement(instance.canonical.nativeTag, instance.canonical.viewConfig, instance.canonical.internalInstanceHandle, instance.canonical.publicRootInstance ?? null);
-        instance.canonical.publicRootInstance = null;
-      }
-      return instance.canonical.publicInstance;
-    }
-    if (instance?.containerInfo?.publicInstance != null) {
-      return instance.containerInfo.publicInstance;
-    }
-    if (instance?._nativeTag != null) {
-      return instance;
-    }
-    return null;
-  }
-  module2.exports = {
-    getPublicInstance
-  };
 });
 
 // ../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter.js
@@ -939,9 +1727,49 @@ global.rootInstance = {
   containerTag: 3,
   publicInstance: null
 };
+var { getPublicInstance } = require_react_fiber_config_fabric();
+var { setComponentTree } = require_EventPluginUtils();
+var {
+  injectEventPluginOrder,
+  injectEventPluginsByName
+} = require_EventPluginRegistry();
+var ReactNativeBridgeEventPluginModule = require_ReactNativeBridgeEventPlugin();
+var ResponderEventPluginModule = require_ResponderEventPlugin();
+var ReactNativeEventPluginOrderModule = require_ReactNativeEventPluginOrder();
+var ReactFabricGlobalResponderHandlerModule = require_ReactFabricGlobalResponderHandler();
+var ReactNativeBridgeEventPlugin = ReactNativeBridgeEventPluginModule.default ?? ReactNativeBridgeEventPluginModule;
+var ResponderEventPlugin = ResponderEventPluginModule.default ?? ResponderEventPluginModule;
+var ReactNativeEventPluginOrder = ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule;
+var ReactFabricGlobalResponderHandler = ReactFabricGlobalResponderHandlerModule.default ?? ReactFabricGlobalResponderHandlerModule;
+function ensureLegacyEventPluginsInjected() {
+  try {
+    injectEventPluginOrder(ReactNativeEventPluginOrder);
+  } catch (error) {
+    if (!String(error).includes("Cannot inject event plugin ordering more than once")) {
+      throw error;
+    }
+  }
+  injectEventPluginsByName({
+    ResponderEventPlugin,
+    ReactNativeBridgeEventPlugin
+  });
+  setComponentTree((instance) => instance?.canonical?.currentProps ?? null, (node) => {
+    if (node?.canonical != null && node.canonical.internalInstanceHandle != null) {
+      return node.canonical.internalInstanceHandle;
+    }
+    return node ?? null;
+  }, (fiber) => {
+    const publicInstance = getPublicInstance(fiber.stateNode);
+    if (publicInstance == null) {
+      throw new Error("Could not find host instance from fiber");
+    }
+    return publicInstance;
+  });
+  ResponderEventPlugin.injection.injectGlobalResponderHandler(ReactFabricGlobalResponderHandler);
+}
+ensureLegacyEventPluginsInjected();
 var { dispatchEvent } = require_ReactFabricEventEmitter();
 global.handleEvent = dispatchEvent;
-var { getPublicInstance } = require_react_fiber_config_fabric();
 function log(...args) {
   global._log?.("[ReactFabricMirror] " + args.map((a) => {
     try {
