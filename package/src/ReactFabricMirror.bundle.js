@@ -835,24 +835,8 @@ var require_EventBatching = __commonJS((exports2) => {
 
 // shims/react-fiber-config-fabric.js
 var require_react_fiber_config_fabric = __commonJS((exports2, module2) => {
-  var {
-    createPublicInstance
-  } = require("react-native/Libraries/ReactPrivate/ReactNativePrivateInterface");
   function getPublicInstance(instance) {
-    if (instance?.canonical != null) {
-      if (instance.canonical.publicInstance == null) {
-        instance.canonical.publicInstance = createPublicInstance(instance.canonical.nativeTag, instance.canonical.viewConfig, instance.canonical.internalInstanceHandle, instance.canonical.publicRootInstance ?? null);
-        instance.canonical.publicRootInstance = null;
-      }
-      return instance.canonical.publicInstance;
-    }
-    if (instance?.containerInfo?.publicInstance != null) {
-      return instance.containerInfo.publicInstance;
-    }
-    if (instance?._nativeTag != null) {
-      return instance;
-    }
-    return null;
+    return instance;
   }
   module2.exports = {
     getPublicInstance
@@ -896,6 +880,7 @@ var require_ReactFabricEventEmitter = __commonJS((exports2) => {
     (0, _EventBatching.runEventsInBatch)(events);
   }
   function dispatchEvent(target, topLevelType, nativeEvent) {
+    console.log("HannoDebug", "dispatchEvent: topLevelType=", topLevelType, "targetFiber=", target, "nativeEvent=", nativeEvent);
     var targetFiber = target;
     var eventTarget = null;
     if (targetFiber != null) {

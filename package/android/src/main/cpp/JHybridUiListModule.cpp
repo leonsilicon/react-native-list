@@ -19,7 +19,7 @@ namespace margelo::nitro::nitrolist {
         void invokeAsync(CallFunc &&func) noexcept override {
             uiScheduler_->scheduleOnUI(
                     [func = std::move(func), uiWorkletRuntime = uiWorkletRuntime_]() {
-                        jsi::Runtime& runtime = uiWorkletRuntime->getJSIRuntime();
+                        jsi::Runtime &runtime = uiWorkletRuntime->getJSIRuntime();
                         func(runtime);
                     });
             // TODO: not sure if i have to call trigger here myself? I _think_ it ticks to some choreographer, so should be fine?
@@ -46,7 +46,8 @@ namespace margelo::nitro::nitrolist {
                                            });
     }
 
-    std::shared_ptr<react::CallInvoker> JHybridUiListModule::getOrInitCallInvoker(jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule) {
+    std::shared_ptr<react::CallInvoker> JHybridUiListModule::getOrInitCallInvoker(
+            jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule) {
         if (uiCallInvoker_) {
             return uiCallInvoker_;
         }
@@ -101,6 +102,11 @@ namespace margelo::nitro::nitrolist {
     void JHybridUiListModule::setupEventInterceptor(
             jni::alias_ref<JHybridUiListModule> jThis,
             jni::alias_ref<JFabricUIManager::javaobject> fabricUIManager) {
+        if (!uiCallInvoker_) {
+            throw std::runtime_error(
+                    "UI CallInvoker must be initialized before setting up event interceptor");
+        }
+
         if (!fabricUIManager) {
             throw std::runtime_error("FabricUIManager reference is null");
         }
@@ -110,18 +116,87 @@ namespace margelo::nitro::nitrolist {
             throw std::runtime_error("Failed to get Scheduler from FabricUIManager");
         }
 
-        eventInterceptor_ = std::make_shared<react::EventListener>([scheduler](const react::RawEvent &event) {
-            // Intercept all events and trigger a transaction to ensure the UI thread is processing updates.
-            auto eventSurfaceId = event.eventTarget->getSurfaceId();
-            if (eventSurfaceId == 3) {
-                // This is an event from a view we manage, special handling needded
-                __android_log_print(ANDROID_LOG_INFO, "JHybridUiListModule", "[HannoDebug] Intercepted event from surface 3!");
-                // TODO: setup weird JS event system on the JS side!
-                return true;
-            }
+        eventInterceptor_ = std::make_shared<react::EventListener>(
+                [uiCallInvoker = uiCallInvoker_](const react::RawEvent &event) {
+                    // Intercept all events and trigger a transaction to ensure the UI thread is processing updates.
+                    auto eventSurfaceId = event.eventTarget->getSurfaceId();
+                    if (eventSurfaceId == 3) {
+                        // This is an event from a view we manage, special handling needded
+                        __android_log_print(ANDROID_LOG_INFO, "JHybridUiListModule",
+                                            "[HannoDebug] Intercepted event from surface 3!");
+                        // Expect function handler to be installed on global
+                        uiCallInvoker->invokeAsync([event_ = event](jsi::Runtime &runtime) {
+                            auto global = runtime.global();
+                            auto handlerValue = global.getProperty(runtime, "handleEvent");
+                            if (handlerValue.isObject() &&
+                                handlerValue.asObject(runtime).isFunction(runtime)) {
+                                // TODO: it would be nice to cache this JSI function!
+                                auto handlerFunc = handlerValue.asObject(runtime).asFunction(
+                                        runtime);
 
-            return false;
-        });
+                                // from: UIManagerBinding.cpp#63
+                                if (event_.eventPayload->getType() ==
+                                    react::EventPayloadType::PointerEvent) {
+                                    throw std::runtime_error(
+                                            "PointerEvent payload handling is not implemented yet");
+                                } else {
+                                    auto payload = event_.eventPayload->asJSIValue(runtime);
+                                    if (payload.isNull()) {
+                                        __android_log_print(ANDROID_LOG_ERROR,
+                                                            "JHybridUiListModule",
+                                                            "[HannoDebug] Event payload is null, skipping event handling");
+                                        return;
+                                    }
+
+                                    auto instanceHandle = event_.eventTarget == nullptr ? jsi::Value::null() : [&]() {
+                                        event_.eventTarget->retain(runtime);
+                                        auto instanceHandle = event_.eventTarget->getInstanceHandle(
+                                                runtime);
+                                        if (instanceHandle.isUndefined()) {
+                                            return jsi::Value::null();
+                                        }
+
+                                        // Mixing `target` into `payload`.
+                                        if (!payload.isObject()) {
+                                            __android_log_print(ANDROID_LOG_ERROR,
+                                                                "JHybridUiListModule",
+                                                                "[HannoDebug] Event payload is not an object, skipping event handling");
+                                        }
+                                        react_native_assert(payload.isObject());
+                                        payload.asObject(runtime).setProperty(
+                                                runtime, "target", event_.eventTarget->getTag());
+                                        return instanceHandle;
+                                    }();
+
+                                    if (instanceHandle.isNull()) {
+                                        __android_log_print(ANDROID_LOG_ERROR,
+                                                            "JHybridUiListModule",
+                                                            "[HannoDebug] Event target instance handle is null, skipping event handling");
+                                    }
+
+
+                                    handlerFunc.call(
+                                            runtime,
+                                            std::move(instanceHandle),
+                                            jsi::String::createFromUtf8(runtime, event_.type),
+                                            std::move(payload)
+                                    );
+                                    __android_log_print(ANDROID_LOG_INFO, "JHybridUiListModule",
+                                                        "[HannoDebug] Called JS event handler successfully");
+                                    event_.eventTarget->release(runtime);
+                                }
+                            } else {
+                                throw std::runtime_error(
+                                        "handleEvent function is not defined on the global object");
+                            }
+                        });
+
+                        // TODO: setup weird JS event system on the JS side!
+                        return true;
+                    }
+
+                    return false;
+                });
 
         // TODO: unregister
         scheduler->addEventListener(eventInterceptor_);

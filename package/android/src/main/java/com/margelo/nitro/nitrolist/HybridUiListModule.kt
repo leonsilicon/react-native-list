@@ -53,10 +53,6 @@ class HybridUiListModule : HybridUiListModuleSpec() {
 
         reactSurfaceView = surfaceView
 
-        val fabricUIManager = uiManager as? FabricUIManager
-            ?: throw IllegalStateException("UIManager is not a FabricUIManager! Is the Fabric architecture enabled?")
-        setupEventInterceptor(fabricUIManager)
-
         // Next: Create a TurboModuleManager for the UI runtime, which will set global.nativeModuleProxy
         // This is whats being used when doing NativeModule.MyNativeModule in JS!
         // TODO: i use a bunch of internals here, can this be improved?
@@ -108,6 +104,10 @@ class HybridUiListModule : HybridUiListModuleSpec() {
                 jsCallInvokerHolder = uiCallInvokerHolder,
                 nativeMethodCallInvokerHolder = nativeMethodCallInvokerHolder
             )
+
+            val fabricUIManager = uiManager as? FabricUIManager
+                ?: throw IllegalStateException("UIManager is not a FabricUIManager! Is the Fabric architecture enabled?")
+            setupEventInterceptor(fabricUIManager)
         }
     }
 
