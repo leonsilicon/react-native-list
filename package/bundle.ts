@@ -1,4 +1,5 @@
-import { stripFlowPlugin } from './strip-flow-plugin.js'
+import { stripFlowPlugin } from './strip-flow-plugin.ts'
+import { reactSubmoduleResolvePlugin } from './react-submodule-resolve-plugin.ts'
 
 console.log('Building ReactFabricMirror worklet...')
 const res = await Bun.build({
@@ -6,9 +7,13 @@ const res = await Bun.build({
   outdir: './src',
   naming: 'ReactFabricMirror.bundle.js',
   format: 'cjs',
-  plugins: [stripFlowPlugin],
+  plugins: [reactSubmoduleResolvePlugin, stripFlowPlugin],
   external: [
     'react',
+    'react/jsx-runtime',
+    'react/jsx-dev-runtime',
+    'react-reconciler',
+    'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface',
     'react-native/Libraries/Renderer/shims/ReactNativeViewConfigRegistry',
   ],
   banner: `

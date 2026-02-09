@@ -37,6 +37,10 @@ global.rootInstance = {
   publicInstance: null,
 }
 
+const {dispatchEvent} = require("../../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter")
+// This will be retrieved on the native side in JSI … hm or we call and set it?
+global.handleEvent = dispatchEvent;
+
 function log(...args) {
   // log('[ReactFabricMirror]', ...args)
   global._log?.(
