@@ -125,7 +125,8 @@ export default function App() {
               }
 
               // const shadowNode = ref.current.node; // jsi::Object NativeState ShadowNodeWrapper
-              const tag = ref.current.canonical.nativeTag;
+              global.log("Ref current:", Object.keys(ref.current));
+              const tag = ref.current.__nativeTag;
               global.log("Ref current nativeTag: ", tag);
               tagToArrayPosition[tag] = currentIndex;
               tagToItemId[tag] = global.itemId;

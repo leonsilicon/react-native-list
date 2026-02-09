@@ -41,6 +41,8 @@ const {dispatchEvent} = require("../../third_party/react/packages/react-native-r
 // This will be retrieved on the native side in JSI … hm or we call and set it?
 global.handleEvent = dispatchEvent;
 
+const {getPublicInstance} = require('../shims/react-fiber-config-fabric.js')
+
 function log(...args) {
   // log('[ReactFabricMirror]', ...args)
   global._log?.(
@@ -259,42 +261,8 @@ const HostConfig = {
   },
 
   getPublicInstance(instance) {
-    // TODO: implement returning react element
-    return instance
+    return getPublicInstance(instance)
   },
-  // getPublicInstance(instance) {
-  //   if (instance.canonical != null) {
-  //     if (instance.canonical.publicInstance == null) {
-  //       instance.canonical.publicInstance = createPublicInstance(
-  //         instance.canonical.nativeTag,
-  //         instance.canonical.viewConfig,
-  //         instance.canonical.internalInstanceHandle,
-  //         instance.canonical.publicRootInstance ?? null
-  //       )
-  //       // This was only necessary to create the public instance.
-  //       instance.canonical.publicRootInstance = null
-  //     }
-
-  //     return instance.canonical.publicInstance
-  //   }
-
-  //   // Handle root containers
-  //   if (instance.containerInfo != null) {
-  //     if (instance.containerInfo.publicInstance != null) {
-  //       return instance.containerInfo.publicInstance
-  //     }
-  //   }
-
-  //   // For compatibility with the legacy renderer, in case it's used with Fabric
-  //   // in the same app.
-  //   // $FlowExpectedError[prop-missing]
-  //   if (instance._nativeTag != null) {
-  //     // $FlowExpectedError[incompatible-return]
-  //     return instance
-  //   }
-
-  //   return null
-  // },
 
   // getPublicTextInstance(textInstance, internalInstanceHandle) {
   //   if (textInstance.publicInstance == null) {

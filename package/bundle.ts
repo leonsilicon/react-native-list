@@ -15,6 +15,7 @@ const res = await Bun.build({
     'react-reconciler',
     'react-native/Libraries/ReactPrivate/ReactNativePrivateInterface',
     'react-native/Libraries/Renderer/shims/ReactNativeViewConfigRegistry',
+    'react-native/src/private/webapis/dom/nodes/ReactNativeElement',
   ],
   banner: `
   const capturedManager = nativeFabricUIManager;
