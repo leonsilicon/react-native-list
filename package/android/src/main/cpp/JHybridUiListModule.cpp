@@ -23,6 +23,7 @@ namespace margelo::nitro::nitrolist {
                         func(runtime);
                     });
             // TODO: not sure if i have to call trigger here myself? I _think_ it ticks to some choreographer, so should be fine?
+            uiScheduler_->triggerUI(); // THIS HAS TO BE CALLED FROM THE UI THREAD I THINK ?
         }
 
         void invokeSync(facebook::react::CallFunc &&func) override {
