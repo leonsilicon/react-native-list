@@ -39,8 +39,12 @@ import { setupWorklet } from './ReactFabricMirror.bundle'
 import { BoxedHybridObject, NitroModules } from 'react-native-nitro-modules'
 import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 
+const boxed = uiListModule
 export function setup() {
-  uiListModule.setupExternalSurface()
+  scheduleOnUI(() => {
+    'worklet'
+    boxed.setupExternalSurface()
+  })
 
   scheduleOnUI(setupWorklet)
 }

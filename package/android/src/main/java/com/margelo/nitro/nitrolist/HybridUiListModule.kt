@@ -27,6 +27,10 @@ class HybridUiListModule : HybridUiListModuleSpec() {
 
     @OptIn(UnstableReactNativeAPI::class, FrameworkAPI::class)
     override fun setupExternalSurface() {
+        if (!UiThreadUtil.isOnUiThread()) {
+            throw IllegalStateException("setupExternalSurface must be called on the UI thread!")
+        }
+
         val context: ReactApplicationContext = NitroModules.applicationContext
             ?: throw IllegalStateException("ReactApplicationContext is null! Is Nitro installed?")
 
@@ -88,7 +92,6 @@ class HybridUiListModule : HybridUiListModuleSpec() {
         reactPackages.add(coreReactPackage)
         reactPackages.addAll(reactHostDelegate.reactPackages)
 
-        UiThreadUtil.runOnUiThread {
             val turboModuleManagerDelegate = reactHostDelegate.turboModuleManagerDelegateBuilder
                 .setPackages(reactPackages)
                 .setReactApplicationContext(context)
