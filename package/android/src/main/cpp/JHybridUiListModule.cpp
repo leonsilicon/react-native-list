@@ -24,7 +24,6 @@ namespace margelo::nitro::nitrolist {
                     });
             // Check: is ui thread
             if (getpid() == gettid()) {
-                // TODO: not sure if i have to call trigger here myself? I _think_ it ticks to some choreographer, so should be fine?
                 uiScheduler_->triggerUI();
             }
         }
