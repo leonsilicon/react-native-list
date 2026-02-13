@@ -1,3 +1,21 @@
+
+function log(...args) {
+  // log('[ReactFabricMirror]', ...args)
+  global._log?.(
+    '[ReactFabricMirror] ' +
+      args
+        .map((a) => {
+          try {
+            return JSON.stringify(a)
+          } catch (e) {
+            return "<failed to parse> " + String(a)
+          }
+        })
+        .join(' ')
+  )
+}
+global.log = log
+
 const Reconciler = require('react-reconciler')
 
 // FabricUIManager is basically a wrapper around global.nativeFabricUIManager
@@ -6,12 +24,7 @@ const {
   getFabricUIManager,
 } = require('react-native/Libraries/ReactNative/FabricUIManager')
 const uiManager = getFabricUIManager()
-console.log('[ReactFabricMirror] got FabricUIManager:', uiManager)
-
-// const {
-//   createPublicInstance,
-//   createPublicTextInstance,
-// } = require('react-native/Libraries/ReactNative/ReactFabricPublicInstance/ReactFabricPublicInstance');
+// console.log('[ReactFabricMirror] got FabricUIManager:', uiManager)
 
 const {
   create: createAttributePayload,
@@ -39,25 +52,215 @@ global.rootInstance = {
 
 const {getPublicInstance} = require('../shims/react-fiber-config-fabric.js')
 
-//#region Setup event system
-const { setComponentTree } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginUtils')
+//#region Event handling
+const EventPluginUtilsModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginUtils')
+const { setComponentTree } = EventPluginUtilsModule
 const {
   injectEventPluginOrder,
   injectEventPluginsByName,
+  plugins: legacyPlugins,
 } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginRegistry')
-const ReactNativeBridgeEventPluginModule = require('../../third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin')
 const ResponderEventPluginModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderEventPlugin')
 const ReactNativeEventPluginOrderModule = require('../../third_party/react/packages/react-native-renderer/src/ReactNativeEventPluginOrder')
 const ReactFabricGlobalResponderHandlerModule = require('../../third_party/react/packages/react-native-renderer/src/ReactFabricGlobalResponderHandler')
+const SyntheticEventModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/SyntheticEvent')
+const accumulateIntoModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto')
+const forEachAccumulatedModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/forEachAccumulated')
+const { batchedUpdates } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/ReactGenericBatching')
+const { runEventsInBatch } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventBatching')
+const { HostComponent } = require('react-reconciler/src/ReactWorkTags')
 
-const ReactNativeBridgeEventPlugin =
-  ReactNativeBridgeEventPluginModule.default ?? ReactNativeBridgeEventPluginModule
 const ResponderEventPlugin =
   ResponderEventPluginModule.default ?? ResponderEventPluginModule
 const ReactNativeEventPluginOrder =
   ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule
 const ReactFabricGlobalResponderHandler =
   ReactFabricGlobalResponderHandlerModule.default ?? ReactFabricGlobalResponderHandlerModule
+
+const SyntheticEvent = SyntheticEventModule.default ?? SyntheticEventModule
+const accumulateInto = accumulateIntoModule.default ?? accumulateIntoModule
+const forEachAccumulated =
+  forEachAccumulatedModule.default ?? forEachAccumulatedModule
+
+const { customBubblingEventTypes, customDirectEventTypes } = ReactNativeViewConfigRegistry
+
+function getParent(inst) {
+  do {
+    inst = inst.return
+  } while (inst && inst.tag !== HostComponent)
+  return inst || null
+}
+
+function traverseTwoPhase(inst, fn, arg, skipBubbling) {
+  const path = []
+  while (inst) {
+    path.push(inst)
+    inst = getParent(inst)
+  }
+
+  for (let i = path.length - 1; i >= 0; i--) {
+    fn(path[i], 'captured', arg)
+  }
+
+  if (skipBubbling) {
+    fn(path[0], 'bubbled', arg)
+  } else {
+    for (let i = 0; i < path.length; i++) {
+      fn(path[i], 'bubbled', arg)
+    }
+  }
+}
+
+function getListener(inst, registrationName) {
+  const stateNode = inst.stateNode
+  if (stateNode == null) {
+    return null
+  }
+
+  const props = EventPluginUtilsModule.getFiberCurrentPropsFromNode(stateNode)
+  if (props == null) {
+    return null
+  }
+
+  const listener = props[registrationName]
+  if (listener != null && typeof listener !== 'function') {
+    throw new Error(
+      `Expected \`${registrationName}\` listener to be a function, got \`${typeof listener}\`.`
+    )
+  }
+  return listener
+}
+
+function listenerAtPhase(inst, event, propagationPhase) {
+  const registrationName =
+    event.dispatchConfig.phasedRegistrationNames[propagationPhase]
+  return getListener(inst, registrationName)
+}
+
+function accumulateDirectionalDispatches(inst, phase, event) {
+  const listener = listenerAtPhase(inst, event, phase)
+  if (listener) {
+    event._dispatchListeners = accumulateInto(event._dispatchListeners, listener)
+    event._dispatchInstances = accumulateInto(event._dispatchInstances, inst)
+  }
+}
+
+function accumulateTwoPhaseDispatchesSingle(event) {
+  if (event && event.dispatchConfig.phasedRegistrationNames) {
+    traverseTwoPhase(
+      event._targetInst,
+      accumulateDirectionalDispatches,
+      event,
+      false
+    )
+  }
+}
+
+function accumulateTwoPhaseDispatches(events) {
+  forEachAccumulated(events, accumulateTwoPhaseDispatchesSingle)
+}
+
+function accumulateCapturePhaseDispatches(event) {
+  if (event && event.dispatchConfig.phasedRegistrationNames) {
+    traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, true)
+  }
+}
+
+function accumulateDispatches(inst, _ignoredDirection, event) {
+  if (inst && event && event.dispatchConfig.registrationName) {
+    const registrationName = event.dispatchConfig.registrationName
+    const listener = getListener(inst, registrationName)
+    if (listener) {
+      event._dispatchListeners = accumulateInto(event._dispatchListeners, listener)
+      event._dispatchInstances = accumulateInto(event._dispatchInstances, inst)
+    }
+  }
+}
+
+function accumulateDirectDispatchesSingle(event) {
+  if (event && event.dispatchConfig.registrationName) {
+    accumulateDispatches(event._targetInst, null, event)
+  }
+}
+
+function accumulateDirectDispatches(events) {
+  forEachAccumulated(events, accumulateDirectDispatchesSingle)
+}
+
+const ReactNativeBridgeEventPlugin = {
+  eventTypes: {},
+  extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+    if (targetInst == null) {
+      return null
+    }
+
+    const bubbleDispatchConfig = customBubblingEventTypes[topLevelType]
+    const directDispatchConfig = customDirectEventTypes[topLevelType]
+
+    if (!bubbleDispatchConfig && !directDispatchConfig) {
+      throw new Error(`Unsupported top level event type "${topLevelType}" dispatched`)
+    }
+
+    const event = SyntheticEvent.getPooled(
+      bubbleDispatchConfig || directDispatchConfig,
+      targetInst,
+      nativeEvent,
+      nativeEventTarget
+    )
+
+    if (bubbleDispatchConfig) {
+      const skipBubbling =
+        event != null &&
+        event.dispatchConfig.phasedRegistrationNames != null &&
+        event.dispatchConfig.phasedRegistrationNames.skipBubbling
+      if (skipBubbling) {
+        accumulateCapturePhaseDispatches(event)
+      } else {
+        accumulateTwoPhaseDispatches(event)
+      }
+    } else if (directDispatchConfig) {
+      accumulateDirectDispatches(event)
+    } else {
+      return null
+    }
+
+    return event
+  },
+}
+
+function extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+  let events = null
+  for (let i = 0; i < legacyPlugins.length; i++) {
+    const plugin = legacyPlugins[i]
+    if (plugin) {
+      const extractedEvents = plugin.extractEvents(
+        topLevelType,
+        targetInst,
+        nativeEvent,
+        nativeEventTarget
+      )
+      if (extractedEvents) {
+        events = accumulateInto(events, extractedEvents)
+      }
+    }
+  }
+  return events
+}
+
+function runExtractedPluginEventsInBatch(
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget
+) {
+  const events = extractPluginEvents(
+    topLevelType,
+    targetInst,
+    nativeEvent,
+    nativeEventTarget
+  )
+  runEventsInBatch(events)
+}
 
 function ensureLegacyEventPluginsInjected() {
   try {
@@ -104,27 +307,29 @@ function ensureLegacyEventPluginsInjected() {
 
 ensureLegacyEventPluginsInjected()
 
-const {dispatchEvent} = require('../../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter')
+function dispatchEvent(target, topLevelType, nativeEvent) {
+  const targetFiber = target
+  let eventTarget = null
+  if (targetFiber != null) {
+    const stateNode = targetFiber.stateNode
+    if (stateNode != null) {
+      eventTarget = getPublicInstance(stateNode)
+    }
+  }
+
+  batchedUpdates(() => {
+    runExtractedPluginEventsInBatch(
+      topLevelType,
+      targetFiber,
+      nativeEvent,
+      eventTarget
+    )
+  })
+}
+
 // This will be retrieved on the native side in JSI ... hm or we call and set it?
 global.handleEvent = dispatchEvent
 //#endregion
-
-function log(...args) {
-  // log('[ReactFabricMirror]', ...args)
-  global._log?.(
-    '[ReactFabricMirror] ' +
-      args
-        .map((a) => {
-          try {
-            return JSON.stringify(a)
-          } catch (e) {
-            return String(a)
-          }
-        })
-        .join(' ')
-  )
-}
-global.log = log
 
 // Counter for uniquely identifying views.
 // % 10 === 1 means it is a rootTag.
@@ -443,22 +648,22 @@ global.Render = function (element, callback) {
       null,
       'ui-renderer',
       function onUncaughtError(error, info) {
-        console.error(
-          '[ReactFabricMirror] Uncaught error in React renderer: ',
+        global.log(
+          '[Error][ReactFabricMirror] Uncaught error in React renderer: ',
           error,
           info
         )
       },
       function onCaughtError(error, info) {
-        console.error(
-          '[ReactFabricMirror] Caught error in React renderer: ',
+        global.log(
+          '[Error][ReactFabricMirror] Caught error in React renderer: ',
           error,
           info
         )
       },
       function onRecoverableError(error, info) {
-        console.error(
-          '[ReactFabricMirror] Recoverable error in React renderer: ',
+        global.log(
+          '[Error][ReactFabricMirror] Recoverable error in React renderer: ',
           error,
           info
         )
@@ -473,6 +678,6 @@ global.Render = function (element, callback) {
   Renderer.updateContainerSync(element, global.rootContainer, null, callback)
   // Renderer.flushPassiveEffects();
   Renderer.flushSyncWork()
-  log('[ReactFabricMirror] updateContainer finished')
+  global.log('[ReactFabricMirror] updateContainer finished')
 }
-log('[ReactFabricMirror] ReactFabricMirror initialized')
+global.log('[ReactFabricMirror] ReactFabricMirror initialized')

@@ -897,195 +897,6 @@ var require_SyntheticEvent = __commonJS((exports2) => {
   var _default = exports2.default = SyntheticEvent;
 });
 
-// ../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto.js
-var require_accumulateInto = __commonJS((exports2) => {
-  var _interopRequireDefault = require_interopRequireDefault();
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.default = undefined;
-  var _isArray = _interopRequireDefault(require_isArray());
-  function accumulateInto(current, next) {
-    if (next == null) {
-      throw new Error("Accumulated items must not be null or undefined.");
-    }
-    if (current == null) {
-      return next;
-    }
-    if ((0, _isArray.default)(current)) {
-      if ((0, _isArray.default)(next)) {
-        current.push.apply(current, next);
-        return current;
-      }
-      current.push(next);
-      return current;
-    }
-    if ((0, _isArray.default)(next)) {
-      return [current].concat(next);
-    }
-    return [current, next];
-  }
-  var _default = exports2.default = accumulateInto;
-});
-
-// ../third_party/react/packages/react-native-renderer/src/ReactNativeGetListener.js
-var require_ReactNativeGetListener = __commonJS((exports2) => {
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.default = getListener;
-  var _EventPluginUtils = require_EventPluginUtils();
-  function getListener(inst, registrationName) {
-    var stateNode = inst.stateNode;
-    if (stateNode === null) {
-      return null;
-    }
-    var props = (0, _EventPluginUtils.getFiberCurrentPropsFromNode)(stateNode);
-    if (props === null) {
-      return null;
-    }
-    var listener = props[registrationName];
-    if (listener && typeof listener !== "function") {
-      throw new Error(`Expected \`${registrationName}\` listener to be a function, instead got a value of \`${typeof listener}\` type.`);
-    }
-    return listener;
-  }
-});
-
-// ../third_party/react/packages/react-native-renderer/src/legacy-events/forEachAccumulated.js
-var require_forEachAccumulated = __commonJS((exports2) => {
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.default = undefined;
-  function forEachAccumulated(arr, cb, scope) {
-    if (Array.isArray(arr)) {
-      arr.forEach(cb, scope);
-    } else if (arr) {
-      cb.call(scope, arr);
-    }
-  }
-  var _default = exports2.default = forEachAccumulated;
-});
-
-// shims/react-work-tags.js
-var require_react_work_tags = __commonJS((exports2, module2) => {
-  var HostComponent = 5;
-  module2.exports = {
-    HostComponent
-  };
-});
-
-// ../third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin.js
-var require_ReactNativeBridgeEventPlugin = __commonJS((exports2) => {
-  var _interopRequireDefault = require_interopRequireDefault();
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.default = undefined;
-  exports2.traverseTwoPhase = traverseTwoPhase;
-  var _SyntheticEvent = _interopRequireDefault(require_SyntheticEvent());
-  var _ReactNativePrivateInterface = require("react-native/Libraries/ReactPrivate/ReactNativePrivateInterface");
-  var _accumulateInto = _interopRequireDefault(require_accumulateInto());
-  var _ReactNativeGetListener = _interopRequireDefault(require_ReactNativeGetListener());
-  var _forEachAccumulated = _interopRequireDefault(require_forEachAccumulated());
-  var _ReactWorkTags = require_react_work_tags();
-  var customBubblingEventTypes = _ReactNativePrivateInterface.ReactNativeViewConfigRegistry.customBubblingEventTypes;
-  var customDirectEventTypes = _ReactNativePrivateInterface.ReactNativeViewConfigRegistry.customDirectEventTypes;
-  function listenerAtPhase(inst, event, propagationPhase) {
-    var registrationName = event.dispatchConfig.phasedRegistrationNames[propagationPhase];
-    return (0, _ReactNativeGetListener.default)(inst, registrationName);
-  }
-  function accumulateDirectionalDispatches(inst, phase, event) {
-    if (__DEV__) {
-      if (!inst) {
-        console.error("Dispatching inst must not be null");
-      }
-    }
-    var listener = listenerAtPhase(inst, event, phase);
-    if (listener) {
-      event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
-      event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
-    }
-  }
-  function getParent(inst) {
-    do {
-      inst = inst.return;
-    } while (inst && inst.tag !== _ReactWorkTags.HostComponent);
-    if (inst) {
-      return inst;
-    }
-    return null;
-  }
-  function traverseTwoPhase(inst, fn, arg, skipBubbling) {
-    var path = [];
-    while (inst) {
-      path.push(inst);
-      inst = getParent(inst);
-    }
-    var i;
-    for (i = path.length;i-- > 0; ) {
-      fn(path[i], "captured", arg);
-    }
-    if (skipBubbling) {
-      fn(path[0], "bubbled", arg);
-    } else {
-      for (i = 0;i < path.length; i++) {
-        fn(path[i], "bubbled", arg);
-      }
-    }
-  }
-  function accumulateTwoPhaseDispatchesSingle(event) {
-    if (event && event.dispatchConfig.phasedRegistrationNames) {
-      traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, false);
-    }
-  }
-  function accumulateTwoPhaseDispatches(events) {
-    (0, _forEachAccumulated.default)(events, accumulateTwoPhaseDispatchesSingle);
-  }
-  function accumulateCapturePhaseDispatches(event) {
-    if (event && event.dispatchConfig.phasedRegistrationNames) {
-      traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, true);
-    }
-  }
-  function accumulateDispatches(inst, ignoredDirection, event) {
-    if (inst && event && event.dispatchConfig.registrationName) {
-      var registrationName = event.dispatchConfig.registrationName;
-      var listener = (0, _ReactNativeGetListener.default)(inst, registrationName);
-      if (listener) {
-        event._dispatchListeners = (0, _accumulateInto.default)(event._dispatchListeners, listener);
-        event._dispatchInstances = (0, _accumulateInto.default)(event._dispatchInstances, inst);
-      }
-    }
-  }
-  function accumulateDirectDispatchesSingle(event) {
-    if (event && event.dispatchConfig.registrationName) {
-      accumulateDispatches(event._targetInst, null, event);
-    }
-  }
-  function accumulateDirectDispatches(events) {
-    (0, _forEachAccumulated.default)(events, accumulateDirectDispatchesSingle);
-  }
-  var ReactNativeBridgeEventPlugin = { eventTypes: {}, extractEvents: function extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
-    if (targetInst == null) {
-      return null;
-    }
-    var bubbleDispatchConfig = customBubblingEventTypes[topLevelType];
-    var directDispatchConfig = customDirectEventTypes[topLevelType];
-    if (!bubbleDispatchConfig && !directDispatchConfig) {
-      throw new Error(`Unsupported top level event type "${topLevelType}" dispatched`);
-    }
-    var event = _SyntheticEvent.default.getPooled(bubbleDispatchConfig || directDispatchConfig, targetInst, nativeEvent, nativeEventTarget);
-    if (bubbleDispatchConfig) {
-      var skipBubbling = event != null && event.dispatchConfig.phasedRegistrationNames != null && event.dispatchConfig.phasedRegistrationNames.skipBubbling;
-      if (skipBubbling) {
-        accumulateCapturePhaseDispatches(event);
-      } else {
-        accumulateTwoPhaseDispatches(event);
-      }
-    } else if (directDispatchConfig) {
-      accumulateDirectDispatches(event);
-    } else {
-      return null;
-    }
-    return event;
-  } };
-  var _default = exports2.default = ReactNativeBridgeEventPlugin;
-  console.warn("Deep imports from the 'react-native' package are deprecated ('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface'). Source: /Users/hannogodecke/Documents/react-native-nitro-list/third_party/react/packages/react-native-renderer/src/ReactNativeBridgeEventPlugin.js 19:0");
-});
-
 // ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderSyntheticEvent.js
 var require_ResponderSyntheticEvent = __commonJS((exports2) => {
   var _interopRequireDefault = require_interopRequireDefault();
@@ -1282,6 +1093,57 @@ var require_accumulate = __commonJS((exports2) => {
     return [current, next];
   }
   var _default = exports2.default = accumulate;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto.js
+var require_accumulateInto = __commonJS((exports2) => {
+  var _interopRequireDefault = require_interopRequireDefault();
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  var _isArray = _interopRequireDefault(require_isArray());
+  function accumulateInto(current, next) {
+    if (next == null) {
+      throw new Error("Accumulated items must not be null or undefined.");
+    }
+    if (current == null) {
+      return next;
+    }
+    if ((0, _isArray.default)(current)) {
+      if ((0, _isArray.default)(next)) {
+        current.push.apply(current, next);
+        return current;
+      }
+      current.push(next);
+      return current;
+    }
+    if ((0, _isArray.default)(next)) {
+      return [current].concat(next);
+    }
+    return [current, next];
+  }
+  var _default = exports2.default = accumulateInto;
+});
+
+// ../third_party/react/packages/react-native-renderer/src/legacy-events/forEachAccumulated.js
+var require_forEachAccumulated = __commonJS((exports2) => {
+  Object.defineProperty(exports2, "__esModule", { value: true });
+  exports2.default = undefined;
+  function forEachAccumulated(arr, cb, scope) {
+    if (Array.isArray(arr)) {
+      arr.forEach(cb, scope);
+    } else if (arr) {
+      cb.call(scope, arr);
+    }
+  }
+  var _default = exports2.default = forEachAccumulated;
+});
+
+// shims/react-work-tags.js
+var require_react_work_tags = __commonJS((exports2, module2) => {
+  var HostComponent = 5;
+  module2.exports = {
+    HostComponent
+  };
 });
 
 // ../third_party/react/packages/react-native-renderer/src/legacy-events/ResponderEventPlugin.js
@@ -1646,68 +1508,22 @@ var require_EventBatching = __commonJS((exports2) => {
   }
 });
 
-// ../third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter.js
-var require_ReactFabricEventEmitter = __commonJS((exports2) => {
-  var _interopRequireDefault = require_interopRequireDefault();
-  Object.defineProperty(exports2, "__esModule", { value: true });
-  exports2.dispatchEvent = dispatchEvent;
-  Object.defineProperty(exports2, "getListener", { enumerable: true, get: function get() {
-    return _ReactNativeGetListener.default;
-  } });
-  Object.defineProperty(exports2, "registrationNames", { enumerable: true, get: function get() {
-    return _EventPluginRegistry.registrationNameModules;
-  } });
-  var _EventPluginRegistry = require_EventPluginRegistry();
-  var _ReactGenericBatching = require_ReactGenericBatching();
-  var _accumulateInto = _interopRequireDefault(require_accumulateInto());
-  var _ReactNativeGetListener = _interopRequireDefault(require_ReactNativeGetListener());
-  var _EventBatching = require_EventBatching();
-  var _ReactNativePrivateInterface = require("react-native/Libraries/ReactPrivate/ReactNativePrivateInterface");
-  var _ReactFiberConfigFabric = require_react_fiber_config_fabric();
-  function extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
-    var events = null;
-    var legacyPlugins = _EventPluginRegistry.plugins;
-    for (var i = 0;i < legacyPlugins.length; i++) {
-      var possiblePlugin = legacyPlugins[i];
-      if (possiblePlugin) {
-        var extractedEvents = possiblePlugin.extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget);
-        if (extractedEvents) {
-          events = (0, _accumulateInto.default)(events, extractedEvents);
-        }
-      }
-    }
-    return events;
-  }
-  function runExtractedPluginEventsInBatch(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
-    var events = extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget);
-    (0, _EventBatching.runEventsInBatch)(events);
-  }
-  function dispatchEvent(target, topLevelType, nativeEvent) {
-    var targetFiber = target;
-    var eventTarget = null;
-    if (targetFiber != null) {
-      var stateNode = targetFiber.stateNode;
-      if (stateNode != null) {
-        eventTarget = (0, _ReactFiberConfigFabric.getPublicInstance)(stateNode);
-      }
-    }
-    (0, _ReactGenericBatching.batchedUpdates)(function() {
-      var event = { eventName: topLevelType, nativeEvent };
-      _ReactNativePrivateInterface.RawEventEmitter.emit(topLevelType, event);
-      _ReactNativePrivateInterface.RawEventEmitter.emit("*", event);
-      runExtractedPluginEventsInBatch(topLevelType, targetFiber, nativeEvent, eventTarget);
-    });
-  }
-  console.warn("Deep imports from the 'react-native' package are deprecated ('react-native/Libraries/ReactPrivate/ReactNativePrivateInterface'). Source: /Users/hannogodecke/Documents/react-native-nitro-list/third_party/react/packages/react-native-renderer/src/ReactFabricEventEmitter.js 31:0");
-});
-
 // src/ReactFabricMirror.js
+function log(...args) {
+  global._log?.("[ReactFabricMirror] " + args.map((a) => {
+    try {
+      return JSON.stringify(a);
+    } catch (e) {
+      return "<failed to parse> " + String(a);
+    }
+  }).join(" "));
+}
+global.log = log;
 var Reconciler = require("react-reconciler");
 var {
   getFabricUIManager
 } = require_FabricUIManager();
 var uiManager = getFabricUIManager();
-console.log("[ReactFabricMirror] got FabricUIManager:", uiManager);
 var {
   create: createAttributePayload,
   diff: diffAttributePayloads
@@ -1728,19 +1544,153 @@ global.rootInstance = {
   publicInstance: null
 };
 var { getPublicInstance } = require_react_fiber_config_fabric();
-var { setComponentTree } = require_EventPluginUtils();
+var EventPluginUtilsModule = require_EventPluginUtils();
+var { setComponentTree } = EventPluginUtilsModule;
 var {
   injectEventPluginOrder,
-  injectEventPluginsByName
+  injectEventPluginsByName,
+  plugins: legacyPlugins
 } = require_EventPluginRegistry();
-var ReactNativeBridgeEventPluginModule = require_ReactNativeBridgeEventPlugin();
 var ResponderEventPluginModule = require_ResponderEventPlugin();
 var ReactNativeEventPluginOrderModule = require_ReactNativeEventPluginOrder();
 var ReactFabricGlobalResponderHandlerModule = require_ReactFabricGlobalResponderHandler();
-var ReactNativeBridgeEventPlugin = ReactNativeBridgeEventPluginModule.default ?? ReactNativeBridgeEventPluginModule;
+var SyntheticEventModule = require_SyntheticEvent();
+var accumulateIntoModule = require_accumulateInto();
+var forEachAccumulatedModule = require_forEachAccumulated();
+var { batchedUpdates } = require_ReactGenericBatching();
+var { runEventsInBatch } = require_EventBatching();
+var { HostComponent } = require_react_work_tags();
 var ResponderEventPlugin = ResponderEventPluginModule.default ?? ResponderEventPluginModule;
 var ReactNativeEventPluginOrder = ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule;
 var ReactFabricGlobalResponderHandler = ReactFabricGlobalResponderHandlerModule.default ?? ReactFabricGlobalResponderHandlerModule;
+var SyntheticEvent = SyntheticEventModule.default ?? SyntheticEventModule;
+var accumulateInto = accumulateIntoModule.default ?? accumulateIntoModule;
+var forEachAccumulated = forEachAccumulatedModule.default ?? forEachAccumulatedModule;
+var { customBubblingEventTypes, customDirectEventTypes } = ReactNativeViewConfigRegistry;
+function getParent(inst) {
+  do {
+    inst = inst.return;
+  } while (inst && inst.tag !== HostComponent);
+  return inst || null;
+}
+function traverseTwoPhase(inst, fn, arg, skipBubbling) {
+  const path = [];
+  while (inst) {
+    path.push(inst);
+    inst = getParent(inst);
+  }
+  for (let i = path.length - 1;i >= 0; i--) {
+    fn(path[i], "captured", arg);
+  }
+  if (skipBubbling) {
+    fn(path[0], "bubbled", arg);
+  } else {
+    for (let i = 0;i < path.length; i++) {
+      fn(path[i], "bubbled", arg);
+    }
+  }
+}
+function getListener(inst, registrationName) {
+  const stateNode = inst.stateNode;
+  if (stateNode == null) {
+    return null;
+  }
+  const props = EventPluginUtilsModule.getFiberCurrentPropsFromNode(stateNode);
+  if (props == null) {
+    return null;
+  }
+  const listener = props[registrationName];
+  if (listener != null && typeof listener !== "function") {
+    throw new Error(`Expected \`${registrationName}\` listener to be a function, got \`${typeof listener}\`.`);
+  }
+  return listener;
+}
+function listenerAtPhase(inst, event, propagationPhase) {
+  const registrationName = event.dispatchConfig.phasedRegistrationNames[propagationPhase];
+  return getListener(inst, registrationName);
+}
+function accumulateDirectionalDispatches(inst, phase, event) {
+  const listener = listenerAtPhase(inst, event, phase);
+  if (listener) {
+    event._dispatchListeners = accumulateInto(event._dispatchListeners, listener);
+    event._dispatchInstances = accumulateInto(event._dispatchInstances, inst);
+  }
+}
+function accumulateTwoPhaseDispatchesSingle(event) {
+  if (event && event.dispatchConfig.phasedRegistrationNames) {
+    traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, false);
+  }
+}
+function accumulateTwoPhaseDispatches(events) {
+  forEachAccumulated(events, accumulateTwoPhaseDispatchesSingle);
+}
+function accumulateCapturePhaseDispatches(event) {
+  if (event && event.dispatchConfig.phasedRegistrationNames) {
+    traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, true);
+  }
+}
+function accumulateDispatches(inst, _ignoredDirection, event) {
+  if (inst && event && event.dispatchConfig.registrationName) {
+    const registrationName = event.dispatchConfig.registrationName;
+    const listener = getListener(inst, registrationName);
+    if (listener) {
+      event._dispatchListeners = accumulateInto(event._dispatchListeners, listener);
+      event._dispatchInstances = accumulateInto(event._dispatchInstances, inst);
+    }
+  }
+}
+function accumulateDirectDispatchesSingle(event) {
+  if (event && event.dispatchConfig.registrationName) {
+    accumulateDispatches(event._targetInst, null, event);
+  }
+}
+function accumulateDirectDispatches(events) {
+  forEachAccumulated(events, accumulateDirectDispatchesSingle);
+}
+var ReactNativeBridgeEventPlugin = {
+  eventTypes: {},
+  extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+    if (targetInst == null) {
+      return null;
+    }
+    const bubbleDispatchConfig = customBubblingEventTypes[topLevelType];
+    const directDispatchConfig = customDirectEventTypes[topLevelType];
+    if (!bubbleDispatchConfig && !directDispatchConfig) {
+      throw new Error(`Unsupported top level event type "${topLevelType}" dispatched`);
+    }
+    const event = SyntheticEvent.getPooled(bubbleDispatchConfig || directDispatchConfig, targetInst, nativeEvent, nativeEventTarget);
+    if (bubbleDispatchConfig) {
+      const skipBubbling = event != null && event.dispatchConfig.phasedRegistrationNames != null && event.dispatchConfig.phasedRegistrationNames.skipBubbling;
+      if (skipBubbling) {
+        accumulateCapturePhaseDispatches(event);
+      } else {
+        accumulateTwoPhaseDispatches(event);
+      }
+    } else if (directDispatchConfig) {
+      accumulateDirectDispatches(event);
+    } else {
+      return null;
+    }
+    return event;
+  }
+};
+function extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+  let events = null;
+  for (let i = 0;i < legacyPlugins.length; i++) {
+    const plugin = legacyPlugins[i];
+    if (plugin) {
+      const extractedEvents = plugin.extractEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget);
+      if (extractedEvents) {
+        events = accumulateInto(events, extractedEvents);
+      }
+    }
+  }
+  return events;
+}
+function runExtractedPluginEventsInBatch(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+  const events = extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget);
+  runEventsInBatch(events);
+}
 function ensureLegacyEventPluginsInjected() {
   try {
     injectEventPluginOrder(ReactNativeEventPluginOrder);
@@ -1768,18 +1718,20 @@ function ensureLegacyEventPluginsInjected() {
   ResponderEventPlugin.injection.injectGlobalResponderHandler(ReactFabricGlobalResponderHandler);
 }
 ensureLegacyEventPluginsInjected();
-var { dispatchEvent } = require_ReactFabricEventEmitter();
-global.handleEvent = dispatchEvent;
-function log(...args) {
-  global._log?.("[ReactFabricMirror] " + args.map((a) => {
-    try {
-      return JSON.stringify(a);
-    } catch (e) {
-      return String(a);
+function dispatchEvent(target, topLevelType, nativeEvent) {
+  const targetFiber = target;
+  let eventTarget = null;
+  if (targetFiber != null) {
+    const stateNode = targetFiber.stateNode;
+    if (stateNode != null) {
+      eventTarget = getPublicInstance(stateNode);
     }
-  }).join(" "));
+  }
+  batchedUpdates(() => {
+    runExtractedPluginEventsInBatch(topLevelType, targetFiber, nativeEvent, eventTarget);
+  });
 }
-global.log = log;
+global.handleEvent = dispatchEvent;
 global.nextReactTag = 2;
 var HostConfig = {
   now: performance.now,
@@ -1952,17 +1904,17 @@ global.React = require("react");
 global.Render = function(element, callback) {
   if (!global.rootContainer) {
     global.rootContainer = Renderer.createContainer(global.rootInstance, 0, null, false, null, "ui-renderer", function onUncaughtError(error, info) {
-      console.error("[ReactFabricMirror] Uncaught error in React renderer: ", error, info);
+      global.log("[Error][ReactFabricMirror] Uncaught error in React renderer: ", error, info);
     }, function onCaughtError(error, info) {
-      console.error("[ReactFabricMirror] Caught error in React renderer: ", error, info);
+      global.log("[Error][ReactFabricMirror] Caught error in React renderer: ", error, info);
     }, function onRecoverableError(error, info) {
-      console.error("[ReactFabricMirror] Recoverable error in React renderer: ", error, info);
+      global.log("[Error][ReactFabricMirror] Recoverable error in React renderer: ", error, info);
     }, function nativeOnDefaultTransitionIndicator() {});
   }
   Renderer.updateContainerSync(element, global.rootContainer, null, callback);
   Renderer.flushSyncWork();
-  log("[ReactFabricMirror] updateContainer finished");
+  global.log("[ReactFabricMirror] updateContainer finished");
 };
-log("[ReactFabricMirror] ReactFabricMirror initialized");
+global.log("[ReactFabricMirror] ReactFabricMirror initialized");
 
 }

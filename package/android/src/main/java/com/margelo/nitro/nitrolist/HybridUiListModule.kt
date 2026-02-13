@@ -1,5 +1,7 @@
 package com.margelo.nitro.nitrolist
 
+import android.util.Log
+import com.facebook.common.executors.UiThreadImmediateExecutorService
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext
@@ -19,6 +21,7 @@ import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.common.UIManagerType
 import com.margelo.nitro.NitroModules
 import com.swmansion.worklets.WorkletsModule
+import java.lang.reflect.Field
 import java.util.ArrayList
 import kotlin.concurrent.Volatile
 
@@ -102,6 +105,7 @@ class HybridUiListModule : HybridUiListModuleSpec() {
 
             // This will install the JSI bindings
             uiTurboModuleManager = TurboModuleManager(
+                // TurboModuleManager will call jni -> cpp, to actually setup nativeModuleProxy
                 runtimeExecutor = uiRuntimeExecutor,
                 delegate = turboModuleManagerDelegate,
                 jsCallInvokerHolder = uiCallInvokerHolder,
@@ -111,7 +115,36 @@ class HybridUiListModule : HybridUiListModuleSpec() {
             val fabricUIManager = uiManager as? FabricUIManager
                 ?: throw IllegalStateException("UIManager is not a FabricUIManager! Is the Fabric architecture enabled?")
             setupEventInterceptor(fabricUIManager)
-        }
+
+            //#region Intercept events from actual surface to forward them to our surface
+            // TODO: problem: i am sure this breaks with multiple react surface setup…
+//        val rootView = uiManager.resolveView(1)
+//            as? ReactSurfaceView
+//            ?: throw IllegalStateException("Could not resolve root view with tag 1, or it is not a ReactSurfaceView! Is the New Architecture enabled?")
+
+            // TODO: another possibility would be to make react native create a custom surface, that will
+            //       get the correct surfaceId. The current code takes the surfaceId from the owner of the JSTouchDispatcher
+            //       not from the underlying view! (we could potentially make a PR to change that!)
+            // We need to get to the event dispatcher of the surface and intercept events there
+            uiManager.eventDispatcher.addListener { event ->
+                if (event.surfaceId == 3) {
+                    // This is already our surface, no need to forward
+                    return@addListener
+                }
+                val view = uiManager.resolveView(event.viewTag)
+                val actualSurfaceId = UIManagerHelper.getSurfaceId(view!!)
+                if (actualSurfaceId != 3) return@addListener
+
+                // surfaceId is declared on Event, not on all concrete subclasses (e.g. TouchEvent).
+                setEventSurfaceIdOrThrow(event, actualSurfaceId)
+
+                Log.d("HannoDebug", "Intercepted event on root view, forwarding to surface view. Event: ${event.eventName}=${event.viewTag}:${event.surfaceId}")
+                // Okay so here we want to dispatch this to our surface
+            }
+
+            //#endregion
+
+            android.util.Log.d("HannoDebug", "✅✅✅✅ UI runtime setup complete!")
     }
 
     @OptIn(FrameworkAPI::class)
@@ -123,4 +156,30 @@ class HybridUiListModule : HybridUiListModuleSpec() {
 
     @Volatile
     private lateinit var uiTurboModuleManager: TurboModuleManager
+
+    private fun setEventSurfaceIdOrThrow(event: Any, surfaceId: Int) {
+        val surfaceIdField = findFieldInHierarchy(event.javaClass, "surfaceId")
+            ?: throw IllegalStateException(
+                "Could not find field 'surfaceId' in ${event.javaClass.name} class hierarchy."
+            )
+        runCatching {
+            surfaceIdField.isAccessible = true
+            surfaceIdField.setInt(event, surfaceId)
+        }.getOrElse { cause ->
+            throw IllegalStateException(
+                "Could not set field 'surfaceId' in ${event.javaClass.name}.",
+                cause
+            )
+        }
+    }
+
+    private fun findFieldInHierarchy(clazz: Class<*>, fieldName: String): Field? {
+        var current: Class<*>? = clazz
+        while (current != null) {
+            val field = runCatching { current.getDeclaredField(fieldName) }.getOrNull()
+            if (field != null) return field
+            current = current.superclass
+        }
+        return null
+    }
 }

@@ -52,7 +52,7 @@ export default function App() {
           scheduleOnUI(() => {
             "worklet";
 
-            console.log(
+            global.log(
               "Setting makeNativeViewCallback on UiListView on",
               typeof ref.setMakeNativeViewCallback
             );
@@ -67,6 +67,8 @@ export default function App() {
             // TODO: can we enable this somehow as a prop?
             ref.setMakeNativeViewCallback(uiListModuleUnboxed, () => {
               "worklet";
+
+              global.log("Make native view callback called");
 
               const ref = global.React.createRef();
               global.itemId = (global.itemId ?? 0) + 1;
@@ -85,9 +87,14 @@ export default function App() {
                     style={{
                       flex: 1,
                     }}
+                    collapsable={false}
                     onPressIn={() => {
                       "worklet"
-                      global.log("Pressed item with id ", global.itemId);
+                      global.log("onPressIn item with id ", global.itemId);
+                    }}
+                    onPress={() => {
+                      "worklet"
+                      global.log("onPress item with id ", global.itemId);
                     }}
                   >
                     <Text>Test</Text>
@@ -165,11 +172,15 @@ export default function App() {
                     }}
                   >
                     <Pressable
+                      collapsable={false}
                       style={{
                         flex: 1,
                       }}
                       onPressIn={() => {
-                        global.log("Pressed item with index", index);
+                        global.log("onPressIn item with index", index);
+                      }}
+                      onPress={() => {
+                        global.log("onPress item with index", index);
                       }}
                     >
                       <Text>Item #{index}</Text>

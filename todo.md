@@ -11,8 +11,8 @@
 
 ## Base functionality (what users expect to just work)
 
-[ ] - Try pressability stuff (even emitter - i think that should just work tbh, at least the emitting part)
-[ ] - Do I have to implement getPublicInstance so people can work with refs as expected?
+[x] - Try pressability stuff (even emitter - i think that should just work tbh, at least the emitting part)
+[x] - Do I have to implement getPublicInstance so people can work with refs as expected?
 [ ] - RNGH / reanimated (i guess?)
 [ ] - When trying to use RNGH it says: Error: GestureDetector must be used as a descendant of GestureHandlerRootView. Otherwise the gestures will not be recognized. 
         - The problem is that they render a react context to check for the gesture detector
