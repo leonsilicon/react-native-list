@@ -69,6 +69,7 @@
   "patchedDependencies": {
     "metro@0.83.3": "patches/metro@0.83.3.patch",
     "metro-runtime@0.83.3": "patches/metro-runtime@0.83.3.patch",
+    "react-native@0.83.1": "patches/react-native@0.83.1.patch",
   },
   "overrides": {
     "react-native-worklets": "bundle-mode-preview",

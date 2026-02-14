@@ -8,8 +8,11 @@
 import Foundation
 
 class HybridUiListModule : HybridUiListModuleSpec {
+    // TODO: add check that this is called from the UI thread!
+    // TODO: create new surface, uiManager start surface
+    // TODO: install nativeModuleProxy into ui runtime
+    // TODO: intercept events and forward to correct surface (potentially not needed on iOS)
     func setupExternalSurface() throws {
-        // TODO: add check that this is called from the UI thread!
     }
     
     
