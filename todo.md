@@ -33,4 +33,4 @@
 [ ] - Fix the crash by delaying setting the adapter after the render phase
         - I think the issue is really that the adapter fill will be requested on layout
 [ ] - Fix crash during hot reload
-[ ] - Test with worklets strict mode
+[ ] - Test with worklets global strict mode

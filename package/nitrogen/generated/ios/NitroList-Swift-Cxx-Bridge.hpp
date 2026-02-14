@@ -50,6 +50,15 @@ namespace margelo::nitro::nitrolist::bridge::swift {
   using std__weak_ptr_HybridUiListModuleSpec_ = std::weak_ptr<HybridUiListModuleSpec>;
   inline std__weak_ptr_HybridUiListModuleSpec_ weakify_std__shared_ptr_HybridUiListModuleSpec_(const std::shared_ptr<HybridUiListModuleSpec>& strong) noexcept { return strong; }
   
+  // pragma MARK: Result<void>
+  using Result_void_ = Result<void>;
+  inline Result_void_ create_Result_void_() noexcept {
+    return Result<void>::withValue();
+  }
+  inline Result_void_ create_Result_void_(const std::exception_ptr& error) noexcept {
+    return Result<void>::withError(error);
+  }
+  
   // pragma MARK: std::function<double()>
   /**
    * Specialized version of `std::function<double()>`.
@@ -107,15 +116,6 @@ namespace margelo::nitro::nitrolist::bridge::swift {
   // pragma MARK: std::weak_ptr<HybridUiListViewSpec>
   using std__weak_ptr_HybridUiListViewSpec_ = std::weak_ptr<HybridUiListViewSpec>;
   inline std__weak_ptr_HybridUiListViewSpec_ weakify_std__shared_ptr_HybridUiListViewSpec_(const std::shared_ptr<HybridUiListViewSpec>& strong) noexcept { return strong; }
-  
-  // pragma MARK: Result<void>
-  using Result_void_ = Result<void>;
-  inline Result_void_ create_Result_void_() noexcept {
-    return Result<void>::withValue();
-  }
-  inline Result_void_ create_Result_void_(const std::exception_ptr& error) noexcept {
-    return Result<void>::withError(error);
-  }
   
   // pragma MARK: std::shared_ptr<HybridViewHolderSpec>
   /**

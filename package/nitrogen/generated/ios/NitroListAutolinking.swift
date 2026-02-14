@@ -35,4 +35,16 @@ public final class NitroListAutolinking {
   public static func isUiListViewRecyclable() -> Bool {
     return HybridUiListView.self is any RecyclableView.Type
   }
+  
+  public static func createUiListModule() -> bridge.std__shared_ptr_HybridUiListModuleSpec_ {
+    let hybridObject = HybridUiListModule()
+    return { () -> bridge.std__shared_ptr_HybridUiListModuleSpec_ in
+      let __cxxWrapped = hybridObject.getCxxWrapper()
+      return __cxxWrapped.getCxxPart()
+    }()
+  }
+  
+  public static func isUiListModuleRecyclable() -> Bool {
+    return HybridUiListModule.self is any RecyclableView.Type
+  }
 }

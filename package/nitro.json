@@ -25,7 +25,8 @@
       "kotlin": "HybridAdapterFactory"
     },
     "UiListModule": {
-      "kotlin": "HybridUiListModule"
+      "kotlin": "HybridUiListModule",
+      "swift": "HybridUiListModule"
     },
     "UiManagerHelper": {
       "cpp": "HybridUiManagerHelper"
