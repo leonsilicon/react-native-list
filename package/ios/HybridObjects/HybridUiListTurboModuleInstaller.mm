@@ -166,6 +166,7 @@ inline void assignError(NSError *__autoreleasing _Nullable *error, NSString *mes
       return YES;
     }
 
+    // TODO: this seems quite defensive, remove?
     bool hasNativeModuleProxy = false;
     uiWorkletRuntime->runSync([&](jsi::Runtime &runtime) {
       jsi::Value proxy = runtime.global().getProperty(runtime, "nativeModuleProxy");
@@ -219,20 +220,10 @@ inline void assignError(NSError *__autoreleasing _Nullable *error, NSString *mes
 
     auto uiCallInvoker = std::make_shared<WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime);
 
-    id devMenuConfigurationDecorator = [rootTurboModuleManager valueForKey:@"_devMenuConfigurationDecorator"];
-    RCTTurboModuleManager *uiTurboModuleManager = nil;
-    if (devMenuConfigurationDecorator != nil) {
-      uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
-                                                           bridgeModuleDecorator:bridgeModuleDecorator
-                                                                        delegate:delegate
-                                                                       jsInvoker:uiCallInvoker
-                                                   devMenuConfigurationDecorator:devMenuConfigurationDecorator];
-    } else {
-      uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
+    RCTTurboModuleManager *uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
                                                            bridgeModuleDecorator:bridgeModuleDecorator
                                                                         delegate:delegate
                                                                        jsInvoker:uiCallInvoker];
-    }
     if (uiTurboModuleManager == nil) {
       assignError(error, @"Failed to create a UI-runtime RCTTurboModuleManager.");
       return NO;
