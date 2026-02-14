@@ -14,7 +14,8 @@ public protocol HybridUiListModuleSpec_protocol: HybridObject {
   
 
   // Methods
-  func setupExternalSurface() throws -> Void
+  func iosGetWorkletsModule() throws -> (any HybridIOSWorkletsModuleProxyHolderSpec)
+  func setupExternalSurface(workletsModuleHolder: Variant_NullType__any_HybridIOSWorkletsModuleProxyHolderSpec_?) throws -> Void
 }
 
 public extension HybridUiListModuleSpec_protocol {

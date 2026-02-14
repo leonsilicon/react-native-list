@@ -28,8 +28,12 @@ import kotlin.concurrent.Volatile
 class HybridUiListModule : HybridUiListModuleSpec() {
     var reactSurfaceView: ReactSurfaceView? = null
 
+    override fun iosGetWorkletsModule(): HybridIOSWorkletsModuleProxyHolderSpec {
+        throw IllegalStateException("iosGetWorkletsModule is iOS-only and must not be called on Android.")
+    }
+
     @OptIn(UnstableReactNativeAPI::class, FrameworkAPI::class)
-    override fun setupExternalSurface() {
+    override fun setupExternalSurface(workletsModuleHolder: Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec?) {
         if (!UiThreadUtil.isOnUiThread()) {
             throw IllegalStateException("setupExternalSurface must be called on the UI thread!")
         }

@@ -13,9 +13,14 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 
-
-
+#include <memory>
+#include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include <NitroModules/Null.hpp>
+#include <variant>
+#include <optional>
 
 namespace margelo::nitro::nitrolist {
 
@@ -48,7 +53,8 @@ namespace margelo::nitro::nitrolist {
 
     public:
       // Methods
-      virtual void setupExternalSurface() = 0;
+      virtual std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> iosGetWorkletsModule() = 0;
+      virtual void setupExternalSurface(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& workletsModuleHolder) = 0;
 
     protected:
       // Hybrid Setup

@@ -19,6 +19,7 @@
 #include "JHybridAdapterFactorySpec.hpp"
 #include "JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double.hpp"
 #include "JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double.hpp"
+#include "JHybridIOSWorkletsModuleProxyHolderSpec.hpp"
 #include "JHybridUiListModuleSpec.hpp"
 #include "JHybridUiListViewSpec.hpp"
 #include "JFunc_double.hpp"
@@ -42,6 +43,7 @@ int initialize(JavaVM* vm) {
     margelo::nitro::nitrolist::JHybridAdapterFactorySpec::registerNatives();
     margelo::nitro::nitrolist::JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::registerNatives();
     margelo::nitro::nitrolist::JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::registerNatives();
+    margelo::nitro::nitrolist::JHybridIOSWorkletsModuleProxyHolderSpec::registerNatives();
     margelo::nitro::nitrolist::JHybridUiListModuleSpec::registerNatives();
     margelo::nitro::nitrolist::JHybridUiListViewSpec::registerNatives();
     margelo::nitro::nitrolist::JFunc_double_cxx::registerNatives();

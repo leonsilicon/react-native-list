@@ -30,9 +30,11 @@ import { scheduleOnUI } from 'react-native-worklets'
 import { uiListModule } from './UiListModule'
 import { uiManagerHelper } from './UiManagerHelper'
 import { UiList } from './UiList'
+import { Platform } from 'react-native'
 
 export { Adapter, AdapterFactory } from './specs/Adapter.nitro'
 export { ViewHolder } from './specs/ViewHolder.nitro'
+export { IOSWorkletsModuleProxyHolder } from './specs/IOSWorkletsModuleProxyHolder.nitro'
 
 // @ts-expect-error shrug
 import { setupWorklet } from './ReactFabricMirror.bundle'
@@ -41,9 +43,12 @@ import { UiManagerHelper } from './specs/UIManagerHelper.nitro'
 
 const boxed = uiListModule
 export function setup() {
+  // TODO: ask SWM if they can remove their JS thread checks, then we could just access this from the UI thread.
+  const iosWorkletsModuleHolder =
+    Platform.OS === 'ios' ? uiListModule.iosGetWorkletsModule() : null
   scheduleOnUI(() => {
     'worklet'
-    boxed.setupExternalSurface()
+    boxed.setupExternalSurface(iosWorkletsModuleHolder)
   })
 
   scheduleOnUI(setupWorklet)

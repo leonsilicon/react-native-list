@@ -7,9 +7,17 @@
 
 #include "JHybridUiListModuleSpec.hpp"
 
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 
-
-
+#include <memory>
+#include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include "JHybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include <NitroModules/Null.hpp>
+#include <variant>
+#include <optional>
+#include "JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include <NitroModules/JNull.hpp>
 
 namespace margelo::nitro::nitrolist {
 
@@ -50,9 +58,14 @@ namespace margelo::nitro::nitrolist {
   
 
   // Methods
-  void JHybridUiListModuleSpec::setupExternalSurface() {
-    static const auto method = javaClassStatic()->getMethod<void()>("setupExternalSurface");
-    method(_javaPart);
+  std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> JHybridUiListModuleSpec::iosGetWorkletsModule() {
+    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JHybridIOSWorkletsModuleProxyHolderSpec::javaobject>()>("iosGetWorkletsModule");
+    auto __result = method(_javaPart);
+    return __result->cthis()->shared_cast<JHybridIOSWorkletsModuleProxyHolderSpec>();
+  }
+  void JHybridUiListModuleSpec::setupExternalSurface(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& workletsModuleHolder) {
+    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> /* workletsModuleHolder */)>("setupExternalSurface");
+    method(_javaPart, workletsModuleHolder.has_value() ? JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec::fromCpp(workletsModuleHolder.value()) : nullptr);
   }
 
 } // namespace margelo::nitro::nitrolist

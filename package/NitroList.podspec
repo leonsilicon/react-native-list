@@ -15,17 +15,19 @@ Pod::Spec.new do |s|
 
   s.source_files = [
     # Implementation (Swift)
-    "ios/**/*.{swift}",
+    "ios/**/*.{h,swift}",
     # Autolinking/Registration (Objective-C++)
     "ios/**/*.{m,mm}",
     # Implementation (C++ objects)
     "cpp/**/*.{hpp,cpp}",
   ]
+  s.public_header_files = "ios/**/*.h"
 
   load 'nitrogen/generated/ios/NitroList+autolinking.rb'
   add_nitrogen_files(s)
 
   s.dependency 'React-jsi'
   s.dependency 'React-callinvoker'
+  s.dependency "RNWorklets"
   install_modules_dependencies(s)
 end

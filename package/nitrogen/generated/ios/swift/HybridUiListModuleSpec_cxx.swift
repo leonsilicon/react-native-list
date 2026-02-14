@@ -126,9 +126,47 @@ open class HybridUiListModuleSpec_cxx {
 
   // Methods
   @inline(__always)
-  public final func setupExternalSurface() -> bridge.Result_void_ {
+  public final func iosGetWorkletsModule() -> bridge.Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ {
     do {
-      try self.__implementation.setupExternalSurface()
+      let __result = try self.__implementation.iosGetWorkletsModule()
+      let __resultCpp = { () -> bridge.std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ in
+        let __cxxWrapped = __result.getCxxWrapper()
+        return __cxxWrapped.getCxxPart()
+      }()
+      return bridge.create_Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func setupExternalSurface(workletsModuleHolder: bridge.std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___) -> bridge.Result_void_ {
+    do {
+      try self.__implementation.setupExternalSurface(workletsModuleHolder: { () -> Variant_NullType__any_HybridIOSWorkletsModuleProxyHolderSpec_? in
+        if bridge.has_value_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(workletsModuleHolder) {
+          let __unwrapped = bridge.get_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(workletsModuleHolder)
+          return { () -> Variant_NullType__any_HybridIOSWorkletsModuleProxyHolderSpec_ in
+            let __variant = bridge.std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(__unwrapped)
+            switch __variant.index() {
+              case 0:
+                let __actual = __variant.get_0()
+                return .first(NullType.null)
+              case 1:
+                let __actual = __variant.get_1()
+                return .second({ () -> any HybridIOSWorkletsModuleProxyHolderSpec in
+                  let __unsafePointer = bridge.get_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(__actual)
+                  let __instance = HybridIOSWorkletsModuleProxyHolderSpec_cxx.fromUnsafe(__unsafePointer)
+                  return __instance.getHybridIOSWorkletsModuleProxyHolderSpec()
+                }())
+              default:
+                fatalError("Variant can never have index \(__variant.index())!")
+            }
+          }()
+        } else {
+          return nil
+        }
+      }())
       return bridge.create_Result_void_()
     } catch (let __error) {
       let __exceptionPtr = __error.toCpp()

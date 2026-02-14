@@ -8,6 +8,8 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 // Forward declaration of `HybridUiListViewSpec` to properly resolve imports.
@@ -16,6 +18,8 @@ namespace margelo::nitro::nitrolist { class HybridUiListViewSpec; }
 namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 
 // Forward declarations of Swift defined types
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec_cxx` to properly resolve imports.
+namespace NitroList { class HybridIOSWorkletsModuleProxyHolderSpec_cxx; }
 // Forward declaration of `HybridUiListModuleSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListModuleSpec_cxx; }
 // Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.
@@ -24,13 +28,17 @@ namespace NitroList { class HybridUiListViewSpec_cxx; }
 namespace NitroList { class HybridViewHolderSpec_cxx; }
 
 // Include C++ defined types
+#include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 #include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
+#include <NitroModules/Null.hpp>
 #include <NitroModules/Result.hpp>
 #include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <variant>
 
 /**
  * Contains specialized versions of C++ templated types so they can be accessed from Swift,
@@ -38,6 +46,62 @@ namespace NitroList { class HybridViewHolderSpec_cxx; }
  */
 namespace margelo::nitro::nitrolist::bridge::swift {
 
+  // pragma MARK: std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>
+  /**
+   * Specialized version of `std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>`.
+   */
+  using std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ = std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>;
+  std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> create_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<HybridIOSWorkletsModuleProxyHolderSpec>
+  using std__weak_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ = std::weak_ptr<HybridIOSWorkletsModuleProxyHolderSpec>;
+  inline std__weak_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ weakify_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(const std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>
+  /**
+   * Wrapper struct for `std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>`.
+   * std::variant cannot be used in Swift because of a Swift bug.
+   * Not even specializing it works. So we create a wrapper struct.
+   */
+  struct std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ final {
+    std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>> variant;
+    std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>> variant): variant(variant) { }
+    operator std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>() const noexcept {
+      return variant;
+    }
+    inline size_t index() const noexcept {
+      return variant.index();
+    }
+    inline nitro::NullType get_0() const noexcept {
+      return std::get<0>(variant);
+    }
+    inline std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> get_1() const noexcept {
+      return std::get<1>(variant);
+    }
+  };
+  inline std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ create_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(nitro::NullType value) noexcept {
+    return std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(value);
+  }
+  inline std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ create_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(const std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>& value) noexcept {
+    return std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(value);
+  }
+  
+  // pragma MARK: std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>
+  /**
+   * Specialized version of `std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>`.
+   */
+  using std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___ = std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>;
+  inline std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>> create_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(const std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>& value) noexcept {
+    return std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>(value);
+  }
+  inline bool has_value_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>> get_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& optional) noexcept {
+    return *optional;
+  }
+  
   // pragma MARK: std::shared_ptr<HybridUiListModuleSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridUiListModuleSpec>`.
@@ -49,6 +113,15 @@ namespace margelo::nitro::nitrolist::bridge::swift {
   // pragma MARK: std::weak_ptr<HybridUiListModuleSpec>
   using std__weak_ptr_HybridUiListModuleSpec_ = std::weak_ptr<HybridUiListModuleSpec>;
   inline std__weak_ptr_HybridUiListModuleSpec_ weakify_std__shared_ptr_HybridUiListModuleSpec_(const std::shared_ptr<HybridUiListModuleSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: Result<std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>
+  using Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ = Result<std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>;
+  inline Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ create_Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(const std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>& value) noexcept {
+    return Result<std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__ create_Result_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec__(const std::exception_ptr& error) noexcept {
+    return Result<std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>::withError(error);
+  }
   
   // pragma MARK: Result<void>
   using Result_void_ = Result<void>;

@@ -12,9 +12,14 @@
 // Forward declaration of `HybridUiListModuleSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListModuleSpec_cxx; }
 
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 
-
-
+#include <memory>
+#include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include <NitroModules/Null.hpp>
+#include <variant>
+#include <optional>
 
 #include "NitroList-Swift-Cxx-Umbrella.hpp"
 
@@ -66,8 +71,16 @@ namespace margelo::nitro::nitrolist {
 
   public:
     // Methods
-    inline void setupExternalSurface() override {
-      auto __result = _swiftPart.setupExternalSurface();
+    inline std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> iosGetWorkletsModule() override {
+      auto __result = _swiftPart.iosGetWorkletsModule();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline void setupExternalSurface(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& workletsModuleHolder) override {
+      auto __result = _swiftPart.setupExternalSurface(workletsModuleHolder);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

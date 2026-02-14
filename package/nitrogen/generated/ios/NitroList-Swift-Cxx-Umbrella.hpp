@@ -8,6 +8,8 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
+namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
 namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 // Forward declaration of `HybridUiListViewSpec` to properly resolve imports.
@@ -16,13 +18,17 @@ namespace margelo::nitro::nitrolist { class HybridUiListViewSpec; }
 namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 
 // Include C++ defined types
+#include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 #include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
+#include <NitroModules/Null.hpp>
 #include <NitroModules/Result.hpp>
 #include <exception>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <variant>
 
 // C++ helpers for Swift
 #include "NitroList-Swift-Cxx-Bridge.hpp"
@@ -34,6 +40,8 @@ namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 #include <NitroModules/DateToChronoDate.hpp>
 
 // Forward declarations of Swift defined types
+// Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec_cxx` to properly resolve imports.
+namespace NitroList { class HybridIOSWorkletsModuleProxyHolderSpec_cxx; }
 // Forward declaration of `HybridUiListModuleSpec_cxx` to properly resolve imports.
 namespace NitroList { class HybridUiListModuleSpec_cxx; }
 // Forward declaration of `HybridUiListViewSpec_cxx` to properly resolve imports.

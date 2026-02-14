@@ -8,6 +8,7 @@
 #include "NitroList-Swift-Cxx-Bridge.hpp"
 
 // Include C++ implementation defined types
+#include "HybridIOSWorkletsModuleProxyHolderSpecSwift.hpp"
 #include "HybridUiListModuleSpecSwift.hpp"
 #include "HybridUiListViewSpecSwift.hpp"
 #include "HybridViewHolderSpecSwift.hpp"
@@ -16,6 +17,22 @@
 
 namespace margelo::nitro::nitrolist::bridge::swift {
 
+  // pragma MARK: std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>
+  std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> create_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx swiftPart = NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::nitrolist::HybridIOSWorkletsModuleProxyHolderSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::nitrolist::HybridIOSWorkletsModuleProxyHolderSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::nitrolist::HybridIOSWorkletsModuleProxyHolderSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridIOSWorkletsModuleProxyHolderSpec\" is not implemented in Swift!");
+    }
+    #endif
+    NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+  
   // pragma MARK: std::shared_ptr<HybridUiListModuleSpec>
   std::shared_ptr<HybridUiListModuleSpec> create_std__shared_ptr_HybridUiListModuleSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     NitroList::HybridUiListModuleSpec_cxx swiftPart = NitroList::HybridUiListModuleSpec_cxx::fromUnsafe(swiftUnsafePointer);
