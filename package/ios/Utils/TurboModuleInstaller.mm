@@ -1,5 +1,6 @@
 #import "TurboModuleInstaller.h"
 #import "SurfacePresenterRegistry.h"
+#import "WorkletsUiCallInvoker.hpp"
 #import "ErrorUtils.h"
 
 #import <React/RCTBridge+Private.h>
@@ -20,37 +21,6 @@ using namespace facebook::react;
 using namespace worklets;
 
 namespace {
-
-class WorkletsUiCallInvoker final : public CallInvoker {
- public:
-  WorkletsUiCallInvoker(std::shared_ptr<UIScheduler> uiScheduler, std::shared_ptr<WorkletRuntime> uiWorkletRuntime)
-      : uiScheduler_(std::move(uiScheduler)), uiWorkletRuntime_(std::move(uiWorkletRuntime))
-  {
-  }
-
-  void invokeAsync(CallFunc &&func) noexcept override
-  {
-    std::shared_ptr<UIScheduler> uiScheduler = uiScheduler_;
-    std::shared_ptr<WorkletRuntime> uiWorkletRuntime = uiWorkletRuntime_;
-    uiScheduler->scheduleOnUI([func = std::move(func), uiWorkletRuntime]() mutable {
-      jsi::Runtime &runtime = uiWorkletRuntime->getJSIRuntime();
-      func(runtime);
-    });
-    if ([NSThread isMainThread]) {
-      uiScheduler->triggerUI();
-    }
-  }
-
-  void invokeSync(CallFunc &&func) override
-  {
-    std::shared_ptr<WorkletRuntime> uiWorkletRuntime = uiWorkletRuntime_;
-    uiWorkletRuntime->runSync([func = std::move(func)](jsi::Runtime &runtime) mutable { func(runtime); });
-  }
-
- private:
-  std::shared_ptr<UIScheduler> uiScheduler_;
-  std::shared_ptr<WorkletRuntime> uiWorkletRuntime_;
-};
 
 static RCTTurboModuleManager *sUiTurboModuleManager = nil;
 static uint64_t sInstalledRuntimeId = 0;
@@ -216,7 +186,9 @@ static BOOL sHasInstalledRuntime = NO;
       return NO;
     }
 
-    auto uiCallInvoker = std::make_shared<WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime);
+      auto uiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
+          return [NSThread isMainThread];
+      });
 
     RCTTurboModuleManager *uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
                                                            bridgeModuleDecorator:bridgeModuleDecorator

@@ -22,6 +22,11 @@ Pod::Spec.new do |s|
     "cpp/**/*.{hpp,cpp}",
   ]
   s.public_header_files = "ios/**/*.h"
+  s.pod_target_xcconfig = {
+    "HEADER_SEARCH_PATHS" => [
+      '"$(PODS_TARGET_SRCROOT)/ReactCommon"',
+    ].join(' ')
+  }
 
   load 'nitrogen/generated/ios/NitroList+autolinking.rb'
   add_nitrogen_files(s)

@@ -5,15 +5,21 @@
 #pragma once
 
 #include "HybridUiManagerHelperSpec.hpp"
+#include "WorkletsUiCallInvoker.hpp"
 
-namespace margelo::nitro::nitrolist {
+#include <react/renderer/scheduler/Scheduler.h>
 
-    class HybridUiManagerHelper : public HybridUiManagerHelperSpec {
+namespace margelo::nitro::nitrolist
+{
+
+    class HybridUiManagerHelper : public HybridUiManagerHelperSpec
+    {
     public:
         HybridUiManagerHelper() : HybridObject(TAG) {}
 
     public:
         void renderSync(std::shared_ptr<facebook::react::UIManagerBinding> nativeFabricUIManager) override;
+        static void setupEventInterceptor(const std::shared_ptr<facebook::react::Scheduler> &scheduler, std::shared_ptr<react::CallInvoker> uiCallInvoker);
     };
 
 }
