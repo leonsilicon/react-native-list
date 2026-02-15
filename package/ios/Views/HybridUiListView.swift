@@ -106,21 +106,23 @@ class HybridUiListView : HybridUiListViewSpec {
     
     var makeViewCallback: (() -> Double)?
     func setMakeNativeViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping () -> Double) throws {
-        makeViewCallback = callback;
+        makeViewCallback = callback
     }
     
     var updateViewCallback: ((_ reactTag: Double, _ index: Double) -> Bool)?
     func setUpdateViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping (Double, Double) -> Bool) throws {
         updateViewCallback = callback;
+
+        // Call this once here on the main queue, to make sure all modules are available.
+        // Without this we potentially crash as applySnapshot will call makeView from a different queue (main thread though)
+        _ = try makeView();
         
-        let test = try makeView();
-        view.addSubview(test.0)
-//        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-//
-//        configureRootView()
-//        configureCollectionView(collectionView: collectionView!)
-//        configureDataSource(collectionView: collectionView!)
-//        applySnapshot()
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+
+        configureRootView()
+        configureCollectionView(collectionView: collectionView!)
+        configureDataSource(collectionView: collectionView!)
+        applySnapshot()
     }
     
     func makeView() throws -> (UIView, ReactTag) {
@@ -187,11 +189,12 @@ class HybridUiListView : HybridUiListViewSpec {
     // MARK: - Diffable Data Source
 
     func configureDataSource(collectionView: UICollectionView) {
+        let reuseId = "main"
+        collectionView.register(HostCell.self, forCellWithReuseIdentifier: reuseId)
+
         dataSource = UICollectionViewDiffableDataSource<Section, Int>(collectionView: collectionView) {
             collectionView, indexPath, item in
-            
-            var reuseId = "main"
-             collectionView.register(HostCell.self, forCellWithReuseIdentifier: reuseId)
+        
 
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: reuseId, for: indexPath
@@ -200,13 +203,21 @@ class HybridUiListView : HybridUiListViewSpec {
             // If the cell has no hosted view yet (fresh or recycled from the same reuse pool), create one.
             // We check by looking at contentView's subviews.
             if cell.contentView.subviews.isEmpty {
-                let res = try? self.makeView()
-                if (res != nil){
-                    cell.install(view: res!.0)
-                    cell.reactTag = res!.1
-                    print("Created view with tag %d" , cell.reactTag)
-                } else {
-                    print("FAILED TO CREAT CELL!!")
+                // TODO: add check if we are on the main queue or not
+                DispatchQueue.main.async {
+                    // ^ Why is here a dispatch async?
+                    // We are actually on the main thread here!!!
+                    // HOWEVER, UIKit handles this call on a different queue. That queue
+                    // runs on the main thread, but it is its own queue …
+                    // RN has a bazillion checks that we are not on the mainthread, but queue, so we have to run from there when rendering
+                    do {
+                        let res = try self.makeView()
+                        cell.install(view: res.0)
+                        cell.reactTag = res.1
+//                        print("✅ Created view with tag %d" , cell.reactTag)
+                    } catch {
+                        print("❌ Failed to create view: \(error)")
+                    }
                 }
             }
 
@@ -214,7 +225,7 @@ class HybridUiListView : HybridUiListViewSpec {
             if let hostedView = cell.contentView.subviews.first {
                 let reactTag = cell.reactTag!
                 let success = self.updateViewCallback!(Double(reactTag), Double(item))
-                print("Updated view for react tag %d success=%b", reactTag, success)
+//                print("Updated view for react tag %d success=%b", reactTag, success)
             }
 
             return cell
@@ -228,7 +239,7 @@ class HybridUiListView : HybridUiListViewSpec {
         snapshot.appendSections(Section.allCases)
         
         var mainItems: [Int] = []
-        for i in 0..<5 {
+        for i in 0..<10000 {
             mainItems.append(i)
         }
         
