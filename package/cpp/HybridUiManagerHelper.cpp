@@ -10,7 +10,7 @@ namespace margelo::nitro::nitrolist
 {
     using namespace facebook;
 
-    static std::shared_ptr<const react::EventListener> eventInterceptor_ = nullptr;
+    static std::shared_ptr<react::EventListener> eventInterceptor_ = nullptr;
 
     void
     HybridUiManagerHelper::renderSync(std::shared_ptr<facebook::react::UIManagerBinding> binding)
@@ -29,18 +29,24 @@ namespace margelo::nitro::nitrolist
             shadowTree.notifyDelegatesOfUpdates(); });
     }
 
-    void HybridUiManagerHelper::setupEventInterceptor(
-        const std::shared_ptr<facebook::react::Scheduler> &scheduler,
+    std::shared_ptr<react::EventListener> HybridUiManagerHelper::createEventInterceptor(
         std::shared_ptr<react::CallInvoker> uiCallInvoker)
     {
-        if (!scheduler)
+        if (!uiCallInvoker)
         {
             throw std::runtime_error(
-                "HybridUiManagerHelper::setupEventInterceptor: Scheduler is not installed in the runtime.");
+                "HybridUiManagerHelper::createEventInterceptor: UI CallInvoker is not available.");
         }
+
         eventInterceptor_ = std::make_shared<react::EventListener>(
             [uiCallInvoker](const react::RawEvent &event)
             {
+                if (event.eventTarget == nullptr)
+                {
+                    Logger::log(LogLevel::Error, "HybridUiManagerHelper", "[HannoDebug] Event target is null, skipping event handling");
+                    return false;
+                }
+
                 // Intercept all events and trigger a transaction to ensure the UI thread is processing updates.
                 auto eventSurfaceId = event.eventTarget->getSurfaceId();
                 if (eventSurfaceId == 3)
@@ -116,7 +122,22 @@ namespace margelo::nitro::nitrolist
                 return false;
             });
 
-        // TODO: unregister
-        scheduler->addEventListener(eventInterceptor_);
+        return eventInterceptor_;
+    }
+
+    void HybridUiManagerHelper::setupEventInterceptor(
+        const std::shared_ptr<facebook::react::Scheduler> &scheduler,
+        std::shared_ptr<react::CallInvoker> uiCallInvoker)
+    {
+        if (!scheduler)
+        {
+            throw std::runtime_error(
+                "HybridUiManagerHelper::setupEventInterceptor: Scheduler is not installed in the runtime.");
+        }
+
+        std::shared_ptr<react::EventListener> eventInterceptor = createEventInterceptor(std::move(uiCallInvoker));
+
+        // TODO: unregister.
+        scheduler->addEventListener(eventInterceptor);
     }
 }

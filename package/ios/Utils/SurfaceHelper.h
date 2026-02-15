@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SurfaceHelper : NSObject
 + (nullable NSNumber *)createExternalSurface:(NSError * _Nullable * _Nullable)error;
-+ (void)setupEventInterceptor:(NSError * _Nullable * _Nullable)error;
 + (nullable UIView *)getViewByTag:(ReactTag)tag error:(NSError * _Nullable * _Nullable)error;
 @end
 

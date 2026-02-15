@@ -42,6 +42,7 @@ class HybridUiListModule : HybridUiListModuleSpec {
         do {
             _ = try SurfaceHelper.createExternalSurface()
             _ = try TurboModuleInstaller.installNativeModuleProxyInUIRuntime(withHolder: holder.holderBox)
+            _ = try TurboModuleInstaller.setupEventInterceptor()
         } catch {
             throw RuntimeError.error(withMessage: String(describing: error))
         }

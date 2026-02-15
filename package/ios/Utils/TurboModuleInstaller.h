@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable HybridWorkletsModuleProxyHolderBox *)createWorkletsModuleProxyHolder:(NSError * _Nullable * _Nullable)error;
 + (BOOL)installNativeModuleProxyInUIRuntimeWithHolder:(HybridWorkletsModuleProxyHolderBox *)holder
                                                  error:(NSError * _Nullable * _Nullable)error;
++ (BOOL)setupEventInterceptor:(NSError * _Nullable * _Nullable)error;
 
 @end
 

@@ -114,7 +114,7 @@ class HybridUiListView : HybridUiListViewSpec {
         updateViewCallback = callback;
         
         let test = try makeView();
-        let skr = test;
+        view.addSubview(test.0)
 //        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
 //
 //        configureRootView()

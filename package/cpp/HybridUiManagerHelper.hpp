@@ -7,6 +7,7 @@
 #include "HybridUiManagerHelperSpec.hpp"
 #include "WorkletsUiCallInvoker.hpp"
 
+#include <react/renderer/core/EventListener.h>
 #include <react/renderer/scheduler/Scheduler.h>
 
 namespace margelo::nitro::nitrolist
@@ -19,6 +20,7 @@ namespace margelo::nitro::nitrolist
 
     public:
         void renderSync(std::shared_ptr<facebook::react::UIManagerBinding> nativeFabricUIManager) override;
+        static std::shared_ptr<react::EventListener> createEventInterceptor(std::shared_ptr<react::CallInvoker> uiCallInvoker);
         static void setupEventInterceptor(const std::shared_ptr<facebook::react::Scheduler> &scheduler, std::shared_ptr<react::CallInvoker> uiCallInvoker);
     };
 

@@ -100,10 +100,6 @@ namespace {
   }
 }
 
-+ (void)setupEventInterceptor:(NSError *__autoreleasing _Nullable * _Nullable)error {
-    
-}
-
 + (nullable UIView *)getViewByTag:(ReactTag)tag error:(NSError * _Nullable __autoreleasing * _Nullable)error {
     if (![NSThread isMainThread]) {
       assignError(error, @"createExternalSurface() must run on the main thread.");

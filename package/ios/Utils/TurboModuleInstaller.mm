@@ -2,6 +2,7 @@
 #import "SurfacePresenterRegistry.h"
 #import "WorkletsUiCallInvoker.hpp"
 #import "ErrorUtils.h"
+#import "HybridUiManagerHelper.hpp"
 
 #import <React/RCTBridge+Private.h>
 #import <React/RCTBridge.h>
@@ -9,6 +10,8 @@
 #import <React/RCTBridgeModuleDecorator.h>
 #import <React/RCTBridgeProxy.h>
 #import <React/RCTBridgeProxy+Cxx.h>
+#import <React/RCTScheduler.h>
+#import <React/RCTSurfacePresenter.h>
 #import <ReactCommon/CallInvoker.h>
 #import <ReactCommon/RCTTurboModuleManager.h>
 #import <worklets/apple/AssertJavaScriptQueue.h>
@@ -25,6 +28,7 @@ namespace {
 static RCTTurboModuleManager *sUiTurboModuleManager = nil;
 static uint64_t sInstalledRuntimeId = 0;
 static BOOL sHasInstalledRuntime = NO;
+static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
 
 } // namespace
 
@@ -186,14 +190,14 @@ static BOOL sHasInstalledRuntime = NO;
       return NO;
     }
 
-      auto uiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
-          return [NSThread isMainThread];
-      });
+    sUiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
+        return [NSThread isMainThread];
+    });
 
     RCTTurboModuleManager *uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
                                                            bridgeModuleDecorator:bridgeModuleDecorator
                                                                         delegate:delegate
-                                                                       jsInvoker:uiCallInvoker];
+                                                                       jsInvoker:sUiCallInvoker];
     if (uiTurboModuleManager == nil) {
       assignError(error, @"Failed to create a UI-runtime RCTTurboModuleManager.");
       return NO;
@@ -209,6 +213,42 @@ static BOOL sHasInstalledRuntime = NO;
     return YES;
   } @catch (NSException *exception) {
     assignError(error, [NSString stringWithFormat:@"TurboModule install failed with NSException: %@", exception.reason]);
+    return NO;
+  }
+}
+
++ (BOOL)setupEventInterceptor:(NSError *__autoreleasing _Nullable * _Nullable)error {
+  @try {
+    if (sUiCallInvoker == nullptr) {
+      assignError(error, @"UI CallInvoker must be initialized before setting up event interceptor.");
+      return NO;
+    }
+
+    id surfacePresenterObj = [SurfacePresenterRegistry currentSurfacePresenter];
+    if (surfacePresenterObj == nil) {
+      assignError(error, @"SurfacePresenter from SurfacePresenterRegistry was null!");
+      return NO;
+    }
+
+    if (![surfacePresenterObj isKindOfClass:[RCTSurfacePresenter class]]) {
+      assignError(error, @"SurfacePresenterRegistry did not return an RCTSurfacePresenter instance.");
+      return NO;
+    }
+
+    RCTSurfacePresenter *surfacePresenter = (RCTSurfacePresenter *)surfacePresenterObj;
+    RCTScheduler *scheduler = surfacePresenter.scheduler;
+    if (scheduler == nil) {
+      assignError(error, @"Could not access an active RCTScheduler from the current RCTSurfacePresenter.");
+      return NO;
+    }
+
+    std::shared_ptr<EventListener> eventInterceptor =
+        margelo::nitro::nitrolist::HybridUiManagerHelper::createEventInterceptor(sUiCallInvoker);
+    [scheduler addEventListener:eventInterceptor];
+
+    return YES;
+  } @catch (NSException *exception) {
+    assignError(error, [NSString stringWithFormat:@"Event interceptor setup failed with NSException: %@", exception.reason]);
     return NO;
   }
 }
