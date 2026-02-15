@@ -84,20 +84,36 @@ final class HostCell: UICollectionViewCell {
 
 // MARK: - List
 
+final class CollectionViewDataSourceProxy: NSObject, UICollectionViewDataSource {
+    weak var owner: HybridUiListView?
+
+    init(owner: HybridUiListView) {
+        self.owner = owner
+        super.init()
+    }
+
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return owner?.numberOfSections(in: collectionView) ?? 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return owner?.collectionView(collectionView, numberOfItemsInSection: section) ?? 0
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let owner else {
+            return UICollectionViewCell()
+        }
+        return owner.collectionView(collectionView, cellForItemAt: indexPath)
+    }
+}
+
 class HybridUiListView : HybridUiListViewSpec {
     let view: UIView
     private var collectionView: UICollectionView?
-    
-    enum Section: Int, CaseIterable {
-        case main
-    }
-    
-    struct Item {
-        let reactTag: Int
-        let data: Int
-    }
-
-    var dataSource: UICollectionViewDiffableDataSource<Section, Int>!
+    private let reuseId = "main"
+    private var mainItems: [Int] = []
+    private var collectionDataSourceProxy: CollectionViewDataSourceProxy?
     
     override init() {
         view = UIView(frame: .zero)
@@ -112,10 +128,6 @@ class HybridUiListView : HybridUiListViewSpec {
     var updateViewCallback: ((_ reactTag: Double, _ index: Double) -> Bool)?
     func setUpdateViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping (Double, Double) -> Bool) throws {
         updateViewCallback = callback;
-
-        // Call this once here on the main queue, to make sure all modules are available.
-        // Without this we potentially crash as applySnapshot will call makeView from a different queue (main thread though)
-        _ = try makeView();
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
 
@@ -138,33 +150,28 @@ class HybridUiListView : HybridUiListViewSpec {
     
     // MARK: - Collection View
     private func createLayout() -> UICollectionViewCompositionalLayout {
-        UICollectionViewCompositionalLayout { sectionIndex, environment in
-            guard let section = Section(rawValue: sectionIndex) else { return nil }
-            
-            switch section {
-                case .main:
-                // Full-width, self-sizing height
-                let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(100)
-                )
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        UICollectionViewCompositionalLayout { _, _ in
+            // Full-width, self-sizing height
+            let itemSize = NSCollectionLayoutSize(
+                widthDimension: .estimated(100),
+                heightDimension: .estimated(100)
+            )
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-                let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(100)
-                )
-                let group = NSCollectionLayoutGroup.vertical(
-                    layoutSize: groupSize, subitems: [item]
-                )
+            let groupSize = NSCollectionLayoutSize(
+                widthDimension: .estimated(100),
+                heightDimension: .estimated(100)
+            )
+            let group = NSCollectionLayoutGroup.vertical(
+                layoutSize: groupSize, subitems: [item]
+            )
 
-                let section = NSCollectionLayoutSection(group: group)
-                section.interGroupSpacing = 12
-                section.contentInsets = NSDirectionalEdgeInsets(
-                    top: 16, leading: 0, bottom: 16, trailing: 0
-                )
-                return section
-            }
+            let section = NSCollectionLayoutSection(group: group)
+            section.interGroupSpacing = 12
+            section.contentInsets = NSDirectionalEdgeInsets(
+                top: 16, leading: 0, bottom: 16, trailing: 0
+            )
+            return section
         }
     }
     
@@ -186,64 +193,66 @@ class HybridUiListView : HybridUiListViewSpec {
         view.backgroundColor = .clear
     }
 
-    // MARK: - Diffable Data Source
+    // MARK: - Data Source
 
     func configureDataSource(collectionView: UICollectionView) {
-        let reuseId = "main"
         collectionView.register(HostCell.self, forCellWithReuseIdentifier: reuseId)
-
-        dataSource = UICollectionViewDiffableDataSource<Section, Int>(collectionView: collectionView) {
-            collectionView, indexPath, item in
-        
-
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: reuseId, for: indexPath
-            ) as! HostCell
-
-            // If the cell has no hosted view yet (fresh or recycled from the same reuse pool), create one.
-            // We check by looking at contentView's subviews.
-            if cell.contentView.subviews.isEmpty {
-                // TODO: add check if we are on the main queue or not
-                DispatchQueue.main.async {
-                    // ^ Why is here a dispatch async?
-                    // We are actually on the main thread here!!!
-                    // HOWEVER, UIKit handles this call on a different queue. That queue
-                    // runs on the main thread, but it is its own queue …
-                    // RN has a bazillion checks that we are not on the mainthread, but queue, so we have to run from there when rendering
-                    do {
-                        let res = try self.makeView()
-                        cell.install(view: res.0)
-                        cell.reactTag = res.1
-//                        print("✅ Created view with tag %d" , cell.reactTag)
-                    } catch {
-                        print("❌ Failed to create view: \(error)")
-                    }
-                }
-            }
-
-            // Bind data - works on both fresh and reused cells.
-            if let hostedView = cell.contentView.subviews.first {
-                let reactTag = cell.reactTag!
-                let success = self.updateViewCallback!(Double(reactTag), Double(item))
-//                print("Updated view for react tag %d success=%b", reactTag, success)
-            }
-
-            return cell
-        }
+        let proxy = CollectionViewDataSourceProxy(owner: self)
+        collectionDataSourceProxy = proxy
+        collectionView.dataSource = proxy
     }
 
     // MARK: - Snapshot
 
     func applySnapshot(animating: Bool = true) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Int>()
-        snapshot.appendSections(Section.allCases)
-        
-        var mainItems: [Int] = []
+        var items: [Int] = []
         for i in 0..<10000 {
-            mainItems.append(i)
+            items.append(i)
         }
-        
-        snapshot.appendItems(mainItems, toSection: .main)
-        dataSource.apply(snapshot, animatingDifferences: false)
+        mainItems = items
+
+        let reload: () -> Void = { [weak self] in
+            guard let self else { return }
+            self.collectionView?.reloadData()
+        }
+        if Thread.isMainThread {
+            reload()
+        } else {
+            DispatchQueue.main.async(execute: reload)
+        }
+    }
+
+    // MARK: - UICollectionViewDataSource
+
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return mainItems.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: reuseId,
+            for: indexPath
+        ) as! HostCell
+
+        if cell.contentView.subviews.isEmpty {
+            do {
+                let res = try makeView()
+                cell.install(view: res.0)
+                cell.reactTag = res.1
+            } catch {
+                print("❌ Failed to create view: \(error)")
+            }
+        }
+
+        if let reactTag = cell.reactTag {
+            let index = mainItems[indexPath.item]
+            _ = updateViewCallback?(Double(reactTag), Double(index))
+        }
+
+        return cell
     }
 }
