@@ -18,7 +18,6 @@ class HybridUiListModule : HybridUiListModuleSpec {
         }
     }
 
-    // TODO: create new surface, uiManager start surface
     // TODO: intercept events and forward to correct surface (potentially not needed on iOS)
     func setupExternalSurface(workletsModuleHolder: Variant_NullType__any_HybridIOSWorkletsModuleProxyHolderSpec_?) throws {
         if (!Thread.isMainThread) {
@@ -41,6 +40,7 @@ class HybridUiListModule : HybridUiListModuleSpec {
         }
 
         do {
+            _ = try HybridUiListTurboModuleInstaller.createExternalSurface()
             _ = try HybridUiListTurboModuleInstaller.installNativeModuleProxyInUIRuntime(withHolder: holder.holderBox)
         } catch {
             throw RuntimeError.error(withMessage: String(describing: error))
