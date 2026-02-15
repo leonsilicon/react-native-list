@@ -7,11 +7,11 @@
 
 import Foundation
 import UIKit
+import NitroModules
 
 class HybridUiListView : HybridUiListViewSpec {
-    typealias ViewType = UIView
     let view: UIView
-    private let collectionView: UICollectionView
+    private var collectionView: UICollectionView?
     
     enum Section {
         case main
@@ -27,6 +27,7 @@ class HybridUiListView : HybridUiListViewSpec {
     
     override init() {
         view = UIView(frame: .zero)
+        super.init()
 
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 100, height: 100)
@@ -35,25 +36,40 @@ class HybridUiListView : HybridUiListViewSpec {
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        super.init()
 
         configureRootView()
-        configureCollectionView()
-        configureDataSource()
+        configureCollectionView(collectionView: collectionView!)
+        configureDataSource(collectionView: collectionView!)
         applySnapshot()
     }
     
+    var makeViewCallback: (() -> Double)?
     func setMakeNativeViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping () -> Double) throws {
-        // TODO: implement
+        makeViewCallback = callback;
+        
+        let test = try makeView();
+        let skr = test;
     }
     
+    var updateViewCallback: ((_ reactTag: Double, _ index: Double) -> Bool)?
     func setUpdateViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping (Double, Double) -> Bool) throws {
-        // TODO: implement
+        updateViewCallback = callback;
+    }
+    
+    func makeView() throws -> UIView {
+        guard let safeMakeViewCallback = makeViewCallback else {
+            throw RuntimeError.error(withMessage: "Can only call makeView when setMakeNativeViewCallback called prior")
+        }
+
+        let viewTag = ReactTag(safeMakeViewCallback())
+        let resolvedView = try SurfaceHelper.getViewByTag(viewTag)
+        // TODO: remove resolvedView here from parent?
+        return resolvedView
     }
     
     // MARK: - Collection View
 
-    func configureCollectionView() {
+    func configureCollectionView(collectionView: UICollectionView) {
         collectionView.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -72,7 +88,7 @@ class HybridUiListView : HybridUiListViewSpec {
 
     // MARK: - Diffable Data Source
 
-    func configureDataSource() {
+    func configureDataSource(collectionView: UICollectionView) {
         // Register cell with a cell registration (modern API)
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, Item> { cell, indexPath, item in
             var config = UIListContentConfiguration.cell()

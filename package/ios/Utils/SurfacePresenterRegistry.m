@@ -1,4 +1,4 @@
-#import "HybridUiListSurfacePresenterRegistry.h"
+#import "SurfacePresenterRegistry.h"
 
 #import <React/RCTSurfacePresenterStub.h>
 
@@ -6,10 +6,10 @@
 
 static __weak id<RCTSurfacePresenterStub> sCurrentSurfacePresenter = nil;
 
-@interface HybridUiListSurfacePresenterRegistry () <RCTTurboModule>
+@interface SurfacePresenterRegistry () <RCTTurboModule>
 @end
 
-@implementation HybridUiListSurfacePresenterRegistry
+@implementation SurfacePresenterRegistry
 
 RCT_EXPORT_MODULE(HybridUiListSurfacePresenterRegistry);
 

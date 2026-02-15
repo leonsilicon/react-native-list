@@ -335,7 +335,12 @@ global.handleEvent = dispatchEvent
 // % 10 === 1 means it is a rootTag.
 // % 2 === 0 means it is a Fabric tag.
 // This means that they never overlap.
-global.nextReactTag = 2
+global.nextReactTag = 200_000_000
+// ^ Why is this number so high?
+// We share the ReactInstance (ie we don't create a seperate one)
+// That means our surface shares the RCTComponentViewRegistry on iOS with the main React Native renderer.
+// When creating new views its checking if the tag already exists, meaning we can't use the same tags that react is using. Bummer!\
+// TODO: find a better solution for this
 
 const HostConfig = {
   now: performance.now,

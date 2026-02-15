@@ -2,13 +2,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface HybridWorkletsModuleProxyHolderBox : NSObject
 @end
 
-@interface HybridUiListTurboModuleInstaller : NSObject
+@interface TurboModuleInstaller : NSObject
 
 + (nullable HybridWorkletsModuleProxyHolderBox *)createWorkletsModuleProxyHolder:(NSError * _Nullable * _Nullable)error;
-+ (nullable NSNumber *)createExternalSurface:(NSError * _Nullable * _Nullable)error;
 + (BOOL)installNativeModuleProxyInUIRuntimeWithHolder:(HybridWorkletsModuleProxyHolderBox *)holder
                                                  error:(NSError * _Nullable * _Nullable)error;
 

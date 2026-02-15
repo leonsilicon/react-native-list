@@ -11,7 +11,7 @@ import NitroModules
 class HybridUiListModule : HybridUiListModuleSpec {
     func iosGetWorkletsModule() throws -> any HybridIOSWorkletsModuleProxyHolderSpec {
         do {
-            let holderBox = try HybridUiListTurboModuleInstaller.createWorkletsModuleProxyHolder()
+            let holderBox = try TurboModuleInstaller.createWorkletsModuleProxyHolder()
             return HybridIOSWorkletsModuleProxyHolder(holderBox: holderBox)
         } catch {
             throw RuntimeError.error(withMessage: String(describing: error))
@@ -40,8 +40,8 @@ class HybridUiListModule : HybridUiListModuleSpec {
         }
 
         do {
-            _ = try HybridUiListTurboModuleInstaller.createExternalSurface()
-            _ = try HybridUiListTurboModuleInstaller.installNativeModuleProxyInUIRuntime(withHolder: holder.holderBox)
+            _ = try SurfaceHelper.createExternalSurface()
+            _ = try TurboModuleInstaller.installNativeModuleProxyInUIRuntime(withHolder: holder.holderBox)
         } catch {
             throw RuntimeError.error(withMessage: String(describing: error))
         }

@@ -59,9 +59,6 @@ var require_FabricUIManager = __commonJS((exports2) => {
   var nativeFabricUIManagerProxy;
   var CACHED_PROPERTIES = ["createNode", "cloneNode", "cloneNodeWithNewChildren", "cloneNodeWithNewProps", "cloneNodeWithNewChildrenAndProps", "createChildSet", "appendChild", "appendChildToSet", "completeRoot", "measure", "measureInWindow", "measureLayout", "configureNextLayoutAnimation", "sendAccessibilityEvent", "findShadowNodeByTag_DEPRECATED", "setNativeProps", "dispatchCommand", "compareDocumentPosition", "getBoundingClientRect", "unstable_DefaultEventPriority", "unstable_DiscreteEventPriority", "unstable_ContinuousEventPriority", "unstable_IdleEventPriority", "unstable_getCurrentEventPriority"];
   function getFabricUIManager() {
-    if (global.nativeFabricUIManager == null) {
-      throw new Error("FabricUIManager is undefined.");
-    }
     if (nativeFabricUIManagerProxy == null && global.nativeFabricUIManager != null) {
       nativeFabricUIManagerProxy = createProxyWithCachedProperties(global.nativeFabricUIManager, CACHED_PROPERTIES);
     }
@@ -1732,7 +1729,7 @@ function dispatchEvent(target, topLevelType, nativeEvent) {
   });
 }
 global.handleEvent = dispatchEvent;
-global.nextReactTag = 2;
+global.nextReactTag = 200000000;
 var HostConfig = {
   now: performance.now,
   getRootHostContext(rootContainerInstance) {

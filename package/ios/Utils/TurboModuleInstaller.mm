@@ -1,5 +1,6 @@
-#import "HybridUiListTurboModuleInstaller.h"
-#import "HybridUiListSurfacePresenterRegistry.h"
+#import "TurboModuleInstaller.h"
+#import "SurfacePresenterRegistry.h"
+#import "ErrorUtils.h"
 
 #import <React/RCTBridge+Private.h>
 #import <React/RCTBridge.h>
@@ -7,9 +8,6 @@
 #import <React/RCTBridgeModuleDecorator.h>
 #import <React/RCTBridgeProxy.h>
 #import <React/RCTBridgeProxy+Cxx.h>
-#import <React/RCTFabricSurface.h>
-#import <React/RCTSurfacePresenterStub.h>
-#import <React/RCTSurfaceProtocol.h>
 #import <ReactCommon/CallInvoker.h>
 #import <ReactCommon/RCTTurboModuleManager.h>
 #import <worklets/apple/AssertJavaScriptQueue.h>
@@ -22,8 +20,6 @@ using namespace facebook::react;
 using namespace worklets;
 
 namespace {
-
-static NSString *const kInstallerErrorDomain = @"NitroList.HybridUiListTurboModuleInstaller";
 
 class WorkletsUiCallInvoker final : public CallInvoker {
  public:
@@ -59,33 +55,6 @@ class WorkletsUiCallInvoker final : public CallInvoker {
 static RCTTurboModuleManager *sUiTurboModuleManager = nil;
 static uint64_t sInstalledRuntimeId = 0;
 static BOOL sHasInstalledRuntime = NO;
-static id<RCTSurfaceProtocol> sExternalSurface = nil;
-static NSInteger sExternalSurfaceRootTag = 0;
-static const NSInteger kExternalSurfaceId = 3;
-
-inline void assignError(NSError *__autoreleasing _Nullable *error, NSString *message)
-{
-  if (error == nil) {
-    return;
-  }
-
-  *error = [NSError errorWithDomain:kInstallerErrorDomain
-                               code:1
-                           userInfo:@{
-                             NSLocalizedDescriptionKey : message,
-                           }];
-}
-
-inline id<RCTSurfacePresenterStub> _Nullable resolveSurfacePresenter(RCTBridge *bridge)
-{
-  id<RCTSurfacePresenterStub> surfacePresenter =
-      (id<RCTSurfacePresenterStub>)[HybridUiListSurfacePresenterRegistry currentSurfacePresenter];
-  if (surfacePresenter != nil) {
-    return surfacePresenter;
-  }
-
-  return [bridge surfacePresenter];
-}
 
 } // namespace
 
@@ -116,7 +85,7 @@ inline id<RCTSurfacePresenterStub> _Nullable resolveSurfacePresenter(RCTBridge *
 
 @end
 
-@implementation HybridUiListTurboModuleInstaller
+@implementation TurboModuleInstaller
 
 + (nullable HybridWorkletsModuleProxyHolderBox *)createWorkletsModuleProxyHolder:
     (NSError *__autoreleasing _Nullable * _Nullable)error
@@ -134,12 +103,12 @@ inline id<RCTSurfacePresenterStub> _Nullable resolveSurfacePresenter(RCTBridge *
     }
 
     // Prime the registry module while we're on the JS queue.
-    id registryModule = [bridge moduleForClass:HybridUiListSurfacePresenterRegistry.class];
+    id registryModule = [bridge moduleForClass:SurfacePresenterRegistry.class];
     if (registryModule == nil) {
       assignError(error, @"Could not initialize HybridUiListSurfacePresenterRegistry.");
       return nil;
     }
-    if ([HybridUiListSurfacePresenterRegistry currentSurfacePresenter] == nil) {
+    if ([SurfacePresenterRegistry currentSurfacePresenter] == nil) {
       assignError(error, @"SurfacePresenter was not injected into HybridUiListSurfacePresenterRegistry.");
       return nil;
     }
@@ -159,64 +128,6 @@ inline id<RCTSurfacePresenterStub> _Nullable resolveSurfacePresenter(RCTBridge *
     return [[HybridWorkletsModuleProxyHolderBox alloc] initWithWorkletsModuleProxy:std::move(workletsModuleProxy)];
   } @catch (NSException *exception) {
     assignError(error, [NSString stringWithFormat:@"Failed to create WorkletsModuleProxy holder: %@", exception.reason]);
-    return nil;
-  }
-}
-
-+ (nullable NSNumber *)createExternalSurface:(NSError *__autoreleasing _Nullable * _Nullable)error
-{
-  @try {
-    if (![NSThread isMainThread]) {
-      assignError(error, @"createExternalSurface() must run on the main thread.");
-      return nil;
-    }
-
-    if (sExternalSurface != nil) {
-      return @(sExternalSurfaceRootTag);
-    }
-
-    RCTBridge *bridge = [RCTBridge currentBridge];
-    if (bridge == nil) {
-      assignError(error, @"Could not access RCTBridge.currentBridge.");
-      return nil;
-    }
-
-    id<RCTSurfacePresenterStub> surfacePresenter = resolveSurfacePresenter(bridge);
-    if (surfacePresenter == nil) {
-      assignError(error, @"Could not access an active RCTSurfacePresenter.");
-      return nil;
-    }
-
-    id<RCTSurfaceProtocol> surface = [surfacePresenter createFabricSurfaceForModuleName:@"" initialProperties:@{
-        @"surfaceId": @(kExternalSurfaceId)
-    }];
-    if (surface == nil) {
-      assignError(error, @"Failed to create Fabric surface.");
-      return nil;
-    }
-
-    if (![surface isKindOfClass:[RCTFabricSurface class]]) {
-      assignError(error, @"Expected a RCTFabricSurface instance.");
-      return nil;
-    }
-
-    RCTFabricSurface *fabricSurface = (RCTFabricSurface *)surface;
-    const auto &surfaceHandler = [fabricSurface surfaceHandler];
-    surfaceHandler.setSurfaceId((facebook::react::SurfaceId)kExternalSurfaceId);
-
-    [surface start];
-    sExternalSurfaceRootTag = surface.rootTag;
-    if (sExternalSurfaceRootTag != kExternalSurfaceId) {
-      [surface stop];
-      assignError(error, [NSString stringWithFormat:@"Unexpected surface rootTag: %ld", (long)sExternalSurfaceRootTag]);
-      return nil;
-    }
-
-    NSLog(@"Created external surface!");
-    sExternalSurface = surface;
-    return @(sExternalSurfaceRootTag);
-  } @catch (NSException *exception) {
-    assignError(error, [NSString stringWithFormat:@"Surface creation failed with NSException: %@", exception.reason]);
     return nil;
   }
 }
