@@ -18,7 +18,6 @@ class HybridUiListModule : HybridUiListModuleSpec {
         }
     }
 
-    // TODO: intercept events and forward to correct surface (potentially not needed on iOS)
     func setupExternalSurface(workletsModuleHolder: Variant_NullType__any_HybridIOSWorkletsModuleProxyHolderSpec_?) throws {
         if (!Thread.isMainThread) {
             throw RuntimeError.error(withMessage: "setupExternalSurface() must be called from UI thread!")
