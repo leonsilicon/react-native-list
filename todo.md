@@ -4,7 +4,7 @@
 [x] - Fix native modules?
 [x] - Make native modules stable & dynamic
         - Fix getConstants use case & crash
-[ ] - Checkout how iOS works so i can get started designing a stable API
+[x] - Checkout how iOS works so i can get started designing a stable API
 [ ] - Create a "SyncRenderer" and a "SyncView", this will also help with debugging (to render just one view instead of a whole list!)
 [ ] - Do I want to use the ReactFiberConfig? 
 
