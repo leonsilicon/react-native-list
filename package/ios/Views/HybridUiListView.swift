@@ -65,13 +65,20 @@ final class HostCell: UICollectionViewCell {
         hostedView?.removeFromSuperview()
         hostedView = view
 
+        let measuredSize = Self.preferredSize(for: view)
+
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
+        let width = view.widthAnchor.constraint(equalToConstant: measuredSize.width)
+        let height = view.heightAnchor.constraint(equalToConstant: measuredSize.height)
+
         NSLayoutConstraint.activate([
             view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            width,
+            height,
         ])
     }
 
@@ -79,6 +86,18 @@ final class HostCell: UICollectionViewCell {
         super.prepareForReuse()
         // We keep the hosted view — it will be re-bound.
         // If reuse identifiers match, the view hierarchy is compatible.
+    }
+
+    private static func preferredSize(for view: UIView) -> CGSize {
+        view.layoutIfNeeded()
+        var size = view.bounds.size
+        if size.width <= 0 || size.height <= 0 {
+            size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        }
+        if size.width <= 0 || size.height <= 0 {
+            size = CGSize(width: 100, height: 100)
+        }
+        return size
     }
 }
 
@@ -151,16 +170,16 @@ class HybridUiListView : HybridUiListViewSpec {
     // MARK: - Collection View
     private func createLayout() -> UICollectionViewCompositionalLayout {
         UICollectionViewCompositionalLayout { _, _ in
-            // Full-width, self-sizing height
+            // Self-sized cells. HostCell provides a measured size for each hosted view.
             let itemSize = NSCollectionLayoutSize(
-                widthDimension: .estimated(100),
-                heightDimension: .estimated(100)
+                widthDimension: .estimated(1),
+                heightDimension: .estimated(1)
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
             let groupSize = NSCollectionLayoutSize(
-                widthDimension: .estimated(100),
-                heightDimension: .estimated(100)
+                widthDimension: .estimated(1),
+                heightDimension: .estimated(1)
             )
             let group = NSCollectionLayoutGroup.vertical(
                 layoutSize: groupSize, subitems: [item]

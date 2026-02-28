@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, useWindowDimensions, Image, Pressable } from "react-native";
+import { View, Text, useWindowDimensions, Image, Pressable, StyleSheet } from "react-native";
 import { scheduleOnUI } from "react-native-worklets";
 import {
   setup,
@@ -77,11 +77,7 @@ export default function App() {
                   key={"itemid-" + global.itemId}
                   ref={ref}
                   collapsable={false}
-                  style={{
-                    width: 100,
-                    height: 100,
-                    backgroundColor: "red",
-                  }}
+                  style={styles.item}
                 >
                   <Pressable
                     style={{
@@ -165,11 +161,7 @@ export default function App() {
                   <View
                     key={"itemid-" + itemId}
                     collapsable={false}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      backgroundColor: "red",
-                    }}
+                    style={styles.item}
                   >
                     <Pressable
                       collapsable={false}
@@ -230,6 +222,14 @@ export default function App() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  item: {
+    width: 100,
+    height: 100,
+    backgroundColor: "red",
+  },
+})
 
 // export default function App() {
 //   return (
