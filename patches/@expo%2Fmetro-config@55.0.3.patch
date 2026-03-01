@@ -1,0 +1,22 @@
+diff --git a/build/serializer/withExpoSerializers.js b/build/serializer/withExpoSerializers.js
+index 2381903ca7d0676bc2246877ce5ff64fb7d13827..15a3745fd43de4dca84a07793617ed12dbb3aa27 100644
+--- a/build/serializer/withExpoSerializers.js
++++ b/build/serializer/withExpoSerializers.js
+@@ -251,7 +251,16 @@ function getDefaultSerializer(config, fallbackSerializer, configOptions = {}) {
+             ...options.serializerOptions,
+             ...serializerOptions,
+         };
+-        const assets = await (0, serializeChunks_1.graphToSerialAssetsAsync)(config, {
++        const staticConfig = {
++            ...config,
++            serializer: {
++                ...(config.serializer ?? {}),
++                // In static serializer mode, rely on runtime-provided pre-main modules
++                // from Metro's bundling options to avoid stale closure-captured config.
++                getModulesRunBeforeMainModule: () => options.runBeforeMainModule ?? [],
++            },
++        };
++        const assets = await (0, serializeChunks_1.graphToSerialAssetsAsync)(staticConfig, {
+             includeSourceMaps: !!serializerOptions.includeSourceMaps,
+             splitChunks: !!serializerOptions.splitChunks,
+             ...configOptions,
