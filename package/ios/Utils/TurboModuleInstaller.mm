@@ -16,6 +16,7 @@
 #import <ReactCommon/RCTTurboModuleManager.h>
 #import <worklets/apple/AssertJavaScriptQueue.h>
 #import <worklets/apple/WorkletsModule.h>
+#import <NitroModules/NitroLogger.hpp>
 
 #include <jsi/jsi.h>
 
@@ -28,7 +29,7 @@ namespace {
 static RCTTurboModuleManager *sUiTurboModuleManager = nil;
 static uint64_t sInstalledRuntimeId = 0;
 static BOOL sHasInstalledRuntime = NO;
-static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
+static std::shared_ptr<facebook::react::CallInvoker> uiCallInvoker = nullptr;
 
 } // namespace
 
@@ -110,6 +111,7 @@ static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
                                                  error:(NSError *__autoreleasing _Nullable * _Nullable)error
 {
   @try {
+      margelo::nitro::Logger::log(margelo::nitro::LogLevel::Debug, "TurboModuleInstaller", "installNativeModuleProxyInUIRuntime()");
     if (holder == nil) {
       assignError(error, @"Expected non-null IOSWorkletsModuleProxyHolder.");
       return NO;
@@ -190,21 +192,23 @@ static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
       return NO;
     }
 
-    sUiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
+    uiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
         return [NSThread isMainThread];
     });
 
     RCTTurboModuleManager *uiTurboModuleManager = [[RCTTurboModuleManager alloc] initWithBridgeProxy:bridgeProxy
                                                            bridgeModuleDecorator:bridgeModuleDecorator
                                                                         delegate:delegate
-                                                                       jsInvoker:sUiCallInvoker];
+                                                                       jsInvoker:uiCallInvoker];
     if (uiTurboModuleManager == nil) {
       assignError(error, @"Failed to create a UI-runtime RCTTurboModuleManager.");
       return NO;
     }
 
+      margelo::nitro::Logger::log(margelo::nitro::LogLevel::Debug, "TurboModuleInstaller", "schedule install JSI bindings!");
     uiWorkletRuntime->runSync([uiTurboModuleManager](jsi::Runtime &runtime) {
       [uiTurboModuleManager installJSBindings:runtime];
+        margelo::nitro::Logger::log(margelo::nitro::LogLevel::Debug, "TurboModuleInstaller", "installed JSI bindings!");
     });
 
     sUiTurboModuleManager = uiTurboModuleManager;
@@ -219,7 +223,7 @@ static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
 
 + (BOOL)setupEventInterceptor:(NSError *__autoreleasing _Nullable * _Nullable)error {
   @try {
-    if (sUiCallInvoker == nullptr) {
+    if (uiCallInvoker == nullptr) {
       assignError(error, @"UI CallInvoker must be initialized before setting up event interceptor.");
       return NO;
     }
@@ -243,7 +247,7 @@ static std::shared_ptr<facebook::react::CallInvoker> sUiCallInvoker = nullptr;
     }
 
     std::shared_ptr<EventListener> eventInterceptor =
-        margelo::nitro::nitrolist::HybridUiManagerHelper::createEventInterceptor(sUiCallInvoker);
+        margelo::nitro::nitrolist::HybridUiManagerHelper::createEventInterceptor(uiCallInvoker);
     [scheduler addEventListener:eventInterceptor];
 
     return YES;
