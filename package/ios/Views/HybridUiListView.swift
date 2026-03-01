@@ -52,33 +52,30 @@ struct AnyCollectionItem: Hashable {
 }
 
 /// A cell that hosts an arbitrary UIView produced by a CollectionItem.
-/// The hosted view is pinned to the contentView edges so Auto Layout
-/// drives self-sizing.
+/// The hosted view is pinned horizontally and top-aligned; explicit height
+/// from React bounds drives sizing to avoid expensive Auto Layout solving.
 final class HostCell: UICollectionViewCell {
+
+    static let verticalInset: CGFloat = 8
+    static let horizontalInset: CGFloat = 16
 
     private var hostedView: UIView?
     
     var reactTag: Int?
 
     /// Install a view created by `item.makeView()`.
-    func install(view: UIView) {
+    func install(view: UIView, contentHeight: CGFloat) {
         hostedView?.removeFromSuperview()
         hostedView = view
 
-        let measuredSize = Self.preferredSize(for: view)
-
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
-        let width = view.widthAnchor.constraint(equalToConstant: measuredSize.width)
-        let height = view.heightAnchor.constraint(equalToConstant: measuredSize.height)
 
         NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            width,
-            height,
+            view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Self.verticalInset),
+            view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Self.horizontalInset),
+            view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Self.horizontalInset),
+            view.heightAnchor.constraint(equalToConstant: contentHeight),
         ])
     }
 
@@ -88,17 +85,6 @@ final class HostCell: UICollectionViewCell {
         // If reuse identifiers match, the view hierarchy is compatible.
     }
 
-    private static func preferredSize(for view: UIView) -> CGSize {
-        view.layoutIfNeeded()
-        var size = view.bounds.size
-        if size.width <= 0 || size.height <= 0 {
-            size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        }
-        if size.width <= 0 || size.height <= 0 {
-            size = CGSize(width: 100, height: 100)
-        }
-        return size
-    }
 }
 
 // MARK: - List
@@ -133,6 +119,8 @@ class HybridUiListView : HybridUiListViewSpec {
     private let reuseId = "main"
     private var mainItems: [Int] = []
     private var collectionDataSourceProxy: CollectionViewDataSourceProxy?
+    private var measuredContentSizeByReuseIdentifier: [String: CGSize] = [:]
+    private var premeasuredViewByReuseIdentifier: [String: (view: UIView, tag: ReactTag)] = [:]
     
     override init() {
         view = UIView(frame: .zero)
@@ -147,8 +135,13 @@ class HybridUiListView : HybridUiListViewSpec {
     var updateViewCallback: ((_ reactTag: Double, _ index: Double) -> Bool)?
     func setUpdateViewCallback(uiListModule: any HybridUiListModuleSpec, callback: @escaping (Double, Double) -> Bool) throws {
         updateViewCallback = callback;
+
+        premeasureItemTypeIfNeeded(reuseIdentifier: reuseId)
+        guard let contentSize = measuredContentSizeByReuseIdentifier[reuseId] else {
+            fatalError("Developer error: Missing measured content size for reuseIdentifier '\(reuseId)'.")
+        }
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout(contentSize: contentSize))
 
         configureRootView()
         configureCollectionView(collectionView: collectionView!)
@@ -156,30 +149,42 @@ class HybridUiListView : HybridUiListViewSpec {
         applySnapshot()
     }
     
-    func makeView() throws -> (UIView, ReactTag) {
+    func makeView() throws -> (UIView, ReactTag, CGSize?) {
         guard let safeMakeViewCallback = makeViewCallback else {
             throw RuntimeError.error(withMessage: "Can only call makeView when setMakeNativeViewCallback called prior")
         }
 
         let viewTag = ReactTag(safeMakeViewCallback())
         let resolvedView = try SurfaceHelper.getViewByTag(viewTag)
+        let measuredWidth = [resolvedView.bounds.width, resolvedView.frame.width]
+            .filter { $0.isFinite && $0 > 0 }
+            .max()
+        let measuredHeight = [resolvedView.bounds.height, resolvedView.frame.height]
+            .filter { $0.isFinite && $0 > 0 }
+            .max()
         resolvedView.removeFromSuperview()
-        return (resolvedView, viewTag)
+        if let measuredWidth, let measuredHeight {
+            return (resolvedView, viewTag, CGSize(width: measuredWidth, height: measuredHeight))
+        } else {
+            return (resolvedView, viewTag, nil)
+        }
     }
     
     // MARK: - Collection View
-    private func createLayout() -> UICollectionViewCompositionalLayout {
-        UICollectionViewCompositionalLayout { _, _ in
-            // Self-sized cells. HostCell provides a measured size for each hosted view.
+    private func createLayout(contentSize: CGSize) -> UICollectionViewCompositionalLayout {
+        let containerWidth = ceil(contentSize.width + HostCell.horizontalInset * 2)
+        let containerHeight = ceil(contentSize.height + HostCell.verticalInset * 2)
+        return UICollectionViewCompositionalLayout { _, _ in
+            // Fixed-size list rows (per type) to avoid self-sizing solver churn while scrolling.
             let itemSize = NSCollectionLayoutSize(
-                widthDimension: .estimated(1),
-                heightDimension: .estimated(1)
+                widthDimension: .absolute(containerWidth),
+                heightDimension: .absolute(containerHeight)
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
             let groupSize = NSCollectionLayoutSize(
-                widthDimension: .estimated(1),
-                heightDimension: .estimated(1)
+                widthDimension: .absolute(containerWidth),
+                heightDimension: .absolute(containerHeight)
             )
             let group = NSCollectionLayoutGroup.vertical(
                 layoutSize: groupSize, subitems: [item]
@@ -191,6 +196,26 @@ class HybridUiListView : HybridUiListViewSpec {
                 top: 16, leading: 0, bottom: 16, trailing: 0
             )
             return section
+        }
+    }
+
+    private func premeasureItemTypeIfNeeded(reuseIdentifier: String) {
+        guard measuredContentSizeByReuseIdentifier[reuseIdentifier] == nil else { return }
+
+        do {
+            let (view, tag, measuredSize) = try makeView()
+            guard let measuredSize else {
+                fatalError(
+                    "Developer error: Failed to measure item size for reuseIdentifier '\(reuseIdentifier)'. " +
+                    "makeView() returned a view without finite non-zero bounds/frame size."
+                )
+            }
+            measuredContentSizeByReuseIdentifier[reuseIdentifier] = measuredSize
+            premeasuredViewByReuseIdentifier[reuseIdentifier] = (view: view, tag: tag)
+        } catch {
+            fatalError(
+                "Developer error: Failed to pre-measure item type '\(reuseIdentifier)': \(error)"
+            )
         }
     }
     
@@ -257,13 +282,21 @@ class HybridUiListView : HybridUiListViewSpec {
             for: indexPath
         ) as! HostCell
 
+        guard let contentSize = measuredContentSizeByReuseIdentifier[reuseId] else {
+            fatalError("Developer error: Missing measured content size for reuseIdentifier '\(reuseId)'.")
+        }
         if cell.contentView.subviews.isEmpty {
-            do {
-                let res = try makeView()
-                cell.install(view: res.0)
-                cell.reactTag = res.1
-            } catch {
-                print("❌ Failed to create view: \(error)")
+            if let premeasured = premeasuredViewByReuseIdentifier.removeValue(forKey: reuseId) {
+                cell.install(view: premeasured.view, contentHeight: contentSize.height)
+                cell.reactTag = premeasured.tag
+            } else {
+                do {
+                    let res = try makeView()
+                    cell.install(view: res.0, contentHeight: contentSize.height)
+                    cell.reactTag = res.1
+                } catch {
+                    print("❌ Failed to create view: \(error)")
+                }
             }
         }
 
