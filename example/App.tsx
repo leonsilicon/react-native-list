@@ -68,8 +68,6 @@ export default function App() {
             ref.setMakeNativeViewCallback(uiListModuleUnboxed, () => {
               "worklet";
 
-              global.log("Make native view callback called");
-
               const ref = global.React.createRef();
               global.itemId = (global.itemId ?? 0) + 1;
               const NewElement = (
@@ -231,10 +229,27 @@ const styles = StyleSheet.create({
   },
 })
 
+// import { View, Text } from "react-native";
+// import { scheduleOnUI } from "react-native-worklets";
+// import { setup } from "react-native-nitro-list";
+  
+// setup();
+
+// scheduleOnUI(() => {
+//   "worklet";
+//   global._log("View2: " + View);
+// })
+
 // export default function App() {
 //   return (
-//     <GestureHandlerRootView>
-//       <AppInner />
-//     </GestureHandlerRootView>
+//     <View
+//       style={{
+//         flex: 1,
+//         alignItems: "center",
+//         justifyContent: "center",
+//       }}
+//     >
+//       <Text>Test</Text>
+//     </View>
 //   );
 // }

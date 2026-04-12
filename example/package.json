@@ -24,7 +24,7 @@
     "react-native-reanimated": "^4.2.1",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "^4.19.0",
-    "react-native-worklets": "*"
+    "react-native-worklets": "0.8.0-bundle-mode-preview-1"
   },
   "devDependencies": {
     "@react-native/metro-config": "^0.83.1",
@@ -44,6 +44,9 @@
       "BUNDLE_MODE_ENABLED": true,
       "FETCH_PREVIEW_ENABLED": false
     }
+  },
+  "patchedDependencies": {
+    "react-native-worklets@0.8.0-bundle-mode-preview-1": "patches/react-native-worklets@0.8.0-bundle-mode-preview-1.patch"
   },
   "private": true
 }
