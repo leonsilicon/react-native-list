@@ -19,6 +19,7 @@
 #import <NitroModules/NitroLogger.hpp>
 
 #include <jsi/jsi.h>
+#include <react/utils/jsi-utils.h>
 
 using namespace facebook;
 using namespace facebook::react;
@@ -140,9 +141,15 @@ static std::shared_ptr<facebook::react::CallInvoker> uiCallInvoker = nullptr;
       return YES;
     }
 
-    // TODO: this seems quite defensive, remove?
     bool hasNativeModuleProxy = false;
     uiWorkletRuntime->runSync([&](jsi::Runtime &runtime) {
+      // We first have to set this to be bridgeless too
+      // TODO: upstream this to worklets to set this for their runtime if the JS runtime is bridgeless
+      // Note: do i want to make this xplat? have the same code dupe in android
+      if (!runtime.global().hasProperty(runtime, "RN$Bridgeless")) {
+        react::defineReadOnlyGlobal(runtime, "RN$Bridgeless", jsi::Value(true));
+      }
+      
       jsi::Value proxy = runtime.global().getProperty(runtime, "nativeModuleProxy");
       hasNativeModuleProxy = !proxy.isUndefined() && !proxy.isNull();
     });
