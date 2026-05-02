@@ -9,6 +9,9 @@
   "source": "src/index",
   "files": [
     "src",
+    "metro",
+    "metro-config.js",
+    "metro-config.d.ts",
     "react-native.config.js",
     "lib",
     "nitrogen",

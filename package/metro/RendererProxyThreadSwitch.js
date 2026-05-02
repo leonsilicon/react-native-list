@@ -8,6 +8,7 @@ let cachedReactNativeRendererProxy
 function getReactNativeRendererProxy() {
   if (cachedReactNativeRendererProxy == null) {
     // Intentionally lazy: avoid loading the default RN renderer in non-RN runtimes.
+    // eslint-disable-next-line @react-native/no-deep-imports
     cachedReactNativeRendererProxy = require('react-native/Libraries/ReactNative/RendererProxy')
   }
   return cachedReactNativeRendererProxy
