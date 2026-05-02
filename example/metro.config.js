@@ -1,6 +1,9 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require('expo/metro-config');
 const { mergeConfig } = require('@react-native/metro-config');
+const {
+    getBundleModeMetroConfig,
+} = require('react-native-worklets/bundleMode');
 const path = require('path');
 
 const defaultConfig = getDefaultConfig(__dirname);
@@ -25,6 +28,10 @@ function isReactNativeDomInternalsImporter(originModulePath) {
 }
 
 /** @type {import('expo/metro-config').MetroConfig} */
+const bundleModeConfig = getBundleModeMetroConfig(defaultConfig);
+// getBundleModeMetroConfig is expo specific!
+
+/** @type {import('expo/metro-config').MetroConfig} */
 const config = {
     watchFolders: [root],
     resolver: {
@@ -44,7 +51,7 @@ const config = {
               }
             }
 
-            return context.resolveRequest(context, moduleName, platform)
+            return bundleModeConfig.resolver.resolveRequest(context, moduleName, platform)
         },
     },
     transformer: {
@@ -59,10 +66,5 @@ const config = {
     }
 }
 
-const {
-    bundleModeMetroConfig,
-} = require('react-native-worklets/bundleMode');
-
-
-module.exports = mergeConfig(defaultConfig, bundleModeMetroConfig, config);
+module.exports = mergeConfig(bundleModeConfig, config);
 module.exports.transformer.getTransformOptions().then(console.log)

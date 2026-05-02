@@ -1,7 +1,7 @@
 diff --git a/src/node-haste/DependencyGraph.js b/src/node-haste/DependencyGraph.js
 --- a/src/node-haste/DependencyGraph.js
 +++ b/src/node-haste/DependencyGraph.js
-@@ -109,6 +109,22 @@
+@@ -114,6 +114,22 @@
            realPath: result.realPath,
            type: result.type,
          };
@@ -24,7 +24,7 @@ diff --git a/src/node-haste/DependencyGraph.js b/src/node-haste/DependencyGraph.
        }
        return {
          exists: false,
-@@ -186,6 +202,14 @@
+@@ -197,6 +213,14 @@
      return (0, _nullthrows.default)(this._fileSystem).getAllFiles();
    }
    async getOrComputeSha1(mixedPath) {
@@ -39,10 +39,10 @@ diff --git a/src/node-haste/DependencyGraph.js b/src/node-haste/DependencyGraph.
      const result = await this._fileSystem.getOrComputeSha1(mixedPath);
      if (!result || !result.sha1) {
        throw new Error(`Failed to get the SHA-1 for: ${mixedPath}.
-@@ -277,6 +301,12 @@
+@@ -288,6 +312,12 @@
      return resolution;
    }
-   _doesFileExist = (filePath) => {
+   doesFileExist = (filePath) => {
 +    if (filePath.includes("react-native-worklets/.worklets/")) {
 +      // Keep this in sync with `fileSystemLookup` above so resolution paths
 +      // that still use `doesFileExist` can see generated bundle-mode worklets

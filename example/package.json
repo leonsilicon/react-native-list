@@ -1,7 +1,7 @@
 {
   "name": "example",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index",
   "scripts": {
     "start": "expo start --dev-client --clear",
     "android": "expo run:android",
@@ -11,20 +11,20 @@
   "dependencies": {
     "@react-navigation/native": "^7.1.27",
     "@react-navigation/native-stack": "^7.9.1",
-    "expo": "^55.0.0-preview.7",
-    "expo-blur": "~55.0.2",
-    "expo-dev-client": "~55.0.2",
-    "expo-modules-core": "~55.0.4",
-    "expo-status-bar": "~55.0.2",
+    "expo": "^55.0.19",
+    "expo-blur": "^55.0.14",
+    "expo-dev-client": "^55.0.29",
+    "expo-modules-core": "^55.0.24",
+    "expo-status-bar": "^55.0.5",
     "react": "19.2.0",
-    "react-native": "0.83.1",
-    "react-native-gesture-handler": "^2.30.0",
+    "react-native": "0.83.6",
+    "react-native-gesture-handler": "^2.31.1",
     "react-native-nitro-list": "workspace:*",
     "react-native-nitro-modules": "^0.33.2",
-    "react-native-reanimated": "^4.2.1",
-    "react-native-safe-area-context": "^5.6.2",
-    "react-native-screens": "^4.19.0",
-    "react-native-worklets": "0.8.0-bundle-mode-preview-1"
+    "react-native-reanimated": "4.3.0",
+    "react-native-safe-area-context": "^5.7.0",
+    "react-native-screens": "^4.24.0",
+    "react-native-worklets": "0.8.1"
   },
   "devDependencies": {
     "@react-native/metro-config": "^0.83.1",
@@ -44,9 +44,6 @@
       "BUNDLE_MODE_ENABLED": true,
       "FETCH_PREVIEW_ENABLED": false
     }
-  },
-  "patchedDependencies": {
-    "react-native-worklets@0.8.0-bundle-mode-preview-1": "patches/react-native-worklets@0.8.0-bundle-mode-preview-1.patch"
   },
   "private": true
 }
