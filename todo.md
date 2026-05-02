@@ -5,7 +5,8 @@
 [x] - Make native modules stable & dynamic - Fix getConstants use case & crash
 [x] - Checkout how iOS works so i can get started designing a stable API
 [ ] - Create a "SyncRenderer" and a "SyncView", this will also help with debugging (to render just one view instead of a whole list!)
-[ ] - Do I want to use the ReactFiberConfig?
+[ ] - Do I want to use the ReactFiberConfig? (what do i mean by that?)
+[ ] - Implement the main list API lol
 
 ## Base functionality (what users expect to just work)
 
