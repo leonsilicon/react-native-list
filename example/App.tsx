@@ -23,7 +23,7 @@ export default function App() {
       <List
         style={{
           flex: 1,
-          // TODO: is this really needed?
+          // TODO: _why_ is this needed
           height,
           width,
         }}
@@ -38,11 +38,9 @@ export default function App() {
                 }}
                 collapsable={false}
                 onPressIn={() => {
-                  "worklet";
                   globalThis.log("onPressIn item with id ", itemInfo?.index);
                 }}
                 onPress={() => {
-                  "worklet";
                   globalThis.log("onPress item with id ", itemInfo?.index);
                 }}
               >
@@ -52,7 +50,6 @@ export default function App() {
                     uri: "https://reactnative.dev/img/tiny_logo.png",
                   }}
                   onLoadEnd={() => {
-                    "worklet";
                     globalThis.log(`Image loaded for item id ${itemInfo?.index}`);
                   }}
                   style={{ width: 50, height: 50 }}
