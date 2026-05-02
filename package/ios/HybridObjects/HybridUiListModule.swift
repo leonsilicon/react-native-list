@@ -1,6 +1,6 @@
 //
 //  HybridUiListModule.swift
-//  NitroList
+//  ReactNativeList
 //
 //  Created by Hanno Gödecke on 14.02.26.
 //

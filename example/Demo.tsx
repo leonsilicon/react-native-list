@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { UiList } from "react-native-nitro-list";
+import { UiList } from "react-native-list";
 
 // This is the vision of how i imagine this API to work one day (next week? lol)
 

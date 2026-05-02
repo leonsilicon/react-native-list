@@ -199,7 +199,7 @@ static std::shared_ptr<facebook::react::CallInvoker> uiCallInvoker = nullptr;
       return NO;
     }
 
-    uiCallInvoker = std::make_shared<margelo::nitro::nitrolist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
+    uiCallInvoker = std::make_shared<margelo::nitro::reactnativelist::WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, []() {
         return [NSThread isMainThread];
     });
 
@@ -254,7 +254,7 @@ static std::shared_ptr<facebook::react::CallInvoker> uiCallInvoker = nullptr;
     }
 
     std::shared_ptr<EventListener> eventInterceptor =
-        margelo::nitro::nitrolist::HybridUiManagerHelper::createEventInterceptor(uiCallInvoker);
+        margelo::nitro::reactnativelist::HybridUiManagerHelper::createEventInterceptor(uiCallInvoker);
     [scheduler addEventListener:eventInterceptor];
 
     return YES;

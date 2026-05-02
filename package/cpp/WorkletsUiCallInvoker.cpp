@@ -1,6 +1,6 @@
 #include "WorkletsUiCallInvoker.hpp"
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
     WorkletsUiCallInvoker::WorkletsUiCallInvoker(std::shared_ptr<worklets::UIScheduler> uiScheduler,
                                                  std::shared_ptr<worklets::WorkletRuntime> uiWorkletRuntime,
@@ -37,4 +37,4 @@ namespace margelo::nitro::nitrolist
         });
     }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

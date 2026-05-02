@@ -13,7 +13,7 @@
 #include <functional>
 #include <NitroModules/JNICallable.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
@@ -23,7 +23,7 @@ namespace margelo::nitro::nitrolist {
    */
   struct JFunc_double: public jni::JavaClass<JFunc_double> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Func_double;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_double;";
 
   public:
     /**
@@ -61,7 +61,7 @@ namespace margelo::nitro::nitrolist {
     }
 
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Func_double_cxx;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_double_cxx;";
     static void registerNatives() {
       registerHybrid({makeNativeMethod("invoke_cxx", JFunc_double_cxx::invoke_cxx)});
     }
@@ -74,4 +74,4 @@ namespace margelo::nitro::nitrolist {
     std::function<double()> _func;
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

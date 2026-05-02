@@ -18,7 +18,7 @@
 #include <NitroModules/AnyMap.hpp>
 #include <vector>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace margelo::nitro;
 
@@ -63,4 +63,4 @@ namespace margelo::nitro::nitrolist {
       static constexpr auto TAG = "Adapter";
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

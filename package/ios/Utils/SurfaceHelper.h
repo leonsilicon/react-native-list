@@ -1,6 +1,6 @@
 //
 //  SurfaceHelper.h
-//  NitroList
+//  ReactNativeList
 //
 //  Created by Hanno Gödecke on 15.02.26.
 //

@@ -7,7 +7,7 @@
 
 #include "HybridViewHolderSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   void HybridViewHolderSpec::loadHybridMethods() {
     // load base methods/properties
@@ -18,4 +18,4 @@ namespace margelo::nitro::nitrolist {
     });
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

@@ -17,7 +17,7 @@
 
 
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace margelo::nitro;
 
@@ -59,4 +59,4 @@ namespace margelo::nitro::nitrolist {
       static constexpr auto TAG = "IOSWorkletsModuleProxyHolder";
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

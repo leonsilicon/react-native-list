@@ -7,7 +7,7 @@
 #include <react/renderer/core/EventListener.h>
 #include <worklets/android/WorkletsModule.h>
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
 
     using namespace facebook;
@@ -15,7 +15,7 @@ namespace margelo::nitro::nitrolist
     struct JHybridUiListModule : public jni::JavaClass<JHybridUiListModule>
     {
         static auto constexpr kJavaDescriptor =
-            "Lcom/margelo/nitro/nitrolist/HybridUiListModule;";
+            "Lcom/margelo/nitro/reactnativelist/HybridUiListModule;";
 
         static void registerNatives();
 
@@ -45,4 +45,4 @@ namespace margelo::nitro::nitrolist
         static std::shared_ptr<const react::EventListener> eventInterceptor_;
     };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

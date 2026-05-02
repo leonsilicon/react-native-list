@@ -1,7 +1,7 @@
 {
-  "name": "react-native-nitro-list",
+  "name": "react-native-list",
   "version": "0.0.2",
-  "description": "react-native-nitro-list",
+  "description": "React Native List",
   "main": "lib/index",
   "module": "lib/index",
   "types": "lib/index.d.ts",
@@ -48,14 +48,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hannojg/react-native-nitro-list.git"
+    "url": "git+https://github.com/hannojg/react-native-list.git"
   },
   "author": "Hanno Gödecke <hanno@margelo.com> (https://github.com/hannojg)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hannojg/react-native-nitro-list/issues"
+    "url": "https://github.com/hannojg/react-native-list/issues"
   },
-  "homepage": "https://github.com/hannojg/react-native-nitro-list#readme",
+  "homepage": "https://github.com/hannojg/react-native-list#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

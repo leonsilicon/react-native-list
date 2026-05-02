@@ -18,7 +18,7 @@
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <react/renderer/components/view/ViewProps.h>
 
-namespace margelo::nitro::nitrolist::views {
+namespace margelo::nitro::reactnativelist::views {
 
   extern const char HybridViewHolderComponentName[] = "ViewHolder";
 
@@ -73,4 +73,4 @@ namespace margelo::nitro::nitrolist::views {
   }
 #endif
 
-} // namespace margelo::nitro::nitrolist::views
+} // namespace margelo::nitro::reactnativelist::views

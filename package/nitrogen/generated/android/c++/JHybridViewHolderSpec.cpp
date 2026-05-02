@@ -11,7 +11,7 @@
 
 
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   jni::local_ref<JHybridViewHolderSpec::jhybriddata> JHybridViewHolderSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
@@ -52,4 +52,4 @@ namespace margelo::nitro::nitrolist {
   // Methods
   
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

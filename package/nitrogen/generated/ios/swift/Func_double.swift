@@ -13,7 +13,7 @@ import NitroModules
  * This class can be used from C++, e.g. to wrap the Swift closure as a `std::function`.
  */
 public final class Func_double {
-  public typealias bridge = margelo.nitro.nitrolist.bridge.swift
+  public typealias bridge = margelo.nitro.reactnativelist.bridge.swift
 
   private let closure: () -> Double
 

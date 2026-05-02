@@ -14,14 +14,14 @@
 
 
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
   class JHybridUiListViewSpec: public jni::HybridClass<JHybridUiListViewSpec, JHybridObject>,
                                public virtual HybridUiListViewSpec {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/HybridUiListViewSpec;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridUiListViewSpec;";
     static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
     static void registerNatives();
 
@@ -64,4 +64,4 @@ namespace margelo::nitro::nitrolist {
     jni::global_ref<JHybridUiListViewSpec::javaobject> _javaPart;
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

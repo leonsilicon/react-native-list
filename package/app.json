@@ -1,8 +1,8 @@
 {
   "android": {
-    "package": "com.anonymous.reactnativenitrolist"
+    "package": "com.hannojg.reactnativelist"
   },
   "ios": {
-    "bundleIdentifier": "com.anonymous.reactnativenitrolist"
+    "bundleIdentifier": "com.hannojg.reactnativelist"
   }
 }

@@ -14,9 +14,9 @@
 #endif
 
 // Forward declaration of `HybridAdapterSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridAdapterSpec; }
+namespace margelo::nitro::reactnativelist { class HybridAdapterSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
+namespace margelo::nitro::reactnativelist { class HybridViewHolderSpec; }
 
 #include <memory>
 #include "HybridAdapterSpec.hpp"
@@ -25,7 +25,7 @@ namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 #include <functional>
 #include <NitroModules/AnyMap.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace margelo::nitro;
 
@@ -67,4 +67,4 @@ namespace margelo::nitro::nitrolist {
       static constexpr auto TAG = "AdapterFactory";
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

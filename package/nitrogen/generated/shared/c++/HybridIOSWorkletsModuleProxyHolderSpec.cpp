@@ -7,7 +7,7 @@
 
 #include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   void HybridIOSWorkletsModuleProxyHolderSpec::loadHybridMethods() {
     // load base methods/properties
@@ -18,4 +18,4 @@ namespace margelo::nitro::nitrolist {
     });
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

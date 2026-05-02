@@ -6,7 +6,7 @@ import {
   UiList,
   uiListModule,
   uiManagerHelper,
-} from "react-native-nitro-list";
+} from "react-native-list";
 import { callback, NitroModules } from "react-native-nitro-modules";
 
 setup();
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
 
 // import { View, Text } from "react-native";
 // import { scheduleOnUI } from "react-native-worklets";
-// import { setup } from "react-native-nitro-list";
+// import { setup } from "react-native-list";
   
 // setup();
 

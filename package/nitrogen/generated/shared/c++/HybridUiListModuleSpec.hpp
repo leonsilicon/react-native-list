@@ -14,7 +14,7 @@
 #endif
 
 // Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
+namespace margelo::nitro::reactnativelist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 
 #include <memory>
 #include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
@@ -22,7 +22,7 @@ namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSp
 #include <variant>
 #include <optional>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace margelo::nitro;
 
@@ -65,4 +65,4 @@ namespace margelo::nitro::nitrolist {
       static constexpr auto TAG = "UiListModule";
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

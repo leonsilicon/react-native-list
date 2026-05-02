@@ -17,7 +17,7 @@
 #include <NitroModules/JNull.hpp>
 #include "JHybridIOSWorkletsModuleProxyHolderSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
@@ -26,7 +26,7 @@ namespace margelo::nitro::nitrolist {
    */
   class JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec: public jni::JavaClass<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec;";
 
     static jni::local_ref<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> create_0(jni::alias_ref<JNull> value) {
       static const auto method = javaClassStatic()->getStaticMethod<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec(jni::alias_ref<JNull>)>("create");
@@ -51,7 +51,7 @@ namespace margelo::nitro::nitrolist {
   namespace JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec_impl {
     class First final: public jni::JavaClass<First, JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> {
     public:
-      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec$First;";
+      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec$First;";
     
       [[nodiscard]] jni::local_ref<JNull> getValue() const {
         static const auto field = javaClassStatic()->getField<JNull>("value");
@@ -61,7 +61,7 @@ namespace margelo::nitro::nitrolist {
     
     class Second final: public jni::JavaClass<Second, JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> {
     public:
-      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec$Second;";
+      static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Variant_NullType_HybridIOSWorkletsModuleProxyHolderSpec$Second;";
     
       [[nodiscard]] jni::local_ref<JHybridIOSWorkletsModuleProxyHolderSpec::javaobject> getValue() const {
         static const auto field = javaClassStatic()->getField<JHybridIOSWorkletsModuleProxyHolderSpec::javaobject>("value");
@@ -69,4 +69,4 @@ namespace margelo::nitro::nitrolist {
       }
     };
   } // namespace JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec_impl
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

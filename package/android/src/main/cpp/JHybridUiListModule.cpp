@@ -7,7 +7,7 @@
 #include <react/fabric/FabricUIManagerBinding.h>
 #include <worklets/android/WorkletsModule.h>
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
     static bool isOnAndroidUiThread()
     {
@@ -154,4 +154,4 @@ namespace margelo::nitro::nitrolist
         HybridUiManagerHelper::setupEventInterceptor(scheduler, uiCallInvoker_);
     }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

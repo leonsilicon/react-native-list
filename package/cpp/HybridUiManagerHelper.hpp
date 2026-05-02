@@ -10,7 +10,7 @@
 #include <react/renderer/core/EventListener.h>
 #include <react/renderer/scheduler/Scheduler.h>
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
 
     class HybridUiManagerHelper : public HybridUiManagerHelperSpec

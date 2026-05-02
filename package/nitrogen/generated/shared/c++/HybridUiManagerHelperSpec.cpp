@@ -7,7 +7,7 @@
 
 #include "HybridUiManagerHelperSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   void HybridUiManagerHelperSpec::loadHybridMethods() {
     // load base methods/properties
@@ -18,4 +18,4 @@ namespace margelo::nitro::nitrolist {
     });
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

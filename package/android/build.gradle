@@ -20,29 +20,29 @@ def isNewArchitectureEnabled() {
 
 apply plugin: "com.android.library"
 apply plugin: 'org.jetbrains.kotlin.android'
-apply from: '../nitrogen/generated/android/NitroList+autolinking.gradle'
+apply from: '../nitrogen/generated/android/ReactNativeList+autolinking.gradle'
 apply from: "./fix-prefab.gradle"
 
 if (isNewArchitectureEnabled()) {
   apply plugin: "com.facebook.react"
 
     react {
-            libraryName = "NitroList"
-            codegenJavaPackageName = "com.margelo.nitro.nitrolist"
+            libraryName = "ReactNativeList"
+            codegenJavaPackageName = "com.hannojg.reactnativelist"
             jsRootDir = file("../src")
         }
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["NitroList_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["ReactNativeList_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NitroList_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["ReactNativeList_" + name]).toInteger()
 }
 
 android {
-  namespace "com.margelo.nitro.nitrolist"
+  namespace "com.hannojg.reactnativelist"
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
@@ -149,4 +149,3 @@ dependencies {
   // RecyclerView
   implementation "androidx.recyclerview:recyclerview:1.4.0"
 }
-

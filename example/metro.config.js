@@ -6,7 +6,7 @@ const {
 } = require('react-native-worklets/bundleMode');
 const {
   getReactNativeListMetroConfig,
-} = require('react-native-nitro-list/metro-config');
+} = require('react-native-list/metro-config');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');

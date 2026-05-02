@@ -7,5 +7,5 @@
 
 #include "HybridIOSWorkletsModuleProxyHolderSpecSwift.hpp"
 
-namespace margelo::nitro::nitrolist {
-} // namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist {
+} // namespace margelo::nitro::reactnativelist

@@ -1,6 +1,6 @@
 //
 //  ErrorUtils.h
-//  NitroList
+//  ReactNativeList
 //
 //  Created by Hanno Gödecke on 15.02.26.
 //
@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString *const kInstallerErrorDomain = @"NitroList.HybridUiListTurboModuleInstaller";
+static NSString *const kInstallerErrorDomain = @"ReactNativeList.HybridUiListTurboModuleInstaller";
 
 inline void assignError(NSError *__autoreleasing _Nullable *error, NSString *message)
 {

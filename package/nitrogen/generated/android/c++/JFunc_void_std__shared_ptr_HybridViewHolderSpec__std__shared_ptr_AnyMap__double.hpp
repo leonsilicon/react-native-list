@@ -18,7 +18,7 @@
 #include "JHybridViewHolderSpec.hpp"
 #include <NitroModules/JAnyMap.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
@@ -28,7 +28,7 @@ namespace margelo::nitro::nitrolist {
    */
   struct JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double: public jni::JavaClass<JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double;";
 
   public:
     /**
@@ -64,7 +64,7 @@ namespace margelo::nitro::nitrolist {
     }
 
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx;";
+    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx;";
     static void registerNatives() {
       registerHybrid({makeNativeMethod("invoke_cxx", JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::invoke_cxx)});
     }
@@ -77,4 +77,4 @@ namespace margelo::nitro::nitrolist {
     std::function<void(const std::shared_ptr<HybridViewHolderSpec>& /* viewHolder */, const std::shared_ptr<AnyMap>& /* item */, double /* index */)> _func;
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

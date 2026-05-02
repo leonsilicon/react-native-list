@@ -8,7 +8,7 @@
 #include "JHybridUiListViewSpec.hpp"
 
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
+namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
 
 #include <memory>
 #include "HybridUiListModuleSpec.hpp"
@@ -18,7 +18,7 @@ namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
 #include <NitroModules/JNICallable.hpp>
 #include "JFunc_bool_double_double.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   jni::local_ref<JHybridUiListViewSpec::jhybriddata> JHybridUiListViewSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
@@ -66,4 +66,4 @@ namespace margelo::nitro::nitrolist {
     method(_javaPart, std::dynamic_pointer_cast<JHybridUiListModuleSpec>(uiListModule)->getJavaPart(), JFunc_bool_double_double_cxx::fromCpp(callback));
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

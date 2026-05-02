@@ -8,7 +8,7 @@
 #pragma once
 
 #ifndef RN_SERIALIZABLE_STATE
-#error NitroList was compiled without the 'RN_SERIALIZABLE_STATE' flag. This flag is required for Nitro Views - set it in your CMakeLists!
+#error ReactNativeList was compiled without the 'RN_SERIALIZABLE_STATE' flag. This flag is required for Nitro Views - set it in your CMakeLists!
 #endif
 
 #include <fbjni/fbjni.h>
@@ -20,13 +20,13 @@
 #include "JHybridUiListViewSpec.hpp"
 #include "views/HybridUiListViewComponent.hpp"
 
-namespace margelo::nitro::nitrolist::views {
+namespace margelo::nitro::reactnativelist::views {
 
 using namespace facebook;
 
 class JHybridUiListViewStateUpdater: public jni::JavaClass<JHybridUiListViewStateUpdater> {
 public:
-  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/nitrolist/views/HybridUiListViewStateUpdater;";
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/views/HybridUiListViewStateUpdater;";
 
 public:
   static void updateViewProps(jni::alias_ref<jni::JClass> /* class */,
@@ -46,4 +46,4 @@ public:
   }
 };
 
-} // namespace margelo::nitro::nitrolist::views
+} // namespace margelo::nitro::reactnativelist::views

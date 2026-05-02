@@ -13,7 +13,7 @@
 #include <vector>
 #include <NitroModules/JAnyMap.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   jni::local_ref<JHybridAdapterSpec::jhybriddata> JHybridAdapterSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
@@ -78,4 +78,4 @@ namespace margelo::nitro::nitrolist {
     method(_javaPart, index);
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

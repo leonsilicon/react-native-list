@@ -10,15 +10,15 @@
 #include "HybridViewHolderSpec.hpp"
 
 // Forward declaration of `HybridViewHolderSpec_cxx` to properly resolve imports.
-namespace NitroList { class HybridViewHolderSpec_cxx; }
+namespace ReactNativeList { class HybridViewHolderSpec_cxx; }
 
 
 
 
 
-#include "NitroList-Swift-Cxx-Umbrella.hpp"
+#include "ReactNativeList-Swift-Cxx-Umbrella.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   /**
    * The C++ part of HybridViewHolderSpec_cxx.swift.
@@ -33,13 +33,13 @@ namespace margelo::nitro::nitrolist {
   class HybridViewHolderSpecSwift: public virtual HybridViewHolderSpec {
   public:
     // Constructor from a Swift instance
-    explicit HybridViewHolderSpecSwift(const NitroList::HybridViewHolderSpec_cxx& swiftPart):
+    explicit HybridViewHolderSpecSwift(const ReactNativeList::HybridViewHolderSpec_cxx& swiftPart):
       HybridObject(HybridViewHolderSpec::TAG),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroList::HybridViewHolderSpec_cxx& getSwiftPart() noexcept {
+    inline ReactNativeList::HybridViewHolderSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -69,7 +69,7 @@ namespace margelo::nitro::nitrolist {
     
 
   private:
-    NitroList::HybridViewHolderSpec_cxx _swiftPart;
+    ReactNativeList::HybridViewHolderSpec_cxx _swiftPart;
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

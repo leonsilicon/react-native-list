@@ -10,15 +10,15 @@
 #include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 
 // Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec_cxx` to properly resolve imports.
-namespace NitroList { class HybridIOSWorkletsModuleProxyHolderSpec_cxx; }
+namespace ReactNativeList { class HybridIOSWorkletsModuleProxyHolderSpec_cxx; }
 
 
 
 
 
-#include "NitroList-Swift-Cxx-Umbrella.hpp"
+#include "ReactNativeList-Swift-Cxx-Umbrella.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   /**
    * The C++ part of HybridIOSWorkletsModuleProxyHolderSpec_cxx.swift.
@@ -33,13 +33,13 @@ namespace margelo::nitro::nitrolist {
   class HybridIOSWorkletsModuleProxyHolderSpecSwift: public virtual HybridIOSWorkletsModuleProxyHolderSpec {
   public:
     // Constructor from a Swift instance
-    explicit HybridIOSWorkletsModuleProxyHolderSpecSwift(const NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& swiftPart):
+    explicit HybridIOSWorkletsModuleProxyHolderSpecSwift(const ReactNativeList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& swiftPart):
       HybridObject(HybridIOSWorkletsModuleProxyHolderSpec::TAG),
       _swiftPart(swiftPart) { }
 
   public:
     // Get the Swift part
-    inline NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& getSwiftPart() noexcept {
+    inline ReactNativeList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& getSwiftPart() noexcept {
       return _swiftPart;
     }
 
@@ -69,7 +69,7 @@ namespace margelo::nitro::nitrolist {
     
 
   private:
-    NitroList::HybridIOSWorkletsModuleProxyHolderSpec_cxx _swiftPart;
+    ReactNativeList::HybridIOSWorkletsModuleProxyHolderSpec_cxx _swiftPart;
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

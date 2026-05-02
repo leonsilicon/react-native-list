@@ -6,7 +6,7 @@
 #include <react/renderer/core/EventTarget.h>
 #include <react/renderer/uimanager/UIManagerBinding.h>
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
     using namespace facebook;
 

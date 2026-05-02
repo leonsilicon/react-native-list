@@ -14,13 +14,13 @@
 #endif
 
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridUiListModuleSpec; }
+namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
 
 #include <memory>
 #include "HybridUiListModuleSpec.hpp"
 #include <functional>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   using namespace margelo::nitro;
 
@@ -63,4 +63,4 @@ namespace margelo::nitro::nitrolist {
       static constexpr auto TAG = "UiListView";
   };
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

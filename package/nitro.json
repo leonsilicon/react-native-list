@@ -1,16 +1,16 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
   "cxxNamespace": [
-    "nitrolist"
+    "reactnativelist"
   ],
   "ios": {
-    "iosModuleName": "NitroList"
+    "iosModuleName": "ReactNativeList"
   },
   "android": {
     "androidNamespace": [
-      "nitrolist"
+      "reactnativelist"
     ],
-    "androidCxxLibName": "NitroList"
+    "androidCxxLibName": "ReactNativeList"
   },
   "autolinking": {
     "ViewHolder": {

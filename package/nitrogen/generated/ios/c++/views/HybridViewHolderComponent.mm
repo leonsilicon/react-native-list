@@ -15,11 +15,11 @@
 #import <UIKit/UIKit.h>
 
 #import "HybridViewHolderSpecSwift.hpp"
-#import "NitroList-Swift-Cxx-Umbrella.hpp"
+#import "ReactNativeList-Swift-Cxx-Umbrella.hpp"
 
 using namespace facebook;
-using namespace margelo::nitro::nitrolist;
-using namespace margelo::nitro::nitrolist::views;
+using namespace margelo::nitro::reactnativelist;
+using namespace margelo::nitro::reactnativelist::views;
 
 /**
  * Represents the React Native View holder for the Nitro "ViewHolder" HybridView.
@@ -43,7 +43,7 @@ using namespace margelo::nitro::nitrolist::views;
 
 - (instancetype) init {
   if (self = [super init]) {
-    std::shared_ptr<HybridViewHolderSpec> hybridView = NitroList::NitroListAutolinking::createViewHolder();
+    std::shared_ptr<HybridViewHolderSpec> hybridView = ReactNativeList::ReactNativeListAutolinking::createViewHolder();
     _hybridView = std::dynamic_pointer_cast<HybridViewHolderSpecSwift>(hybridView);
     [self updateView];
   }
@@ -52,7 +52,7 @@ using namespace margelo::nitro::nitrolist::views;
 
 - (void) updateView {
   // 1. Get Swift part
-  NitroList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
+  ReactNativeList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
 
   // 2. Get UIView*
   void* viewUnsafe = swiftPart.getView();
@@ -67,7 +67,7 @@ using namespace margelo::nitro::nitrolist::views;
   // 1. Downcast props
   const auto& newViewPropsConst = *std::static_pointer_cast<HybridViewHolderProps const>(props);
   auto& newViewProps = const_cast<HybridViewHolderProps&>(newViewPropsConst);
-  NitroList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
+  ReactNativeList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
 
   // 2. Update each prop individually
   swiftPart.beforeUpdate();
@@ -91,12 +91,12 @@ using namespace margelo::nitro::nitrolist::views;
 }
 
 + (BOOL)shouldBeRecycled {
-  return NitroList::NitroListAutolinking::isViewHolderRecyclable();
+  return ReactNativeList::ReactNativeListAutolinking::isViewHolderRecyclable();
 }
 
 - (void)prepareForRecycle {
   [super prepareForRecycle];
-  NitroList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
+  ReactNativeList::HybridViewHolderSpec_cxx& swiftPart = _hybridView->getSwiftPart();
   swiftPart.maybePrepareForRecycle();
 }
 

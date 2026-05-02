@@ -7,7 +7,7 @@
 
 #include "HybridAdapterSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   void HybridAdapterSpec::loadHybridMethods() {
     // load base methods/properties
@@ -21,4 +21,4 @@ namespace margelo::nitro::nitrolist {
     });
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

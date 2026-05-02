@@ -21,7 +21,7 @@
 #include <functional>
 #include <optional>
 
-namespace margelo::nitro::nitrolist::views {
+namespace margelo::nitro::reactnativelist::views {
 
   using namespace facebook;
 
@@ -103,4 +103,4 @@ namespace margelo::nitro::nitrolist::views {
 
   /* The actual view for "ViewHolder" needs to be implemented in platform-specific code. */
 
-} // namespace margelo::nitro::nitrolist::views
+} // namespace margelo::nitro::reactnativelist::views

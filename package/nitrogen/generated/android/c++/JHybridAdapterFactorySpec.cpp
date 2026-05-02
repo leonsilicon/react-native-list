@@ -8,9 +8,9 @@
 #include "JHybridAdapterFactorySpec.hpp"
 
 // Forward declaration of `HybridAdapterSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridAdapterSpec; }
+namespace margelo::nitro::reactnativelist { class HybridAdapterSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
+namespace margelo::nitro::reactnativelist { class HybridViewHolderSpec; }
 
 #include <memory>
 #include "HybridAdapterSpec.hpp"
@@ -26,7 +26,7 @@ namespace margelo::nitro::nitrolist { class HybridViewHolderSpec; }
 #include "JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double.hpp"
 #include <NitroModules/JAnyMap.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   jni::local_ref<JHybridAdapterFactorySpec::jhybriddata> JHybridAdapterFactorySpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
@@ -71,4 +71,4 @@ namespace margelo::nitro::nitrolist {
     return __result->cthis()->shared_cast<JHybridAdapterSpec>();
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

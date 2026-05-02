@@ -3,7 +3,7 @@ const workletsPluginOptions = {
   // globals: ['React'],
   bundleMode: true,
   workletizableModules: [
-    "react-native-nitro-list",
+    "react-native-list",
     "react-native-reanimated",
     "react-native-worklets",
     "react-native",

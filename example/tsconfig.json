@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "react-native-nitro-list": ["../package/src/index.tsx"]
+      "react-native-list": ["../package/src/index.tsx"]
     }
   }
 }

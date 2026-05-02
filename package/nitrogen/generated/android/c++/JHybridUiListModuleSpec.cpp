@@ -8,7 +8,7 @@
 #include "JHybridUiListModuleSpec.hpp"
 
 // Forward declaration of `HybridIOSWorkletsModuleProxyHolderSpec` to properly resolve imports.
-namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSpec; }
+namespace margelo::nitro::reactnativelist { class HybridIOSWorkletsModuleProxyHolderSpec; }
 
 #include <memory>
 #include "HybridIOSWorkletsModuleProxyHolderSpec.hpp"
@@ -19,7 +19,7 @@ namespace margelo::nitro::nitrolist { class HybridIOSWorkletsModuleProxyHolderSp
 #include "JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 #include <NitroModules/JNull.hpp>
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
 
   jni::local_ref<JHybridUiListModuleSpec::jhybriddata> JHybridUiListModuleSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
@@ -68,4 +68,4 @@ namespace margelo::nitro::nitrolist {
     method(_javaPart, workletsModuleHolder.has_value() ? JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec::fromCpp(workletsModuleHolder.value()) : nullptr);
   }
 
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

@@ -9,7 +9,7 @@
 #include "views/HybridUiListViewComponent.hpp"
 #include <NitroModules/NitroDefines.hpp>
 
-namespace margelo::nitro::nitrolist::views {
+namespace margelo::nitro::reactnativelist::views {
 
 using namespace facebook;
 using ConcreteStateData = react::ConcreteState<HybridUiListViewState>;
@@ -50,4 +50,4 @@ void JHybridUiListViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> 
   }
 }
 
-} // namespace margelo::nitro::nitrolist::views
+} // namespace margelo::nitro::reactnativelist::views

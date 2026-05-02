@@ -4,7 +4,7 @@
 #include <ReactCommon/CallInvoker.h>
 #include <worklets/WorkletRuntime/WorkletRuntime.h>
 
-namespace margelo::nitro::nitrolist
+namespace margelo::nitro::reactnativelist
 {
     class WorkletsUiCallInvoker : public facebook::react::CallInvoker
     {
@@ -22,4 +22,4 @@ namespace margelo::nitro::nitrolist
         std::shared_ptr<worklets::WorkletRuntime> uiWorkletRuntime_;
         std::function<bool()> isOnUIThread_;
     };
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

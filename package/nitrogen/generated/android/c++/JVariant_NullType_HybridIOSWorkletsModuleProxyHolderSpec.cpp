@@ -7,7 +7,7 @@
 
 #include "JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec.hpp"
 
-namespace margelo::nitro::nitrolist {
+namespace margelo::nitro::reactnativelist {
   /**
    * Converts JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec to std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>
    */
@@ -23,4 +23,4 @@ namespace margelo::nitro::nitrolist {
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }
-} // namespace margelo::nitro::nitrolist
+} // namespace margelo::nitro::reactnativelist

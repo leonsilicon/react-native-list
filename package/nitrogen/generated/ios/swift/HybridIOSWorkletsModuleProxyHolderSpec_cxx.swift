@@ -19,11 +19,11 @@ import NitroModules
  */
 open class HybridIOSWorkletsModuleProxyHolderSpec_cxx {
   /**
-   * The Swift <> C++ bridge's namespace (`margelo::nitro::nitrolist::bridge::swift`)
-   * from `NitroList-Swift-Cxx-Bridge.hpp`.
+   * The Swift <> C++ bridge's namespace (`margelo::nitro::reactnativelist::bridge::swift`)
+   * from `ReactNativeList-Swift-Cxx-Bridge.hpp`.
    * This contains specialized C++ templates, and C++ helper functions that can be accessed from Swift.
    */
-  public typealias bridge = margelo.nitro.nitrolist.bridge.swift
+  public typealias bridge = margelo.nitro.reactnativelist.bridge.swift
 
   /**
    * Holds an instance of the `HybridIOSWorkletsModuleProxyHolderSpec` Swift protocol.
