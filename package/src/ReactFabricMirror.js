@@ -1,4 +1,3 @@
-
 function log(...args) {
   // log('[ReactFabricMirror]', ...args)
   global._log?.(
@@ -8,7 +7,7 @@ function log(...args) {
           try {
             return JSON.stringify(a)
           } catch (e) {
-            return "<failed to parse> " + String(a)
+            return '<failed to parse> ' + String(a)
           }
         })
         .join(' ')
@@ -50,7 +49,7 @@ global.rootInstance = {
   publicInstance: null,
 }
 
-const {getPublicInstance} = require('../shims/react-fiber-config-fabric.js')
+const { getPublicInstance } = require('../shims/react-fiber-config-fabric.js')
 
 //#region Event handling
 const EventPluginUtilsModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventPluginUtils')
@@ -66,8 +65,12 @@ const ReactFabricGlobalResponderHandlerModule = require('../../third_party/react
 const SyntheticEventModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/SyntheticEvent')
 const accumulateIntoModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/accumulateInto')
 const forEachAccumulatedModule = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/forEachAccumulated')
-const { batchedUpdates } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/ReactGenericBatching')
-const { runEventsInBatch } = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventBatching')
+const {
+  batchedUpdates,
+} = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/ReactGenericBatching')
+const {
+  runEventsInBatch,
+} = require('../../third_party/react/packages/react-native-renderer/src/legacy-events/EventBatching')
 const { HostComponent } = require('react-reconciler/src/ReactWorkTags')
 
 const ResponderEventPlugin =
@@ -75,14 +78,16 @@ const ResponderEventPlugin =
 const ReactNativeEventPluginOrder =
   ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule
 const ReactFabricGlobalResponderHandler =
-  ReactFabricGlobalResponderHandlerModule.default ?? ReactFabricGlobalResponderHandlerModule
+  ReactFabricGlobalResponderHandlerModule.default ??
+  ReactFabricGlobalResponderHandlerModule
 
 const SyntheticEvent = SyntheticEventModule.default ?? SyntheticEventModule
 const accumulateInto = accumulateIntoModule.default ?? accumulateIntoModule
 const forEachAccumulated =
   forEachAccumulatedModule.default ?? forEachAccumulatedModule
 
-const { customBubblingEventTypes, customDirectEventTypes } = ReactNativeViewConfigRegistry
+const { customBubblingEventTypes, customDirectEventTypes } =
+  ReactNativeViewConfigRegistry
 
 function getParent(inst) {
   do {
@@ -140,7 +145,10 @@ function listenerAtPhase(inst, event, propagationPhase) {
 function accumulateDirectionalDispatches(inst, phase, event) {
   const listener = listenerAtPhase(inst, event, phase)
   if (listener) {
-    event._dispatchListeners = accumulateInto(event._dispatchListeners, listener)
+    event._dispatchListeners = accumulateInto(
+      event._dispatchListeners,
+      listener
+    )
     event._dispatchInstances = accumulateInto(event._dispatchInstances, inst)
   }
 }
@@ -162,7 +170,12 @@ function accumulateTwoPhaseDispatches(events) {
 
 function accumulateCapturePhaseDispatches(event) {
   if (event && event.dispatchConfig.phasedRegistrationNames) {
-    traverseTwoPhase(event._targetInst, accumulateDirectionalDispatches, event, true)
+    traverseTwoPhase(
+      event._targetInst,
+      accumulateDirectionalDispatches,
+      event,
+      true
+    )
   }
 }
 
@@ -171,7 +184,10 @@ function accumulateDispatches(inst, _ignoredDirection, event) {
     const registrationName = event.dispatchConfig.registrationName
     const listener = getListener(inst, registrationName)
     if (listener) {
-      event._dispatchListeners = accumulateInto(event._dispatchListeners, listener)
+      event._dispatchListeners = accumulateInto(
+        event._dispatchListeners,
+        listener
+      )
       event._dispatchInstances = accumulateInto(event._dispatchInstances, inst)
     }
   }
@@ -198,7 +214,9 @@ const ReactNativeBridgeEventPlugin = {
     const directDispatchConfig = customDirectEventTypes[topLevelType]
 
     if (!bubbleDispatchConfig && !directDispatchConfig) {
-      throw new Error(`Unsupported top level event type "${topLevelType}" dispatched`)
+      throw new Error(
+        `Unsupported top level event type "${topLevelType}" dispatched`
+      )
     }
 
     const event = SyntheticEvent.getPooled(
@@ -228,7 +246,12 @@ const ReactNativeBridgeEventPlugin = {
   },
 }
 
-function extractPluginEvents(topLevelType, targetInst, nativeEvent, nativeEventTarget) {
+function extractPluginEvents(
+  topLevelType,
+  targetInst,
+  nativeEvent,
+  nativeEventTarget
+) {
   let events = null
   for (let i = 0; i < legacyPlugins.length; i++) {
     const plugin = legacyPlugins[i]
@@ -267,7 +290,11 @@ function ensureLegacyEventPluginsInjected() {
     injectEventPluginOrder(ReactNativeEventPluginOrder)
   } catch (error) {
     // The plugin order can only be injected once for a given registry instance.
-    if (!String(error).includes('Cannot inject event plugin ordering more than once')) {
+    if (
+      !String(error).includes(
+        'Cannot inject event plugin ordering more than once'
+      )
+    ) {
       throw error
     }
   }

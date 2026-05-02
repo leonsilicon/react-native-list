@@ -1,4 +1,5 @@
-const ReactNativeElement = require('react-native/src/private/webapis/dom/nodes/ReactNativeElement').default
+const ReactNativeElement =
+  require('react-native/src/private/webapis/dom/nodes/ReactNativeElement').default
 
 function getPublicInstance(instance) {
   if (instance?.canonical != null) {
