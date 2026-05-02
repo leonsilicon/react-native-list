@@ -10,6 +10,12 @@ bun add react-native-list
 
 ## Development
 
+First clone init the submodules:
+
+```sh
+git submodule update --init --recursive
+```
+
 Regenerate native Nitro specs after changing files in `src/specs` or `nitro.json`:
 
 ```sh

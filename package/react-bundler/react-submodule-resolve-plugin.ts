@@ -1,27 +1,21 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 
-const workspaceRoot = path.resolve(import.meta.dir, '..')
+const workspaceRoot = path.resolve(import.meta.dir, '../..')
 const reactPackagesRoot = path.join(
   workspaceRoot,
   'third_party',
   'react',
   'packages'
 )
-const noopModulePath = path.join(import.meta.dir, 'shims', 'noop.js')
-const reactCurrentFiberShimPath = path.join(
-  import.meta.dir,
-  'shims',
-  'react-current-fiber.js'
-)
-const reactWorkTagsShimPath = path.join(
-  import.meta.dir,
-  'shims',
-  'react-work-tags.js'
-)
+console.log('React packages root:', reactPackagesRoot)
+const shimsDir = path.join(workspaceRoot, 'package', 'shims')
+console.log('React shim paths:', shimsDir)
+const noopModulePath = path.join(shimsDir, 'noop.js')
+const reactCurrentFiberShimPath = path.join(shimsDir, 'react-current-fiber.js')
+const reactWorkTagsShimPath = path.join(shimsDir, 'react-work-tags.js')
 const reactFiberConfigFabricShimPath = path.join(
-  import.meta.dir,
-  'shims',
+  shimsDir,
   'react-fiber-config-fabric.js'
 )
 

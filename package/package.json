@@ -39,8 +39,8 @@
     "specs": "nitrogen --logLevel=\"debug\"",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "bundle:js": "bun run bundle.ts",
-    "bundle:js:prod": "NODE_ENV=production bun run bundle.ts"
+    "bundle:js": "bun run react-bundler/bundle.ts",
+    "bundle:js:prod": "NODE_ENV=production bun run react-bundler/bundle.ts"
   },
   "keywords": [
     "react-native",

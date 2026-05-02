@@ -66,7 +66,7 @@ var require_FabricUIManager = __commonJS((exports2) => {
   }
   function createProxyWithCachedProperties(implementation, propertiesToCache) {
     var proxy = Object.create(implementation);
-    var _loop = function _loop(propertyName2) {
+    var _loop = function _loop2(propertyName2) {
       (0, _defineLazyObjectProperty.default)(proxy, propertyName2, { get: function get() {
         return implementation[propertyName2];
       } });
@@ -832,7 +832,7 @@ var require_SyntheticEvent = __commonJS((exports2) => {
   SyntheticEvent.Interface = EventInterface;
   SyntheticEvent.extend = function(Interface) {
     var Super = this;
-    var E = function E() {};
+    var E = function E2() {};
     E.prototype = Super.prototype;
     var prototype = new E;
     function Class() {
@@ -1435,10 +1435,10 @@ var require_ReactGenericBatching = __commonJS((exports2) => {
   exports2.batchedUpdates = batchedUpdates;
   exports2.discreteUpdates = discreteUpdates;
   exports2.setBatchingImplementation = setBatchingImplementation;
-  var batchedUpdatesImpl = function batchedUpdatesImpl(fn, bookkeeping) {
+  var batchedUpdatesImpl = function batchedUpdatesImpl2(fn, bookkeeping) {
     return fn(bookkeeping);
   };
-  var discreteUpdatesImpl = function discreteUpdatesImpl(fn, a, b, c, d) {
+  var discreteUpdatesImpl = function discreteUpdatesImpl2(fn, a, b, c, d) {
     return fn(a, b, c, d);
   };
   var isInsideEventHandler = false;
@@ -1554,8 +1554,12 @@ var ReactFabricGlobalResponderHandlerModule = require_ReactFabricGlobalResponder
 var SyntheticEventModule = require_SyntheticEvent();
 var accumulateIntoModule = require_accumulateInto();
 var forEachAccumulatedModule = require_forEachAccumulated();
-var { batchedUpdates } = require_ReactGenericBatching();
-var { runEventsInBatch } = require_EventBatching();
+var {
+  batchedUpdates
+} = require_ReactGenericBatching();
+var {
+  runEventsInBatch
+} = require_EventBatching();
 var { HostComponent } = require_react_work_tags();
 var ResponderEventPlugin = ResponderEventPluginModule.default ?? ResponderEventPluginModule;
 var ReactNativeEventPluginOrder = ReactNativeEventPluginOrderModule.default ?? ReactNativeEventPluginOrderModule;

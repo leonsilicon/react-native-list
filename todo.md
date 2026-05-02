@@ -8,6 +8,7 @@
 [ ] - Do I want to use the ReactFiberConfig? (what do i mean by that?)
 [ ] - Implement the main list API lol
 [ ] - I think fast refresh is crashing the app right now?
+[ ] - There was some react tag collision as we are reusing the same fabric ui manager … thats why i just started the tags from 1mil. Idk, seems dirty, and is potentially something we'd like to address in the future by running our own instance?
 
 ## Base functionality (what users expect to just work)
 
