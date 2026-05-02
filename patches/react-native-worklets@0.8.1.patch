@@ -1,5 +1,46 @@
+diff --git a/bundleMode/index.js b/bundleMode/index.js
+index 3cdbd778034d908a2235b993518b0c4c9ad0851a..f37cc5e54dfdc3e0f4fe108aa115c3988e33bb09 100644
+--- a/bundleMode/index.js
++++ b/bundleMode/index.js
+@@ -18,11 +18,16 @@ const workletsDirPath = path.join('react-native-worklets', '.worklets');
+ function bundleModeResolveRequest(
+   /** @type {any} */ context,
+   /** @type {string} */ moduleName,
+-  /** @type {any} */ platform
++  /** @type {any} */ platform,
++  /** @type {any} */ userConfigResolveRequest
+ ) {
+   if (moduleName.startsWith(workletsDirPath)) {
+     const fullModuleName = path.join(workletsPackageParentDir, moduleName);
+     return { type: 'sourceFile', filePath: fullModuleName };
+   }
+-  return context.resolveRequest(context, moduleName, platform);
++  return (userConfigResolveRequest || context.resolveRequest)(
++    context,
++    moduleName,
++    platform
++  );
+ }
+@@ -69,5 +74,14 @@ function getBundleModeMetroConfig(config) {
+   config.serializer.createModuleIdFactory = bundleModeCreateModuleIdFactory;
+-
+-  config.resolver.resolveRequest = bundleModeResolveRequest;
+-
++  const currentResolveRequest = config?.resolver?.resolveRequest;
++  config.resolver.resolveRequest = (
++    /** @type {any} */ context,
++    /** @type {string} */ moduleName,
++    /** @type {any} */ platform
++  ) =>
++    bundleModeResolveRequest(
++      context,
++      moduleName,
++      platform,
++      currentResolveRequest
++    );
+   const currentGetTransformOptions = config?.transformer?.getTransformOptions;
 diff --git a/lib/module/initializers/initializers.native.js b/lib/module/initializers/initializers.native.js
-index d02f3136d59e9117459ae3f5f5564c2be0bc77fb..5847bb6896f3a21d5900e3d0edc03937c896bea6 100644
+index d02f3136d59e9117459ae3f5f5564c2be0bc77fb..894a0a880ae0479b6de1021cb7d6197f2e2536eb 100644
 --- a/lib/module/initializers/initializers.native.js
 +++ b/lib/module/initializers/initializers.native.js
 @@ -129,7 +129,7 @@ function initializeWorkletRuntime() {
