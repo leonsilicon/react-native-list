@@ -7,6 +7,7 @@
 [ ] - Create a "SyncRenderer" and a "SyncView", this will also help with debugging (to render just one view instead of a whole list!)
 [ ] - Do I want to use the ReactFiberConfig? (what do i mean by that?)
 [ ] - Implement the main list API lol
+[ ] - I think fast refresh is crashing the app right now?
 
 ## Base functionality (what users expect to just work)
 
