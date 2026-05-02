@@ -36,7 +36,6 @@ namespace margelo::nitro::reactnativelist::views {
   class HybridViewHolderProps final: public react::ViewProps {
   public:
     HybridViewHolderProps() = default;
-    HybridViewHolderProps(const HybridViewHolderProps&);
     HybridViewHolderProps(const react::PropsParserContext& context,
                           const HybridViewHolderProps& sourceProps,
                           const react::RawProps& rawProps);
@@ -54,10 +53,14 @@ namespace margelo::nitro::reactnativelist::views {
   class HybridViewHolderState final {
   public:
     HybridViewHolderState() = default;
+    explicit HybridViewHolderState(const std::shared_ptr<HybridViewHolderProps>& props):
+      _props(props) {}
 
   public:
-    void setProps(const HybridViewHolderProps& props) { _props.emplace(props); }
-    const std::optional<HybridViewHolderProps>& getProps() const { return _props; }
+    [[nodiscard]]
+    const std::shared_ptr<HybridViewHolderProps>& getProps() const {
+      return _props;
+    }
 
   public:
 #ifdef ANDROID
@@ -71,7 +74,7 @@ namespace margelo::nitro::reactnativelist::views {
 #endif
 
   private:
-    std::optional<HybridViewHolderProps> _props;
+    std::shared_ptr<HybridViewHolderProps> _props;
   };
 
   /**
@@ -87,7 +90,7 @@ namespace margelo::nitro::reactnativelist::views {
    */
   class HybridViewHolderComponentDescriptor final: public react::ConcreteComponentDescriptor<HybridViewHolderShadowNode> {
   public:
-    HybridViewHolderComponentDescriptor(const react::ComponentDescriptorParameters& parameters);
+    explicit HybridViewHolderComponentDescriptor(const react::ComponentDescriptorParameters& parameters);
 
   public:
     /**

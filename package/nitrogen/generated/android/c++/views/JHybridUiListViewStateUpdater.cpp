@@ -8,6 +8,7 @@
 #include "JHybridUiListViewStateUpdater.hpp"
 #include "views/HybridUiListViewComponent.hpp"
 #include <NitroModules/NitroDefines.hpp>
+#include <react/fabric/StateWrapperImpl.h>
 
 namespace margelo::nitro::reactnativelist::views {
 
@@ -15,38 +16,37 @@ using namespace facebook;
 using ConcreteStateData = react::ConcreteState<HybridUiListViewState>;
 
 void JHybridUiListViewStateUpdater::updateViewProps(jni::alias_ref<jni::JClass> /* class */,
-                                           jni::alias_ref<JHybridUiListViewSpec::javaobject> javaView,
+                                           jni::alias_ref<JHybridUiListViewSpec::JavaPart> javaView,
                                            jni::alias_ref<JStateWrapper::javaobject> stateWrapperInterface) {
-  JHybridUiListViewSpec* view = javaView->cthis();
+  std::shared_ptr<JHybridUiListViewSpec> hybridView = javaView->getJHybridUiListViewSpec();
 
   // Get concrete StateWrapperImpl from passed StateWrapper interface object
   jobject rawStateWrapper = stateWrapperInterface.get();
-  if (!stateWrapperInterface->isInstanceOf(react::StateWrapperImpl::javaClassStatic())) {
+  if (!stateWrapperInterface->isInstanceOf(react::StateWrapperImpl::javaClassStatic())) [[unlikely]] {
       throw std::runtime_error("StateWrapper is not a StateWrapperImpl");
   }
   auto stateWrapper = jni::alias_ref<react::StateWrapperImpl::javaobject>{
             static_cast<react::StateWrapperImpl::javaobject>(rawStateWrapper)};
-
   std::shared_ptr<const react::State> state = stateWrapper->cthis()->getState();
-  auto concreteState = std::dynamic_pointer_cast<const ConcreteStateData>(state);
+  auto concreteState = std::static_pointer_cast<const ConcreteStateData>(state);
   const HybridUiListViewState& data = concreteState->getData();
-  const std::optional<HybridUiListViewProps>& maybeProps = data.getProps();
-  if (!maybeProps.has_value()) {
+  const std::shared_ptr<HybridUiListViewProps>& props = data.getProps();
+  if (props == nullptr) [[unlikely]] {
     // Props aren't set yet!
     throw std::runtime_error("HybridUiListViewState's data doesn't contain any props!");
   }
-  const HybridUiListViewProps& props = maybeProps.value();
+
+  // Update all props if they are dirty
   
 
   // Update hybridRef if it changed
-  if (props.hybridRef.isDirty) {
+  if (props->hybridRef.isDirty) {
     // hybridRef changed - call it with new this
-    const auto& maybeFunc = props.hybridRef.value;
+    const auto& maybeFunc = props->hybridRef.value;
     if (maybeFunc.has_value()) {
-      std::shared_ptr<JHybridUiListViewSpec> shared = javaView->cthis()->shared_cast<JHybridUiListViewSpec>();
-      maybeFunc.value()(shared);
+      maybeFunc.value()(hybridView);
     }
-    // TODO: Set isDirty = false
+    props->hybridRef.isDirty = false;
   }
 }
 

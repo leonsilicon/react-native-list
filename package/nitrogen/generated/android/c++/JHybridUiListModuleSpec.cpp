@@ -21,37 +21,31 @@ namespace margelo::nitro::reactnativelist { class HybridIOSWorkletsModuleProxyHo
 
 namespace margelo::nitro::reactnativelist {
 
-  jni::local_ref<JHybridUiListModuleSpec::jhybriddata> JHybridUiListModuleSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+  std::shared_ptr<JHybridUiListModuleSpec> JHybridUiListModuleSpec::JavaPart::getJHybridUiListModuleSpec() {
+    auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
+    auto castHybridObject = std::dynamic_pointer_cast<JHybridUiListModuleSpec>(hybridObject);
+    if (castHybridObject == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to downcast JHybridObject to JHybridUiListModuleSpec!");
+    }
+    return castHybridObject;
+  }
+
+  jni::local_ref<JHybridUiListModuleSpec::CxxPart::jhybriddata> JHybridUiListModuleSpec::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
   }
 
-  void JHybridUiListModuleSpec::registerNatives() {
-    registerHybrid({
-      makeNativeMethod("initHybrid", JHybridUiListModuleSpec::initHybrid),
-    });
-  }
-
-  size_t JHybridUiListModuleSpec::getExternalMemorySize() noexcept {
-    static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
-    return method(_javaPart);
-  }
-
-  bool JHybridUiListModuleSpec::equals(const std::shared_ptr<HybridObject>& other) {
-    if (auto otherCast = std::dynamic_pointer_cast<JHybridUiListModuleSpec>(other)) {
-      return _javaPart == otherCast->_javaPart;
+  std::shared_ptr<JHybridObject> JHybridUiListModuleSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+    auto castJavaPart = jni::dynamic_ref_cast<JHybridUiListModuleSpec::JavaPart>(javaPart);
+    if (castJavaPart == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridUiListModuleSpec::JavaPart!");
     }
-    return false;
+    return std::make_shared<JHybridUiListModuleSpec>(castJavaPart);
   }
 
-  void JHybridUiListModuleSpec::dispose() noexcept {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
-
-  std::string JHybridUiListModuleSpec::toString() {
-    static const auto method = javaClassStatic()->getMethod<jni::JString()>("toString");
-    auto javaString = method(_javaPart);
-    return javaString->toStdString();
+  void JHybridUiListModuleSpec::CxxPart::registerNatives() {
+    registerHybrid({
+      makeNativeMethod("initHybrid", JHybridUiListModuleSpec::CxxPart::initHybrid),
+    });
   }
 
   // Properties
@@ -59,12 +53,12 @@ namespace margelo::nitro::reactnativelist {
 
   // Methods
   std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec> JHybridUiListModuleSpec::iosGetWorkletsModule() {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JHybridIOSWorkletsModuleProxyHolderSpec::javaobject>()>("iosGetWorkletsModule");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JHybridIOSWorkletsModuleProxyHolderSpec::JavaPart>()>("iosGetWorkletsModule");
     auto __result = method(_javaPart);
-    return __result->cthis()->shared_cast<JHybridIOSWorkletsModuleProxyHolderSpec>();
+    return __result->getJHybridIOSWorkletsModuleProxyHolderSpec();
   }
   void JHybridUiListModuleSpec::setupExternalSurface(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& workletsModuleHolder) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> /* workletsModuleHolder */)>("setupExternalSurface");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec> /* workletsModuleHolder */)>("setupExternalSurface");
     method(_javaPart, workletsModuleHolder.has_value() ? JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec::fromCpp(workletsModuleHolder.value()) : nullptr);
   }
 

@@ -28,37 +28,31 @@ namespace margelo::nitro::reactnativelist { class HybridViewHolderSpec; }
 
 namespace margelo::nitro::reactnativelist {
 
-  jni::local_ref<JHybridAdapterFactorySpec::jhybriddata> JHybridAdapterFactorySpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+  std::shared_ptr<JHybridAdapterFactorySpec> JHybridAdapterFactorySpec::JavaPart::getJHybridAdapterFactorySpec() {
+    auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
+    auto castHybridObject = std::dynamic_pointer_cast<JHybridAdapterFactorySpec>(hybridObject);
+    if (castHybridObject == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to downcast JHybridObject to JHybridAdapterFactorySpec!");
+    }
+    return castHybridObject;
+  }
+
+  jni::local_ref<JHybridAdapterFactorySpec::CxxPart::jhybriddata> JHybridAdapterFactorySpec::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
   }
 
-  void JHybridAdapterFactorySpec::registerNatives() {
-    registerHybrid({
-      makeNativeMethod("initHybrid", JHybridAdapterFactorySpec::initHybrid),
-    });
-  }
-
-  size_t JHybridAdapterFactorySpec::getExternalMemorySize() noexcept {
-    static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
-    return method(_javaPart);
-  }
-
-  bool JHybridAdapterFactorySpec::equals(const std::shared_ptr<HybridObject>& other) {
-    if (auto otherCast = std::dynamic_pointer_cast<JHybridAdapterFactorySpec>(other)) {
-      return _javaPart == otherCast->_javaPart;
+  std::shared_ptr<JHybridObject> JHybridAdapterFactorySpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+    auto castJavaPart = jni::dynamic_ref_cast<JHybridAdapterFactorySpec::JavaPart>(javaPart);
+    if (castJavaPart == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridAdapterFactorySpec::JavaPart!");
     }
-    return false;
+    return std::make_shared<JHybridAdapterFactorySpec>(castJavaPart);
   }
 
-  void JHybridAdapterFactorySpec::dispose() noexcept {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
-
-  std::string JHybridAdapterFactorySpec::toString() {
-    static const auto method = javaClassStatic()->getMethod<jni::JString()>("toString");
-    auto javaString = method(_javaPart);
-    return javaString->toStdString();
+  void JHybridAdapterFactorySpec::CxxPart::registerNatives() {
+    registerHybrid({
+      makeNativeMethod("initHybrid", JHybridAdapterFactorySpec::CxxPart::initHybrid),
+    });
   }
 
   // Properties
@@ -66,9 +60,9 @@ namespace margelo::nitro::reactnativelist {
 
   // Methods
   std::shared_ptr<HybridAdapterSpec> JHybridAdapterFactorySpec::create(const std::function<std::shared_ptr<Promise<std::shared_ptr<HybridViewHolderSpec>>>(double /* viewType */)>& createViewHolder, const std::function<void(const std::shared_ptr<HybridViewHolderSpec>& /* viewHolder */, const std::shared_ptr<AnyMap>& /* item */, double /* index */)>& onBindViewHolder) {
-    static const auto method = javaClassStatic()->getMethod<jni::local_ref<JHybridAdapterSpec::javaobject>(jni::alias_ref<JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double::javaobject> /* createViewHolder */, jni::alias_ref<JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double::javaobject> /* onBindViewHolder */)>("create_cxx");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JHybridAdapterSpec::JavaPart>(jni::alias_ref<JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double::javaobject> /* createViewHolder */, jni::alias_ref<JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double::javaobject> /* onBindViewHolder */)>("create_cxx");
     auto __result = method(_javaPart, JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::fromCpp(createViewHolder), JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::fromCpp(onBindViewHolder));
-    return __result->cthis()->shared_cast<JHybridAdapterSpec>();
+    return __result->getJHybridAdapterSpec();
   }
 
 } // namespace margelo::nitro::reactnativelist

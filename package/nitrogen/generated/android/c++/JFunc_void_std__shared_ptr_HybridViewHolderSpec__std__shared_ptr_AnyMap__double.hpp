@@ -28,14 +28,14 @@ namespace margelo::nitro::reactnativelist {
    */
   struct JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double: public jni::JavaClass<JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double;";
 
   public:
     /**
      * Invokes the function this `JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double` instance holds through JNI.
      */
     void invoke(const std::shared_ptr<HybridViewHolderSpec>& viewHolder, const std::shared_ptr<AnyMap>& item, double index) const {
-      static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JHybridViewHolderSpec::javaobject> /* viewHolder */, jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("invoke");
+      static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JHybridViewHolderSpec::JavaPart> /* viewHolder */, jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("invoke");
       method(self(), std::dynamic_pointer_cast<JHybridViewHolderSpec>(viewHolder)->getJavaPart(), JAnyMap::create(item), index);
     }
   };
@@ -53,8 +53,8 @@ namespace margelo::nitro::reactnativelist {
     /**
      * Invokes the C++ `std::function<...>` this `JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx` instance holds.
      */
-    void invoke_cxx(jni::alias_ref<JHybridViewHolderSpec::javaobject> viewHolder, jni::alias_ref<JAnyMap::javaobject> item, double index) {
-      _func(viewHolder->cthis()->shared_cast<JHybridViewHolderSpec>(), item->cthis()->getMap(), index);
+    void invoke_cxx(jni::alias_ref<JHybridViewHolderSpec::JavaPart> viewHolder, jni::alias_ref<JAnyMap::javaobject> item, double index) {
+      _func(viewHolder->getJHybridViewHolderSpec(), item->cthis()->getMap(), index);
     }
 
   public:
@@ -64,7 +64,7 @@ namespace margelo::nitro::reactnativelist {
     }
 
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx;";
     static void registerNatives() {
       registerHybrid({makeNativeMethod("invoke_cxx", JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::invoke_cxx)});
     }

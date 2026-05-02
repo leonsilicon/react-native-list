@@ -15,37 +15,31 @@
 
 namespace margelo::nitro::reactnativelist {
 
-  jni::local_ref<JHybridAdapterSpec::jhybriddata> JHybridAdapterSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+  std::shared_ptr<JHybridAdapterSpec> JHybridAdapterSpec::JavaPart::getJHybridAdapterSpec() {
+    auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
+    auto castHybridObject = std::dynamic_pointer_cast<JHybridAdapterSpec>(hybridObject);
+    if (castHybridObject == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to downcast JHybridObject to JHybridAdapterSpec!");
+    }
+    return castHybridObject;
+  }
+
+  jni::local_ref<JHybridAdapterSpec::CxxPart::jhybriddata> JHybridAdapterSpec::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
   }
 
-  void JHybridAdapterSpec::registerNatives() {
-    registerHybrid({
-      makeNativeMethod("initHybrid", JHybridAdapterSpec::initHybrid),
-    });
-  }
-
-  size_t JHybridAdapterSpec::getExternalMemorySize() noexcept {
-    static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
-    return method(_javaPart);
-  }
-
-  bool JHybridAdapterSpec::equals(const std::shared_ptr<HybridObject>& other) {
-    if (auto otherCast = std::dynamic_pointer_cast<JHybridAdapterSpec>(other)) {
-      return _javaPart == otherCast->_javaPart;
+  std::shared_ptr<JHybridObject> JHybridAdapterSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+    auto castJavaPart = jni::dynamic_ref_cast<JHybridAdapterSpec::JavaPart>(javaPart);
+    if (castJavaPart == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridAdapterSpec::JavaPart!");
     }
-    return false;
+    return std::make_shared<JHybridAdapterSpec>(castJavaPart);
   }
 
-  void JHybridAdapterSpec::dispose() noexcept {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
-
-  std::string JHybridAdapterSpec::toString() {
-    static const auto method = javaClassStatic()->getMethod<jni::JString()>("toString");
-    auto javaString = method(_javaPart);
-    return javaString->toStdString();
+  void JHybridAdapterSpec::CxxPart::registerNatives() {
+    registerHybrid({
+      makeNativeMethod("initHybrid", JHybridAdapterSpec::CxxPart::initHybrid),
+    });
   }
 
   // Properties
@@ -53,28 +47,28 @@ namespace margelo::nitro::reactnativelist {
 
   // Methods
   void JHybridAdapterSpec::changeDataSet(const std::vector<std::shared_ptr<AnyMap>>& newDataSet) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<jni::JArrayClass<JAnyMap::javaobject>> /* newDataSet */)>("changeDataSet");
-    method(_javaPart, [&]() {
-      size_t __size = newDataSet.size();
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<jni::JArrayClass<JAnyMap::javaobject>> /* newDataSet */)>("changeDataSet");
+    method(_javaPart, [&](auto&& __input) {
+      size_t __size = __input.size();
       jni::local_ref<jni::JArrayClass<JAnyMap::javaobject>> __array = jni::JArrayClass<JAnyMap::javaobject>::newArray(__size);
       for (size_t __i = 0; __i < __size; __i++) {
-        const auto& __element = newDataSet[__i];
+        const auto& __element = __input[__i];
         auto __elementJni = JAnyMap::create(__element);
         __array->setElement(__i, __elementJni.get());
       }
       return __array;
-    }());
+    }(newDataSet));
   }
   void JHybridAdapterSpec::insertItem(const std::shared_ptr<AnyMap>& item, double index) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("insertItem");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("insertItem");
     method(_javaPart, JAnyMap::create(item), index);
   }
   void JHybridAdapterSpec::changeItem(const std::shared_ptr<AnyMap>& item, double index) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("changeItem");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JAnyMap::javaobject> /* item */, double /* index */)>("changeItem");
     method(_javaPart, JAnyMap::create(item), index);
   }
   void JHybridAdapterSpec::removeItem(double index) {
-    static const auto method = javaClassStatic()->getMethod<void(double /* index */)>("removeItem");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(double /* index */)>("removeItem");
     method(_javaPart, index);
   }
 

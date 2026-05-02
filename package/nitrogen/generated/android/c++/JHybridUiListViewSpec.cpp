@@ -20,37 +20,31 @@ namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
 
 namespace margelo::nitro::reactnativelist {
 
-  jni::local_ref<JHybridUiListViewSpec::jhybriddata> JHybridUiListViewSpec::initHybrid(jni::alias_ref<jhybridobject> jThis) {
+  std::shared_ptr<JHybridUiListViewSpec> JHybridUiListViewSpec::JavaPart::getJHybridUiListViewSpec() {
+    auto hybridObject = JHybridObject::JavaPart::getJHybridObject();
+    auto castHybridObject = std::dynamic_pointer_cast<JHybridUiListViewSpec>(hybridObject);
+    if (castHybridObject == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to downcast JHybridObject to JHybridUiListViewSpec!");
+    }
+    return castHybridObject;
+  }
+
+  jni::local_ref<JHybridUiListViewSpec::CxxPart::jhybriddata> JHybridUiListViewSpec::CxxPart::initHybrid(jni::alias_ref<jhybridobject> jThis) {
     return makeCxxInstance(jThis);
   }
 
-  void JHybridUiListViewSpec::registerNatives() {
-    registerHybrid({
-      makeNativeMethod("initHybrid", JHybridUiListViewSpec::initHybrid),
-    });
-  }
-
-  size_t JHybridUiListViewSpec::getExternalMemorySize() noexcept {
-    static const auto method = javaClassStatic()->getMethod<jlong()>("getMemorySize");
-    return method(_javaPart);
-  }
-
-  bool JHybridUiListViewSpec::equals(const std::shared_ptr<HybridObject>& other) {
-    if (auto otherCast = std::dynamic_pointer_cast<JHybridUiListViewSpec>(other)) {
-      return _javaPart == otherCast->_javaPart;
+  std::shared_ptr<JHybridObject> JHybridUiListViewSpec::CxxPart::createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) {
+    auto castJavaPart = jni::dynamic_ref_cast<JHybridUiListViewSpec::JavaPart>(javaPart);
+    if (castJavaPart == nullptr) [[unlikely]] {
+      throw std::runtime_error("Failed to cast JHybridObject::JavaPart to JHybridUiListViewSpec::JavaPart!");
     }
-    return false;
+    return std::make_shared<JHybridUiListViewSpec>(castJavaPart);
   }
 
-  void JHybridUiListViewSpec::dispose() noexcept {
-    static const auto method = javaClassStatic()->getMethod<void()>("dispose");
-    method(_javaPart);
-  }
-
-  std::string JHybridUiListViewSpec::toString() {
-    static const auto method = javaClassStatic()->getMethod<jni::JString()>("toString");
-    auto javaString = method(_javaPart);
-    return javaString->toStdString();
+  void JHybridUiListViewSpec::CxxPart::registerNatives() {
+    registerHybrid({
+      makeNativeMethod("initHybrid", JHybridUiListViewSpec::CxxPart::initHybrid),
+    });
   }
 
   // Properties
@@ -58,11 +52,11 @@ namespace margelo::nitro::reactnativelist {
 
   // Methods
   void JHybridUiListViewSpec::setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JHybridUiListModuleSpec::javaobject> /* uiListModule */, jni::alias_ref<JFunc_double::javaobject> /* callback */)>("setMakeNativeViewCallback_cxx");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JHybridUiListModuleSpec::JavaPart> /* uiListModule */, jni::alias_ref<JFunc_double::javaobject> /* callback */)>("setMakeNativeViewCallback_cxx");
     method(_javaPart, std::dynamic_pointer_cast<JHybridUiListModuleSpec>(uiListModule)->getJavaPart(), JFunc_double_cxx::fromCpp(callback));
   }
   void JHybridUiListViewSpec::setUpdateViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<bool(double /* reactTag */, double /* index */)>& callback) {
-    static const auto method = javaClassStatic()->getMethod<void(jni::alias_ref<JHybridUiListModuleSpec::javaobject> /* uiListModule */, jni::alias_ref<JFunc_bool_double_double::javaobject> /* callback */)>("setUpdateViewCallback_cxx");
+    static const auto method = _javaPart->javaClassStatic()->getMethod<void(jni::alias_ref<JHybridUiListModuleSpec::JavaPart> /* uiListModule */, jni::alias_ref<JFunc_bool_double_double::javaobject> /* callback */)>("setUpdateViewCallback_cxx");
     method(_javaPart, std::dynamic_pointer_cast<JHybridUiListModuleSpec>(uiListModule)->getJavaPart(), JFunc_bool_double_double_cxx::fromCpp(callback));
   }
 

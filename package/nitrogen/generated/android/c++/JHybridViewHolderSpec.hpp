@@ -18,34 +18,33 @@ namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
-  class JHybridViewHolderSpec: public jni::HybridClass<JHybridViewHolderSpec, JHybridObject>,
-                               public virtual HybridViewHolderSpec {
+  class JHybridViewHolderSpec: public virtual HybridViewHolderSpec, public virtual JHybridObject {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridViewHolderSpec;";
-    static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
-    static void registerNatives();
+    struct JavaPart: public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridViewHolderSpec;";
+      std::shared_ptr<JHybridViewHolderSpec> getJHybridViewHolderSpec();
+    };
+    struct CxxPart: public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridViewHolderSpec$CxxPart;";
+      static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
+      static void registerNatives();
+      using HybridBase::HybridBase;
+    protected:
+      std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;
+    };
 
-  protected:
-    // C++ constructor (called from Java via `initHybrid()`)
-    explicit JHybridViewHolderSpec(jni::alias_ref<jhybridobject> jThis) :
+  public:
+    explicit JHybridViewHolderSpec(const jni::local_ref<JHybridViewHolderSpec::JavaPart>& javaPart):
       HybridObject(HybridViewHolderSpec::TAG),
-      HybridBase(jThis),
-      _javaPart(jni::make_global(jThis)) {}
-
-  public:
+      JHybridObject(javaPart),
+      _javaPart(jni::make_global(javaPart)) {}
     ~JHybridViewHolderSpec() override {
       // Hermes GC can destroy JS objects on a non-JNI Thread.
       jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
     }
 
   public:
-    size_t getExternalMemorySize() noexcept override;
-    bool equals(const std::shared_ptr<HybridObject>& other) override;
-    void dispose() noexcept override;
-    std::string toString() override;
-
-  public:
-    inline const jni::global_ref<JHybridViewHolderSpec::javaobject>& getJavaPart() const noexcept {
+    inline const jni::global_ref<JHybridViewHolderSpec::JavaPart>& getJavaPart() const noexcept {
       return _javaPart;
     }
 
@@ -58,9 +57,7 @@ namespace margelo::nitro::reactnativelist {
     
 
   private:
-    friend HybridBase;
-    using HybridBase::HybridBase;
-    jni::global_ref<JHybridViewHolderSpec::javaobject> _javaPart;
+    jni::global_ref<JHybridViewHolderSpec::JavaPart> _javaPart;
   };
 
 } // namespace margelo::nitro::reactnativelist

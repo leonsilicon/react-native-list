@@ -99,7 +99,7 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
     return optional.has_value();
   }
   inline std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>> get_std__optional_std__variant_nitro__NullType__std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec___(const std::optional<std::variant<nitro::NullType, std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>>>& optional) noexcept {
-    return *optional;
+    return optional.value();
   }
   
   // pragma MARK: std::shared_ptr<HybridUiListModuleSpec>

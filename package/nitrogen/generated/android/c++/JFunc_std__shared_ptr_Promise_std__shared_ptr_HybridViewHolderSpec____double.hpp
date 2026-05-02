@@ -28,7 +28,7 @@ namespace margelo::nitro::reactnativelist {
    */
   struct JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double: public jni::JavaClass<JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double> {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double;";
 
   public:
     /**
@@ -40,8 +40,8 @@ namespace margelo::nitro::reactnativelist {
       return [&]() {
         auto __promise = Promise<std::shared_ptr<HybridViewHolderSpec>>::create();
         __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
-          auto __result = jni::static_ref_cast<JHybridViewHolderSpec::javaobject>(__boxedResult);
-          __promise->resolve(__result->cthis()->shared_cast<JHybridViewHolderSpec>());
+          auto __result = jni::static_ref_cast<JHybridViewHolderSpec::JavaPart>(__boxedResult);
+          __promise->resolve(__result->getJHybridViewHolderSpec());
         });
         __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
           jni::JniException __jniError(__throwable);
@@ -88,7 +88,7 @@ namespace margelo::nitro::reactnativelist {
     }
 
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx;";
+    static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/Func_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx;";
     static void registerNatives() {
       registerHybrid({makeNativeMethod("invoke_cxx", JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::invoke_cxx)});
     }

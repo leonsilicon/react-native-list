@@ -37,10 +37,6 @@ namespace margelo::nitro::reactnativelist::views {
       }
     }()) { }
 
-  HybridViewHolderProps::HybridViewHolderProps(const HybridViewHolderProps& other):
-    react::ViewProps(),
-    hybridRef(other.hybridRef) { }
-
   bool HybridViewHolderProps::filterObjectKeys(const std::string& propName) {
     switch (hashString(propName)) {
       case hashString("hybridRef"): return true;
@@ -65,10 +61,10 @@ namespace margelo::nitro::reactnativelist::views {
   void HybridViewHolderComponentDescriptor::adopt(react::ShadowNode& shadowNode) const {
     // This is called immediately after `ShadowNode` is created, cloned or in progress.
     // On Android, we need to wrap props in our state, which gets routed through Java and later unwrapped in JNI/C++.
-    auto& concreteShadowNode = dynamic_cast<HybridViewHolderShadowNode&>(shadowNode);
-    const HybridViewHolderProps& props = concreteShadowNode.getConcreteProps();
-    HybridViewHolderState state;
-    state.setProps(props);
+    auto& concreteShadowNode = static_cast<HybridViewHolderShadowNode&>(shadowNode);
+    const std::shared_ptr<const HybridViewHolderProps>& constProps = concreteShadowNode.getConcreteSharedProps();
+    const std::shared_ptr<HybridViewHolderProps>& props = std::const_pointer_cast<HybridViewHolderProps>(constProps);
+    HybridViewHolderState state{props};
     concreteShadowNode.setStateData(std::move(state));
   }
 #endif

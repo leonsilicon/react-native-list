@@ -19,7 +19,7 @@ namespace margelo::nitro::reactnativelist {
     } else if (isInstanceOf(JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec_impl::Second::javaClassStatic())) {
       // It's a `std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>`
       auto jniValue = static_cast<const JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec_impl::Second*>(this)->getValue();
-      return jniValue->cthis()->shared_cast<JHybridIOSWorkletsModuleProxyHolderSpec>();
+      return jniValue->getJHybridIOSWorkletsModuleProxyHolderSpec();
     }
     throw std::invalid_argument("Variant is unknown Kotlin instance!");
   }

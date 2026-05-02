@@ -33,68 +33,96 @@
 namespace margelo::nitro::reactnativelist {
 
 int initialize(JavaVM* vm) {
+  return facebook::jni::initialize(vm, []() {
+    ::margelo::nitro::reactnativelist::registerAllNatives();
+  });
+}
+
+struct JHybridViewHolderSpecImpl: public jni::JavaClass<JHybridViewHolderSpecImpl, JHybridViewHolderSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridViewHolder;";
+  static std::shared_ptr<JHybridViewHolderSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridViewHolderSpecImpl::javaobject()>();
+    jni::local_ref<JHybridViewHolderSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridViewHolderSpec();
+  }
+};
+struct JHybridUiListViewSpecImpl: public jni::JavaClass<JHybridUiListViewSpecImpl, JHybridUiListViewSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridUiListView;";
+  static std::shared_ptr<JHybridUiListViewSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridUiListViewSpecImpl::javaobject()>();
+    jni::local_ref<JHybridUiListViewSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridUiListViewSpec();
+  }
+};
+struct JHybridAdapterFactorySpecImpl: public jni::JavaClass<JHybridAdapterFactorySpecImpl, JHybridAdapterFactorySpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridAdapterFactory;";
+  static std::shared_ptr<JHybridAdapterFactorySpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridAdapterFactorySpecImpl::javaobject()>();
+    jni::local_ref<JHybridAdapterFactorySpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridAdapterFactorySpec();
+  }
+};
+struct JHybridUiListModuleSpecImpl: public jni::JavaClass<JHybridUiListModuleSpecImpl, JHybridUiListModuleSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridUiListModule;";
+  static std::shared_ptr<JHybridUiListModuleSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridUiListModuleSpecImpl::javaobject()>();
+    jni::local_ref<JHybridUiListModuleSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridUiListModuleSpec();
+  }
+};
+
+void registerAllNatives() {
   using namespace margelo::nitro;
   using namespace margelo::nitro::reactnativelist;
-  using namespace facebook;
 
-  return facebook::jni::initialize(vm, [] {
-    // Register native JNI methods
-    margelo::nitro::reactnativelist::JHybridAdapterSpec::registerNatives();
-    margelo::nitro::reactnativelist::JHybridAdapterFactorySpec::registerNatives();
-    margelo::nitro::reactnativelist::JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::registerNatives();
-    margelo::nitro::reactnativelist::JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::registerNatives();
-    margelo::nitro::reactnativelist::JHybridIOSWorkletsModuleProxyHolderSpec::registerNatives();
-    margelo::nitro::reactnativelist::JHybridUiListModuleSpec::registerNatives();
-    margelo::nitro::reactnativelist::JHybridUiListViewSpec::registerNatives();
-    margelo::nitro::reactnativelist::JFunc_double_cxx::registerNatives();
-    margelo::nitro::reactnativelist::JFunc_bool_double_double_cxx::registerNatives();
-    margelo::nitro::reactnativelist::views::JHybridUiListViewStateUpdater::registerNatives();
-    margelo::nitro::reactnativelist::JHybridViewHolderSpec::registerNatives();
-    margelo::nitro::reactnativelist::views::JHybridViewHolderStateUpdater::registerNatives();
+  // Register native JNI methods
+  margelo::nitro::reactnativelist::JHybridAdapterSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JHybridAdapterFactorySpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JHybridIOSWorkletsModuleProxyHolderSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JHybridUiListModuleSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JHybridUiListViewSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_double_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_bool_double_double_cxx::registerNatives();
+  margelo::nitro::reactnativelist::views::JHybridUiListViewStateUpdater::registerNatives();
+  margelo::nitro::reactnativelist::JHybridViewHolderSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::views::JHybridViewHolderStateUpdater::registerNatives();
 
-    // Register Nitro Hybrid Objects
-    HybridObjectRegistry::registerHybridObjectConstructor(
-      "ViewHolder",
-      []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridViewHolderSpec::javaobject> object("com/margelo/nitro/reactnativelist/HybridViewHolder");
-        auto instance = object.create();
-        return instance->cthis()->shared();
-      }
-    );
-    HybridObjectRegistry::registerHybridObjectConstructor(
-      "UiListView",
-      []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridUiListViewSpec::javaobject> object("com/margelo/nitro/reactnativelist/HybridUiListView");
-        auto instance = object.create();
-        return instance->cthis()->shared();
-      }
-    );
-    HybridObjectRegistry::registerHybridObjectConstructor(
-      "AdapterFactory",
-      []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridAdapterFactorySpec::javaobject> object("com/margelo/nitro/reactnativelist/HybridAdapterFactory");
-        auto instance = object.create();
-        return instance->cthis()->shared();
-      }
-    );
-    HybridObjectRegistry::registerHybridObjectConstructor(
-      "UiListModule",
-      []() -> std::shared_ptr<HybridObject> {
-        static DefaultConstructableObject<JHybridUiListModuleSpec::javaobject> object("com/margelo/nitro/reactnativelist/HybridUiListModule");
-        auto instance = object.create();
-        return instance->cthis()->shared();
-      }
-    );
-    HybridObjectRegistry::registerHybridObjectConstructor(
-      "UiManagerHelper",
-      []() -> std::shared_ptr<HybridObject> {
-        static_assert(std::is_default_constructible_v<HybridUiManagerHelper>,
-                      "The HybridObject \"HybridUiManagerHelper\" is not default-constructible! "
-                      "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
-        return std::make_shared<HybridUiManagerHelper>();
-      }
-    );
-  });
+  // Register Nitro Hybrid Objects
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "ViewHolder",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridViewHolderSpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "UiListView",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridUiListViewSpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "AdapterFactory",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridAdapterFactorySpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "UiListModule",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridUiListModuleSpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "UiManagerHelper",
+    []() -> std::shared_ptr<HybridObject> {
+      static_assert(std::is_default_constructible_v<HybridUiManagerHelper>,
+                    "The HybridObject \"HybridUiManagerHelper\" is not default-constructible! "
+                    "Create a public constructor that takes zero arguments to be able to autolink this HybridObject.");
+      return std::make_shared<HybridUiManagerHelper>();
+    }
+  );
 }
 
 } // namespace margelo::nitro::reactnativelist

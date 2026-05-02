@@ -12,8 +12,8 @@
 #endif
 
 #include <fbjni/fbjni.h>
-#include <react/fabric/StateWrapperImpl.h>
 #include <react/fabric/CoreComponentsRegistry.h>
+#include <react/fabric/StateWrapperImpl.h>
 #include <react/renderer/core/ConcreteComponentDescriptor.h>
 #include <NitroModules/NitroDefines.hpp>
 #include <NitroModules/JStateWrapper.hpp>
@@ -24,13 +24,13 @@ namespace margelo::nitro::reactnativelist::views {
 
 using namespace facebook;
 
-class JHybridViewHolderStateUpdater: public jni::JavaClass<JHybridViewHolderStateUpdater> {
+class JHybridViewHolderStateUpdater final: public jni::JavaClass<JHybridViewHolderStateUpdater> {
 public:
   static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/views/HybridViewHolderStateUpdater;";
 
 public:
   static void updateViewProps(jni::alias_ref<jni::JClass> /* class */,
-                              jni::alias_ref<JHybridViewHolderSpec::javaobject> view,
+                              jni::alias_ref<JHybridViewHolderSpec::JavaPart> view,
                               jni::alias_ref<JStateWrapper::javaobject> stateWrapperInterface);
 
 public:

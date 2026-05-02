@@ -36,7 +36,6 @@ namespace margelo::nitro::reactnativelist::views {
   class HybridUiListViewProps final: public react::ViewProps {
   public:
     HybridUiListViewProps() = default;
-    HybridUiListViewProps(const HybridUiListViewProps&);
     HybridUiListViewProps(const react::PropsParserContext& context,
                           const HybridUiListViewProps& sourceProps,
                           const react::RawProps& rawProps);
@@ -54,10 +53,14 @@ namespace margelo::nitro::reactnativelist::views {
   class HybridUiListViewState final {
   public:
     HybridUiListViewState() = default;
+    explicit HybridUiListViewState(const std::shared_ptr<HybridUiListViewProps>& props):
+      _props(props) {}
 
   public:
-    void setProps(const HybridUiListViewProps& props) { _props.emplace(props); }
-    const std::optional<HybridUiListViewProps>& getProps() const { return _props; }
+    [[nodiscard]]
+    const std::shared_ptr<HybridUiListViewProps>& getProps() const {
+      return _props;
+    }
 
   public:
 #ifdef ANDROID
@@ -71,7 +74,7 @@ namespace margelo::nitro::reactnativelist::views {
 #endif
 
   private:
-    std::optional<HybridUiListViewProps> _props;
+    std::shared_ptr<HybridUiListViewProps> _props;
   };
 
   /**
@@ -87,7 +90,7 @@ namespace margelo::nitro::reactnativelist::views {
    */
   class HybridUiListViewComponentDescriptor final: public react::ConcreteComponentDescriptor<HybridUiListViewShadowNode> {
   public:
-    HybridUiListViewComponentDescriptor(const react::ComponentDescriptorParameters& parameters);
+    explicit HybridUiListViewComponentDescriptor(const react::ComponentDescriptorParameters& parameters);
 
   public:
     /**

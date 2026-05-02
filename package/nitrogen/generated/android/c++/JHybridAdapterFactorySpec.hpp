@@ -18,34 +18,33 @@ namespace margelo::nitro::reactnativelist {
 
   using namespace facebook;
 
-  class JHybridAdapterFactorySpec: public jni::HybridClass<JHybridAdapterFactorySpec, JHybridObject>,
-                                   public virtual HybridAdapterFactorySpec {
+  class JHybridAdapterFactorySpec: public virtual HybridAdapterFactorySpec, public virtual JHybridObject {
   public:
-    static auto constexpr kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridAdapterFactorySpec;";
-    static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
-    static void registerNatives();
+    struct JavaPart: public jni::JavaClass<JavaPart, JHybridObject::JavaPart> {
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridAdapterFactorySpec;";
+      std::shared_ptr<JHybridAdapterFactorySpec> getJHybridAdapterFactorySpec();
+    };
+    struct CxxPart: public jni::HybridClass<CxxPart, JHybridObject::CxxPart> {
+      static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridAdapterFactorySpec$CxxPart;";
+      static jni::local_ref<jhybriddata> initHybrid(jni::alias_ref<jhybridobject> jThis);
+      static void registerNatives();
+      using HybridBase::HybridBase;
+    protected:
+      std::shared_ptr<JHybridObject> createHybridObject(const jni::local_ref<JHybridObject::JavaPart>& javaPart) override;
+    };
 
-  protected:
-    // C++ constructor (called from Java via `initHybrid()`)
-    explicit JHybridAdapterFactorySpec(jni::alias_ref<jhybridobject> jThis) :
+  public:
+    explicit JHybridAdapterFactorySpec(const jni::local_ref<JHybridAdapterFactorySpec::JavaPart>& javaPart):
       HybridObject(HybridAdapterFactorySpec::TAG),
-      HybridBase(jThis),
-      _javaPart(jni::make_global(jThis)) {}
-
-  public:
+      JHybridObject(javaPart),
+      _javaPart(jni::make_global(javaPart)) {}
     ~JHybridAdapterFactorySpec() override {
       // Hermes GC can destroy JS objects on a non-JNI Thread.
       jni::ThreadScope::WithClassLoader([&] { _javaPart.reset(); });
     }
 
   public:
-    size_t getExternalMemorySize() noexcept override;
-    bool equals(const std::shared_ptr<HybridObject>& other) override;
-    void dispose() noexcept override;
-    std::string toString() override;
-
-  public:
-    inline const jni::global_ref<JHybridAdapterFactorySpec::javaobject>& getJavaPart() const noexcept {
+    inline const jni::global_ref<JHybridAdapterFactorySpec::JavaPart>& getJavaPart() const noexcept {
       return _javaPart;
     }
 
@@ -58,9 +57,7 @@ namespace margelo::nitro::reactnativelist {
     std::shared_ptr<HybridAdapterSpec> create(const std::function<std::shared_ptr<Promise<std::shared_ptr<HybridViewHolderSpec>>>(double /* viewType */)>& createViewHolder, const std::function<void(const std::shared_ptr<HybridViewHolderSpec>& /* viewHolder */, const std::shared_ptr<AnyMap>& /* item */, double /* index */)>& onBindViewHolder) override;
 
   private:
-    friend HybridBase;
-    using HybridBase::HybridBase;
-    jni::global_ref<JHybridAdapterFactorySpec::javaobject> _javaPart;
+    jni::global_ref<JHybridAdapterFactorySpec::JavaPart> _javaPart;
   };
 
 } // namespace margelo::nitro::reactnativelist
