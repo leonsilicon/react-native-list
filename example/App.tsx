@@ -196,9 +196,12 @@ const renderers: ListRenderers<DebugRowItem> = {
       const backgroundColor = item?.data.color ?? "#f0f0f0";
 
       return (
-        <Pressable style={[styles.row, { height, backgroundColor }]} onPress={() => {
-          globalThis.log("Pressed: " + item?.key);
-        }}>
+        <Pressable
+          style={[styles.row, { height, backgroundColor }]}
+          onPress={() => {
+            globalThis.log("Pressed: " + item?.key);
+          }}
+        >
           <Text style={styles.rowTitle}>
             {index}: {item?.data.label}
           </Text>
@@ -431,7 +434,10 @@ export default function App() {
         <DebugButton label="Move first" onPress={moveFirstToEnd} />
         <DebugButton label="Reverse animated" onPress={replaceAnimated} />
         <DebugButton label="Reload data" onPress={() => replace(false)} />
-        <DebugButton label="Reload data (animated)" onPress={() => replace(true)} />
+        <DebugButton
+          label="Reload data (animated)"
+          onPress={() => replace(true)}
+        />
         <DebugButton label="Reset" onPress={resetRows} />
       </ScrollView>
 
@@ -445,8 +451,7 @@ export default function App() {
         layout={layout}
         renderers={renderers}
         style={{
-          height: height - 148,
-          width,
+          flex: 1,
         }}
       />
     </View>
