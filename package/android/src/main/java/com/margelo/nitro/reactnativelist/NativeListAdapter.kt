@@ -16,20 +16,14 @@ internal class NativeListAdapter(
     var dataSource: HybridNativeListDataSource? = null
     private val viewTypeByItemType = mutableMapOf<String, Int>()
     private val itemTypeByViewType = mutableMapOf<Int, String>()
-    private val measuredContentSizeByType = mutableMapOf<String, PixelSize>()
+    private val measuredContentSizeByItemKey = mutableMapOf<String, PixelSize>()
     private var nextViewType = 1
 
     class ViewHolder(val container: FrameLayout) : RecyclerView.ViewHolder(container) {
-        var boundType: String? = null
-        var boundKey: String? = null
+        var hostedView: View? = null
+        var itemType: String? = null
         var reactTag: Int? = null
     }
-
-    private data class HostedContent(
-        val view: View,
-        val reactTag: Int,
-        val type: String
-    )
 
     private data class PixelSize(
         val width: Int?,
@@ -40,8 +34,6 @@ internal class NativeListAdapter(
         val width: Int,
         val height: Int
     )
-
-    private val hostedContentByItemKey = mutableMapOf<String, HostedContent>()
 
     override fun getItemViewType(position: Int): Int {
         val item = requireDataSource().getItemAt(position)
@@ -63,32 +55,40 @@ internal class NativeListAdapter(
             RecyclerView.LayoutParams.WRAP_CONTENT,
             RecyclerView.LayoutParams.WRAP_CONTENT
         )
-        return ViewHolder(container)
+        val itemType = itemTypeByViewType[viewType]
+            ?: throw IllegalStateException("Missing item type for viewType $viewType.")
+        val child = createView(itemType)
+        val existingParent = child.parent as? ViewGroup
+        existingParent?.removeView(child)
+
+        container.addView(child)
+        val holder = ViewHolder(container)
+        holder.hostedView = child
+        holder.itemType = itemType
+        holder.reactTag = child.id
+        return holder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = requireDataSource().getItemAt(position)
-        val child = installHostedContent(holder, item)
-        captureMeasuredContentSize(item.type, child)
-        val contentSize = resolvedContentSize(item)
-        bindContainerLayout(holder.container, contentSize)
-        bindChildLayout(child, contentSize)
-
+        val child = requireHostedView(holder, item)
+        prepareChildLayoutForMeasurement(child, item)
         val reactTag = holder.reactTag
         if (reactTag != null) {
             updateView(reactTag.toDouble(), item, position.toDouble())
         }
+
+        captureMeasuredContentSize(item.key, child)
+        val contentSize = resolvedContentSize(item)
+        bindContainerLayout(holder.container, contentSize)
+        bindChildLayout(child, contentSize)
     }
 
     override fun getItemCount(): Int {
         return dataSource?.getCountAsInt() ?: 0
     }
 
-    fun releaseHostedContent(itemKey: String) {
-        hostedContentByItemKey.remove(itemKey)
-    }
-
-    fun retainHostedContent(dataSource: HybridNativeListDataSource) {
+    fun retainMeasuredContent(dataSource: HybridNativeListDataSource) {
         val activeKeys = mutableSetOf<String>()
         val itemCount = dataSource.getCountAsInt()
         for (index in 0 until itemCount) {
@@ -96,13 +96,13 @@ internal class NativeListAdapter(
             activeKeys.add(item.key)
         }
 
-        val iterator = hostedContentByItemKey.keys.iterator()
-        while (iterator.hasNext()) {
-            val itemKey = iterator.next()
+        val measuredSizeIterator = measuredContentSizeByItemKey.keys.iterator()
+        while (measuredSizeIterator.hasNext()) {
+            val itemKey = measuredSizeIterator.next()
             if (activeKeys.contains(itemKey)) {
                 continue
             }
-            iterator.remove()
+            measuredSizeIterator.remove()
         }
     }
 
@@ -110,58 +110,18 @@ internal class NativeListAdapter(
         return dataSource ?: throw IllegalStateException("NativeListDataSource is not set.")
     }
 
-    private fun installHostedContent(holder: ViewHolder, item: NativeListItem): View {
-        val currentChild = firstHostedChild(holder)
-        if (
-            currentChild != null &&
-            holder.boundKey == item.key &&
-            holder.boundType == item.type
-        ) {
-            return currentChild
-        }
-
-        holder.container.removeAllViews()
-        val previousKey = holder.boundKey
-        if (previousKey != null && previousKey != item.key) {
-            releaseHostedContent(previousKey)
-        }
-
-        val existingHostedContent = hostedContentByItemKey[item.key]
-        val hostedContent = if (
-            existingHostedContent != null &&
-            existingHostedContent.type == item.type
-        ) {
-            existingHostedContent
-        } else {
-            val child = createView(item.type)
-            val nextHostedContent = HostedContent(
-                view = child,
-                reactTag = child.id,
-                type = item.type
+    private fun requireHostedView(holder: ViewHolder, item: NativeListItem): View {
+        if (holder.itemType != item.type) {
+            throw IllegalStateException(
+                "RecyclerView supplied holder for type '${holder.itemType}' " +
+                    "to item type '${item.type}'."
             )
-            hostedContentByItemKey[item.key] = nextHostedContent
-            nextHostedContent
         }
-
-        val parent = hostedContent.view.parent as? ViewGroup
-        parent?.removeView(hostedContent.view)
-
-        holder.container.addView(hostedContent.view)
-        holder.boundType = item.type
-        holder.boundKey = item.key
-        holder.reactTag = hostedContent.reactTag
-        return hostedContent.view
+        return holder.hostedView ?: throw IllegalStateException("ViewHolder has no hosted view.")
     }
 
-    private fun firstHostedChild(holder: ViewHolder): View? {
-        if (holder.container.childCount == 0) {
-            return null
-        }
-        return holder.container.getChildAt(0)
-    }
-
-    private fun captureMeasuredContentSize(type: String, view: View) {
-        val existingSize = measuredContentSizeByType[type]
+    private fun captureMeasuredContentSize(itemKey: String, view: View) {
+        val existingSize = measuredContentSizeByItemKey[itemKey]
         val measuredWidth = positiveDimension(view.measuredWidth)
         val measuredHeight = positiveDimension(view.measuredHeight)
         val viewWidth = positiveDimension(view.width)
@@ -177,14 +137,14 @@ internal class NativeListAdapter(
             return
         }
 
-        measuredContentSizeByType[type] = PixelSize(
+        measuredContentSizeByItemKey[itemKey] = PixelSize(
             width = nextWidth,
             height = nextHeight
         )
     }
 
     private fun resolvedContentSize(item: NativeListItem): ResolvedPixelSize {
-        val measuredSize = measuredContentSizeByType[item.type]
+        val measuredSize = measuredContentSizeByItemKey[item.key]
         val width = item.width?.let { toPixels(it) } ?: measuredSize?.width
         val height = item.height?.let { toPixels(it) } ?: measuredSize?.height
 
@@ -214,6 +174,17 @@ internal class NativeListAdapter(
 
     private fun bindChildLayout(child: View, contentSize: ResolvedPixelSize) {
         val layoutParams = FrameLayout.LayoutParams(contentSize.width, contentSize.height)
+        child.layoutParams = layoutParams
+    }
+
+    private fun prepareChildLayoutForMeasurement(child: View, item: NativeListItem) {
+        if (item.width != null && item.height != null) {
+            return
+        }
+
+        val width = item.width?.let { toPixels(it) } ?: ViewGroup.LayoutParams.WRAP_CONTENT
+        val height = item.height?.let { toPixels(it) } ?: ViewGroup.LayoutParams.WRAP_CONTENT
+        val layoutParams = FrameLayout.LayoutParams(width, height)
         child.layoutParams = layoutParams
     }
 

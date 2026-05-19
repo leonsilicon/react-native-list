@@ -2,6 +2,7 @@ package com.margelo.nitro.reactnativelist
 
 import android.graphics.Color
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -68,7 +69,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             nativeDataSource.observer = this
             val nativeAdapter = ensureAdapter()
             nativeAdapter.dataSource = nativeDataSource
-            nativeAdapter.retainHostedContent(nativeDataSource)
+            nativeAdapter.retainMeasuredContent(nativeDataSource)
             nativeAdapter.notifyDataSetChanged()
         }
     }
@@ -87,7 +88,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             val nativeAdapter = ensureAdapter()
             val nativeDataSource = dataSource
             if (nativeDataSource != null) {
-                nativeAdapter.retainHostedContent(nativeDataSource)
+                nativeAdapter.retainMeasuredContent(nativeDataSource)
             }
 
             if (!animated || diffResult == null) {
@@ -108,11 +109,6 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     override fun dataSourceDidUpdate(index: Int, previousItem: NativeListItem) {
         runOnMain {
             val nativeAdapter = ensureAdapter()
-            val nativeDataSource = dataSource
-            val nextItem = nativeDataSource?.getItemAt(index)
-            if (nextItem == null || previousItem.key != nextItem.key) {
-                nativeAdapter.releaseHostedContent(previousItem.key)
-            }
             nativeAdapter.notifyItemChanged(index)
         }
     }
@@ -120,7 +116,6 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     override fun dataSourceDidRemove(index: Int, removedItem: NativeListItem) {
         runOnMain {
             val nativeAdapter = ensureAdapter()
-            nativeAdapter.releaseHostedContent(removedItem.key)
             nativeAdapter.notifyItemRemoved(index)
         }
     }

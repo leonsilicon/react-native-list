@@ -15,7 +15,7 @@ import { ExampleHeader } from "../components";
 import { styles } from "../styles";
 
 type DynamicTextItem = ListItem<
-  string,
+  typeof dynamicTextItemType,
   {
     title: string;
     body: string;
@@ -26,7 +26,6 @@ type DynamicTextItem = ListItem<
 >;
 
 type DynamicTextVariant = {
-  type: string;
   body: string;
   sentenceCount: number;
   accentColor: string;
@@ -37,6 +36,8 @@ type DynamicTextConfig = {
   rowCount: number;
   variantCount: number;
 };
+
+const dynamicTextItemType = "dynamic-text";
 
 const dynamicTextConfig: DynamicTextConfig = {
   rowCount: 10000,
@@ -118,7 +119,6 @@ function makeDynamicVariants(count: number): DynamicTextVariant[] {
     const colorIndex = index % dynamicRowColors.length;
     const accentIndex = index % dynamicAccentColors.length;
     const variant: DynamicTextVariant = {
-      type: "dynamic-text-variant-" + String(variantNumber),
       body: makeLorem(index, sentenceCount),
       sentenceCount,
       accentColor: dynamicAccentColors[accentIndex],
@@ -144,7 +144,7 @@ function makeDynamicRows(
     const key = "dynamic-text-" + String(rowNumber);
     const row: DynamicTextItem = {
       key,
-      type: variant.type,
+      type: dynamicTextItemType,
       data: {
         title: "Generated text row " + String(rowNumber),
         body: variant.body,
@@ -158,25 +158,6 @@ function makeDynamicRows(
   }
 
   return rows;
-}
-
-function makeFallbackItem(
-  variant: DynamicTextVariant,
-  index: number,
-): DynamicTextItem {
-  const variantNumber = index + 1;
-
-  return {
-    key: "dynamic-text-fallback-" + String(variantNumber),
-    type: variant.type,
-    data: {
-      title: "Generated text variant " + String(variantNumber),
-      body: variant.body,
-      sentenceCount: variant.sentenceCount,
-      accentColor: variant.accentColor,
-      backgroundColor: variant.backgroundColor,
-    },
-  };
 }
 
 function renderDynamicRow(
@@ -215,34 +196,31 @@ function renderDynamicRow(
 }
 
 function makeDynamicRenderers(
-  variants: readonly DynamicTextVariant[],
   contentWidth: number,
 ): ListRenderers<DynamicTextItem> {
-  const dynamicRenderers: ListRenderers<DynamicTextItem> = {};
-
-  variants.forEach((variant, index) => {
-    const fallbackItem = makeFallbackItem(variant, index);
-
-    dynamicRenderers[variant.type] = {
+  return {
+    [dynamicTextItemType]: {
       renderItemWorklet: ({ item }) => {
         "worklet";
 
-        const resolvedItem = item ?? fallbackItem;
-        return renderDynamicRow(resolvedItem, contentWidth);
+        if (item == null) {
+          return (
+            <View
+              style={{
+                width: contentWidth,
+              }}
+            />
+          );
+        }
+        return renderDynamicRow(item, contentWidth);
       },
-    };
-  });
-
-  return dynamicRenderers;
+    },
+  };
 }
 
-function makeDynamicContentEqualByType(
-  variants: readonly DynamicTextVariant[],
-): ListContentEqualByType<DynamicTextItem> {
-  const contentEqualByType: ListContentEqualByType<DynamicTextItem> = {};
-
-  variants.forEach((variant) => {
-    contentEqualByType[variant.type] = (oldItem, newItem) => {
+function makeDynamicContentEqualByType(): ListContentEqualByType<DynamicTextItem> {
+  return {
+    [dynamicTextItemType]: (oldItem, newItem) => {
       if (oldItem.data.title !== newItem.data.title) {
         return false;
       }
@@ -259,10 +237,8 @@ function makeDynamicContentEqualByType(
         return false;
       }
       return true;
-    };
-  });
-
-  return contentEqualByType;
+    },
+  };
 }
 
 function getContentWidth(windowWidth: number) {
@@ -289,11 +265,11 @@ export function DynamicTextHeightsExample(props: { onBack: () => void }) {
     return makeDynamicRows(dynamicTextConfig.rowCount, variants);
   }, [variants]);
   const renderersByType = useMemo(() => {
-    return makeDynamicRenderers(variants, contentWidth);
-  }, [contentWidth, variants]);
+    return makeDynamicRenderers(contentWidth);
+  }, [contentWidth]);
   const contentEqualByType = useMemo(() => {
-    return makeDynamicContentEqualByType(variants);
-  }, [variants]);
+    return makeDynamicContentEqualByType();
+  }, []);
   const dataSource = useMemo(() => {
     return createListDataSource<DynamicTextItem>({
       isContentEqualByType: contentEqualByType,

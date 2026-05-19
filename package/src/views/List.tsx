@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { Platform, View, ViewStyle } from 'react-native'
+import { View, ViewStyle } from 'react-native'
 import { callback, NitroModules } from 'react-native-nitro-modules'
 import {
   createShareable,
