@@ -18,22 +18,33 @@ public extension NativeLinearListLayoutConfig {
   /**
    * Create a new instance of `NativeLinearListLayoutConfig`.
    */
-  init(topInset: Double, bottomInset: Double, itemSpacing: Double) {
-    self.init(topInset, bottomInset, itemSpacing)
+  init(topInset: Double, bottomInset: Double, itemSpacing: Double, iosConfig: NativeLinearListLayoutIOSConfig?) {
+    self.init(topInset, bottomInset, itemSpacing, { () -> bridge.std__optional_NativeLinearListLayoutIOSConfig_ in
+      if let __unwrappedValue = iosConfig {
+        return bridge.create_std__optional_NativeLinearListLayoutIOSConfig_(__unwrappedValue)
+      } else {
+        return .init()
+      }
+    }())
   }
 
   @inline(__always)
   var topInset: Double {
     return self.__topInset
   }
-  
+
   @inline(__always)
   var bottomInset: Double {
     return self.__bottomInset
   }
-  
+
   @inline(__always)
   var itemSpacing: Double {
     return self.__itemSpacing
+  }
+
+  @inline(__always)
+  var iosConfig: NativeLinearListLayoutIOSConfig? {
+    return self.__iosConfig.value
   }
 }

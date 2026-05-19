@@ -14,10 +14,17 @@ namespace ReactNativeList { class HybridNativeLinearListLayoutSpec_cxx; }
 
 // Forward declaration of `NativeLinearListLayoutConfig` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutConfig; }
+// Forward declaration of `NativeLinearListLayoutIOSConfig` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutIOSConfig; }
+// Forward declaration of `NativeItemSizeEstimate` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeItemSizeEstimate; }
 // Forward declaration of `HybridNativeListLayoutSpecSwift` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { class HybridNativeListLayoutSpecSwift; }
 
 #include "NativeLinearListLayoutConfig.hpp"
+#include "NativeLinearListLayoutIOSConfig.hpp"
+#include <optional>
+#include "NativeItemSizeEstimate.hpp"
 #include "HybridNativeListLayoutSpecSwift.hpp"
 
 #include "ReactNativeList-Swift-Cxx-Umbrella.hpp"

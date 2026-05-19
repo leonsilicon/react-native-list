@@ -7,7 +7,6 @@
 [ ] - Create a "SyncRenderer" and a "SyncView", this will also help with debugging (to render just one view instead of a whole list!)
 [ ] - Do I want to use the ReactFiberConfig? (what do i mean by that?)
 [x] - Implement the main list API lol
-[ ] - I think fast refresh is crashing the app right now?
 [ ] - There was some react tag collision as we are reusing the same fabric ui manager … thats why i just started the tags from 1mil. Idk, seems dirty, and is potentially something we'd like to address in the future by running our own instance?
 [x] - Right now we need to pass a fixed size to the list (with height/width), lets get rid of that
 [x] - Changing item height back and forth breaks layout on iOS
@@ -16,6 +15,7 @@
 [x] - Android: you always have to interact with the UI once to render out the changes lol
 [x] - Android: content overflowing
 [x] - iOS: first content broken layout
+[ ] - Upgrade nitro to latest
 
 ## Base functionality (what users expect to just work)
 
@@ -29,6 +29,9 @@
 
 [ ] - Mosaic layout
 [ ] - An API to pull data in when rendering (see discussion i had with miguel)
+[ ] - An API that tells you how many recycles happened and how many views were created. If the user does not provide
+item sizes or just estimates, its possible that too many creates happen if the estimation is off on iOS! Could be paired
+with some other performance data.
 
 ## Performance
 

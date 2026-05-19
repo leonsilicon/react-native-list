@@ -28,9 +28,11 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `NativeLinearListLayoutIOSConfig` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutIOSConfig; }
 
-
-
+#include "NativeLinearListLayoutIOSConfig.hpp"
+#include <optional>
 
 namespace margelo::nitro::reactnativelist {
 
@@ -42,10 +44,11 @@ namespace margelo::nitro::reactnativelist {
     double topInset     SWIFT_PRIVATE;
     double bottomInset     SWIFT_PRIVATE;
     double itemSpacing     SWIFT_PRIVATE;
+    std::optional<NativeLinearListLayoutIOSConfig> iosConfig     SWIFT_PRIVATE;
 
   public:
     NativeLinearListLayoutConfig() = default;
-    explicit NativeLinearListLayoutConfig(double topInset, double bottomInset, double itemSpacing): topInset(topInset), bottomInset(bottomInset), itemSpacing(itemSpacing) {}
+    explicit NativeLinearListLayoutConfig(double topInset, double bottomInset, double itemSpacing, std::optional<NativeLinearListLayoutIOSConfig> iosConfig): topInset(topInset), bottomInset(bottomInset), itemSpacing(itemSpacing), iosConfig(iosConfig) {}
 
   public:
     friend bool operator==(const NativeLinearListLayoutConfig& lhs, const NativeLinearListLayoutConfig& rhs) = default;
@@ -63,7 +66,8 @@ namespace margelo::nitro {
       return margelo::nitro::reactnativelist::NativeLinearListLayoutConfig(
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "topInset"))),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "bottomInset"))),
-        JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing")))
+        JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing"))),
+        JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "iosConfig")))
       );
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::reactnativelist::NativeLinearListLayoutConfig& arg) {
@@ -71,6 +75,7 @@ namespace margelo::nitro {
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "topInset"), JSIConverter<double>::toJSI(runtime, arg.topInset));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "bottomInset"), JSIConverter<double>::toJSI(runtime, arg.bottomInset));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing"), JSIConverter<double>::toJSI(runtime, arg.itemSpacing));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "iosConfig"), JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::toJSI(runtime, arg.iosConfig));
       return obj;
     }
     static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
@@ -84,6 +89,7 @@ namespace margelo::nitro {
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "topInset")))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "bottomInset")))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing")))) return false;
+      if (!JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "iosConfig")))) return false;
       return true;
     }
   };

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
+import { Dimensions, Text, useWindowDimensions, View } from "react-native";
 import {
   createListDataSource,
   List,
@@ -280,6 +280,12 @@ export function DynamicTextHeightsExample(props: { onBack: () => void }) {
       topInset: 16,
       bottomInset: 24,
       itemSpacing: 12,
+      iosConfig: {
+        estimatedItemSize: {
+          // roughly two items in the viewport
+          height: Dimensions.get("window").height / 2,
+        },
+      },
     };
   }, []);
   const layout = useLinearListLayout(layoutConfig);

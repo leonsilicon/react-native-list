@@ -9,9 +9,18 @@
 
 // Forward declaration of `NativeLinearListLayoutConfig` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutConfig; }
+// Forward declaration of `NativeLinearListLayoutIOSConfig` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutIOSConfig; }
+// Forward declaration of `NativeItemSizeEstimate` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeItemSizeEstimate; }
 
 #include "NativeLinearListLayoutConfig.hpp"
 #include "JNativeLinearListLayoutConfig.hpp"
+#include "NativeLinearListLayoutIOSConfig.hpp"
+#include <optional>
+#include "JNativeLinearListLayoutIOSConfig.hpp"
+#include "NativeItemSizeEstimate.hpp"
+#include "JNativeItemSizeEstimate.hpp"
 
 namespace margelo::nitro::reactnativelist {
 

@@ -22,6 +22,10 @@ namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
 namespace margelo::nitro::reactnativelist { class HybridUiListViewSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { class HybridViewHolderSpec; }
+// Forward declaration of `NativeItemSizeEstimate` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeItemSizeEstimate; }
+// Forward declaration of `NativeLinearListLayoutIOSConfig` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutIOSConfig; }
 // Forward declaration of `NativeListItem` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { struct NativeListItem; }
 
@@ -49,6 +53,8 @@ namespace ReactNativeList { class HybridViewHolderSpec_cxx; }
 #include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
+#include "NativeItemSizeEstimate.hpp"
+#include "NativeLinearListLayoutIOSConfig.hpp"
 #include "NativeListItem.hpp"
 #include <NitroModules/AnyMap.hpp>
 #include <NitroModules/Null.hpp>
@@ -78,6 +84,51 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
   // pragma MARK: std::weak_ptr<HybridIOSWorkletsModuleProxyHolderSpec>
   using std__weak_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ = std::weak_ptr<HybridIOSWorkletsModuleProxyHolderSpec>;
   inline std__weak_ptr_HybridIOSWorkletsModuleProxyHolderSpec_ weakify_std__shared_ptr_HybridIOSWorkletsModuleProxyHolderSpec_(const std::shared_ptr<HybridIOSWorkletsModuleProxyHolderSpec>& strong) noexcept { return strong; }
+
+  // pragma MARK: std::optional<double>
+  /**
+   * Specialized version of `std::optional<double>`.
+   */
+  using std__optional_double_ = std::optional<double>;
+  inline std::optional<double> create_std__optional_double_(const double& value) noexcept {
+    return std::optional<double>(value);
+  }
+  inline bool has_value_std__optional_double_(const std::optional<double>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline double get_std__optional_double_(const std::optional<double>& optional) noexcept {
+    return optional.value();
+  }
+
+  // pragma MARK: std::optional<NativeItemSizeEstimate>
+  /**
+   * Specialized version of `std::optional<NativeItemSizeEstimate>`.
+   */
+  using std__optional_NativeItemSizeEstimate_ = std::optional<NativeItemSizeEstimate>;
+  inline std::optional<NativeItemSizeEstimate> create_std__optional_NativeItemSizeEstimate_(const NativeItemSizeEstimate& value) noexcept {
+    return std::optional<NativeItemSizeEstimate>(value);
+  }
+  inline bool has_value_std__optional_NativeItemSizeEstimate_(const std::optional<NativeItemSizeEstimate>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline NativeItemSizeEstimate get_std__optional_NativeItemSizeEstimate_(const std::optional<NativeItemSizeEstimate>& optional) noexcept {
+    return optional.value();
+  }
+
+  // pragma MARK: std::optional<NativeLinearListLayoutIOSConfig>
+  /**
+   * Specialized version of `std::optional<NativeLinearListLayoutIOSConfig>`.
+   */
+  using std__optional_NativeLinearListLayoutIOSConfig_ = std::optional<NativeLinearListLayoutIOSConfig>;
+  inline std::optional<NativeLinearListLayoutIOSConfig> create_std__optional_NativeLinearListLayoutIOSConfig_(const NativeLinearListLayoutIOSConfig& value) noexcept {
+    return std::optional<NativeLinearListLayoutIOSConfig>(value);
+  }
+  inline bool has_value_std__optional_NativeLinearListLayoutIOSConfig_(const std::optional<NativeLinearListLayoutIOSConfig>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline NativeLinearListLayoutIOSConfig get_std__optional_NativeLinearListLayoutIOSConfig_(const std::optional<NativeLinearListLayoutIOSConfig>& optional) noexcept {
+    return optional.value();
+  }
 
   // pragma MARK: std::shared_ptr<HybridNativeListLayoutSpec>
   /**
@@ -113,21 +164,6 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
   }
   inline Result_void_ create_Result_void_(const std::exception_ptr& error) noexcept {
     return Result<void>::withError(error);
-  }
-
-  // pragma MARK: std::optional<double>
-  /**
-   * Specialized version of `std::optional<double>`.
-   */
-  using std__optional_double_ = std::optional<double>;
-  inline std::optional<double> create_std__optional_double_(const double& value) noexcept {
-    return std::optional<double>(value);
-  }
-  inline bool has_value_std__optional_double_(const std::optional<double>& optional) noexcept {
-    return optional.has_value();
-  }
-  inline double get_std__optional_double_(const std::optional<double>& optional) noexcept {
-    return optional.value();
   }
 
   // pragma MARK: std::function<bool(const NativeListItem& /* oldItem */, const NativeListItem& /* newItem */)>

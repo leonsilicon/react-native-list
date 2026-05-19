@@ -21,7 +21,12 @@ export type {
   ListKey,
 } from './ListDataSource'
 export { createLinearListLayout, useLinearListLayout } from './ListLayout'
-export type { LinearListLayoutConfig, ListLayout } from './ListLayout'
+export type {
+  ItemSizeEstimate,
+  LinearListLayoutConfig,
+  LinearListLayoutIOSConfig,
+  ListLayout,
+} from './ListLayout'
 
 const boxed = uiListModule
 const nativeFabricUIManager = globalThis.nativeFabricUIManager

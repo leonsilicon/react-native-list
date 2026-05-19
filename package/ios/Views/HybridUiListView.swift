@@ -195,7 +195,11 @@ class HybridUiListView : HybridUiListViewSpec {
         } else if let measuredWidth = measuredSize?.width {
             width = measuredWidth
         } else {
-            width = estimatedContentWidth()
+            let collectionViewWidth = collectionView?.bounds.width ?? 0
+            width = layoutProvider.estimatedContentWidth(
+                collectionViewWidth: collectionViewWidth,
+                viewWidth: view.bounds.width
+            )
         }
 
         let height: CGFloat
@@ -204,7 +208,11 @@ class HybridUiListView : HybridUiListViewSpec {
         } else if let measuredHeight = measuredSize?.height {
             height = measuredHeight
         } else {
-            height = estimatedContentHeight()
+            let collectionViewHeight = collectionView?.bounds.height ?? 0
+            height = layoutProvider.estimatedContentHeight(
+                collectionViewHeight: collectionViewHeight,
+                viewHeight: view.bounds.height
+            )
         }
 
         return CGSize(width: width, height: height)
@@ -236,29 +244,6 @@ class HybridUiListView : HybridUiListViewSpec {
 
     private func needsMeasuredContentSize(for item: NativeListItem) -> Bool {
         return item.width == nil || item.height == nil
-    }
-
-    private func estimatedContentWidth() -> CGFloat {
-        let collectionWidth = collectionView?.bounds.width ?? view.bounds.width
-        let availableWidth = collectionWidth - HostCell.horizontalInset * 2
-        guard availableWidth.isFinite, availableWidth > 0 else {
-            return 1
-        }
-        return availableWidth
-    }
-
-    private func estimatedContentHeight() -> CGFloat {
-        let collectionHeight = collectionView?.bounds.height ?? view.bounds.height
-        if collectionHeight.isFinite && collectionHeight > 0 {
-            return collectionHeight / 2
-        }
-
-        let screenHeight = UIScreen.main.bounds.height
-        if screenHeight.isFinite && screenHeight > 0 {
-            return screenHeight / 2
-        }
-
-        return 120
     }
 
     private func ensureReuseRegistered(for type: String) {

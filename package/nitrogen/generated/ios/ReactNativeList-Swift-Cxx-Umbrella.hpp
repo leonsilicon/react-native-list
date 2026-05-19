@@ -22,8 +22,12 @@ namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
 namespace margelo::nitro::reactnativelist { class HybridUiListViewSpec; }
 // Forward declaration of `HybridViewHolderSpec` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { class HybridViewHolderSpec; }
+// Forward declaration of `NativeItemSizeEstimate` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeItemSizeEstimate; }
 // Forward declaration of `NativeLinearListLayoutConfig` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutConfig; }
+// Forward declaration of `NativeLinearListLayoutIOSConfig` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeLinearListLayoutIOSConfig; }
 // Forward declaration of `NativeListItem` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { struct NativeListItem; }
 
@@ -35,7 +39,9 @@ namespace margelo::nitro::reactnativelist { struct NativeListItem; }
 #include "HybridUiListModuleSpec.hpp"
 #include "HybridUiListViewSpec.hpp"
 #include "HybridViewHolderSpec.hpp"
+#include "NativeItemSizeEstimate.hpp"
 #include "NativeLinearListLayoutConfig.hpp"
+#include "NativeLinearListLayoutIOSConfig.hpp"
 #include "NativeListItem.hpp"
 #include <NitroModules/AnyMap.hpp>
 #include <NitroModules/Null.hpp>

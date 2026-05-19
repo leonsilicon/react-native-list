@@ -6,7 +6,28 @@ import type {
   NativeLinearListLayoutConfig,
 } from './specs/NativeLinearListLayout.nitro'
 
-export type LinearListLayoutConfig = Partial<NativeLinearListLayoutConfig>
+type LinearListLayoutBaseConfig = Omit<
+  Partial<NativeLinearListLayoutConfig>,
+  'iosConfig'
+>
+
+export type ItemSizeEstimate =
+  | {
+      width: number
+      height?: number
+    }
+  | {
+      width?: number
+      height: number
+    }
+
+export type LinearListLayoutIOSConfig = {
+  estimatedItemSize?: ItemSizeEstimate
+}
+
+export type LinearListLayoutConfig = LinearListLayoutBaseConfig & {
+  iosConfig?: LinearListLayoutIOSConfig
+}
 
 export type ListLayout = {
   __nativeLayout: NativeListLayout
@@ -27,6 +48,7 @@ function normalizeLinearConfig(
       config.bottomInset ?? defaultLinearListLayoutConfig.bottomInset,
     itemSpacing:
       config.itemSpacing ?? defaultLinearListLayoutConfig.itemSpacing,
+    iosConfig: config.iosConfig,
   }
 }
 

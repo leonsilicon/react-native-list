@@ -10,7 +10,11 @@
 #include <fbjni/fbjni.h>
 #include "NativeLinearListLayoutConfig.hpp"
 
-
+#include "JNativeItemSizeEstimate.hpp"
+#include "JNativeLinearListLayoutIOSConfig.hpp"
+#include "NativeItemSizeEstimate.hpp"
+#include "NativeLinearListLayoutIOSConfig.hpp"
+#include <optional>
 
 namespace margelo::nitro::reactnativelist {
 
@@ -37,10 +41,13 @@ namespace margelo::nitro::reactnativelist {
       double bottomInset = this->getFieldValue(fieldBottomInset);
       static const auto fieldItemSpacing = clazz->getField<double>("itemSpacing");
       double itemSpacing = this->getFieldValue(fieldItemSpacing);
+      static const auto fieldIosConfig = clazz->getField<JNativeLinearListLayoutIOSConfig>("iosConfig");
+      jni::local_ref<JNativeLinearListLayoutIOSConfig> iosConfig = this->getFieldValue(fieldIosConfig);
       return NativeLinearListLayoutConfig(
         topInset,
         bottomInset,
-        itemSpacing
+        itemSpacing,
+        iosConfig != nullptr ? std::make_optional(iosConfig->toCpp()) : std::nullopt
       );
     }
 
@@ -50,14 +57,15 @@ namespace margelo::nitro::reactnativelist {
      */
     [[maybe_unused]]
     static jni::local_ref<JNativeLinearListLayoutConfig::javaobject> fromCpp(const NativeLinearListLayoutConfig& value) {
-      using JSignature = JNativeLinearListLayoutConfig(double, double, double);
+      using JSignature = JNativeLinearListLayoutConfig(double, double, double, jni::alias_ref<JNativeLinearListLayoutIOSConfig>);
       static const auto clazz = javaClassStatic();
       static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
       return create(
         clazz,
         value.topInset,
         value.bottomInset,
-        value.itemSpacing
+        value.itemSpacing,
+        value.iosConfig.has_value() ? JNativeLinearListLayoutIOSConfig::fromCpp(value.iosConfig.value()) : nullptr
       );
     }
   };
