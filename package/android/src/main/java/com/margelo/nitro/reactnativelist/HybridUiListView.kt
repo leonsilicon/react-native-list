@@ -24,11 +24,11 @@ typealias UpdateViewCallbackType = (
 class HybridUiListView(val reactContext: ThemedReactContext) :
     HybridUiListViewSpec(),
     NativeListDataSourceObserver {
-
     private var createViewCallback: CreateViewCallbackType? = null
     private var updateViewCallback: UpdateViewCallbackType? = null
     private var adapter: NativeListAdapter? = null
     private var dataSource: HybridNativeListDataSource? = null
+    private var isRecyclerViewLayoutScheduled = false
 
     override val view: RecyclerView by lazy {
         RecyclerView(reactContext).apply {
@@ -71,6 +71,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             nativeAdapter.dataSource = nativeDataSource
             nativeAdapter.retainMeasuredContent(nativeDataSource)
             nativeAdapter.notifyDataSetChanged()
+            scheduleRecyclerViewLayout()
         }
     }
 
@@ -80,6 +81,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
 
         runOnMain {
             layoutProvider.applyTo(view, reactContext)
+            scheduleRecyclerViewLayout()
         }
     }
 
@@ -93,16 +95,20 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
 
             if (!animated || diffResult == null) {
                 nativeAdapter.notifyDataSetChanged()
+                scheduleRecyclerViewLayout()
                 return@runOnMain
             }
 
             diffResult.dispatchUpdatesTo(nativeAdapter)
+            scheduleRecyclerViewLayout()
         }
     }
 
     override fun dataSourceDidInsert(index: Int) {
         runOnMain {
-            ensureAdapter().notifyItemInserted(index)
+            val nativeAdapter = ensureAdapter()
+            nativeAdapter.notifyItemInserted(index)
+            scheduleRecyclerViewLayout()
         }
     }
 
@@ -110,6 +116,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
         runOnMain {
             val nativeAdapter = ensureAdapter()
             nativeAdapter.notifyItemChanged(index)
+            scheduleRecyclerViewLayout()
         }
     }
 
@@ -117,12 +124,15 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
         runOnMain {
             val nativeAdapter = ensureAdapter()
             nativeAdapter.notifyItemRemoved(index)
+            scheduleRecyclerViewLayout()
         }
     }
 
     override fun dataSourceDidMove(fromIndex: Int, toIndex: Int) {
         runOnMain {
-            ensureAdapter().notifyItemMoved(fromIndex, toIndex)
+            val nativeAdapter = ensureAdapter()
+            nativeAdapter.notifyItemMoved(fromIndex, toIndex)
+            scheduleRecyclerViewLayout()
         }
     }
 
@@ -172,6 +182,34 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
         parent.addView(View(reactContext), childIndex)
 
         return resolvedView
+    }
+
+    private fun scheduleRecyclerViewLayout() {
+        if (isRecyclerViewLayoutScheduled) {
+            return
+        }
+
+        isRecyclerViewLayoutScheduled = true
+        view.post {
+            isRecyclerViewLayoutScheduled = false
+            performRecyclerViewLayoutIfReady()
+        }
+    }
+
+    private fun performRecyclerViewLayoutIfReady() {
+        val viewWidth = view.width
+        val viewHeight = view.height
+        if (!view.isAttachedToWindow || viewWidth <= 0 || viewHeight <= 0) {
+            return
+        }
+
+        // React Native has already assigned bounds, but RecyclerView requestLayout()
+        // is not always traversed from this Fabric-hosted view. Drive RecyclerView's
+        // pending adapter updates with the current RN layout.
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(viewWidth, View.MeasureSpec.EXACTLY)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(viewHeight, View.MeasureSpec.EXACTLY)
+        view.measure(widthSpec, heightSpec)
+        view.layout(view.left, view.top, view.right, view.bottom)
     }
 
     private fun runOnMain(block: () -> Unit) {
