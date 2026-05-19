@@ -12,26 +12,8 @@ final class HostCell: UICollectionViewCell {
     var reactTag: Int?
     var itemKey: String?
     var itemType: String?
-    var hasHostedView: Bool {
-        return hostedView != nil
-    }
     var hostedContentView: UIView? {
         return hostedView
-    }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        print("[UserDebug] create HostCell cell=\(debugIdentifier)")
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        print("[UserDebug] create HostCell cell=\(debugIdentifier)")
-    }
-
-    var debugIdentifier: String {
-        let objectIdentifier = ObjectIdentifier(self)
-        return String(describing: objectIdentifier)
     }
 
     func install(view: UIView, contentSize: CGSize, itemKey: String, itemType: String) {
@@ -50,14 +32,6 @@ final class HostCell: UICollectionViewCell {
         self.itemKey = itemKey
         self.itemType = itemType
 
-        let viewIdentifier = ObjectIdentifier(view)
-        let viewDebugIdentifier = String(describing: viewIdentifier)
-        print(
-            "[UserDebug] install hosted view cell=\(debugIdentifier) " +
-            "itemKey=\(itemKey) type=\(itemType) view=\(viewDebugIdentifier) " +
-            "contentSize=\(contentSize.width)x\(contentSize.height)"
-        )
-
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
 
@@ -75,19 +49,6 @@ final class HostCell: UICollectionViewCell {
     }
 
     func bind(itemKey: String) {
-        let previousKey = self.itemKey ?? "<nil>"
-        let previousType = itemType ?? "<nil>"
-        let reactTagDescription: String
-        if let reactTag {
-            reactTagDescription = String(reactTag)
-        } else {
-            reactTagDescription = "<nil>"
-        }
-        print(
-            "[UserDebug] rebind HostCell cell=\(debugIdentifier) " +
-            "previousKey=\(previousKey) nextKey=\(itemKey) type=\(previousType) " +
-            "reactTag=\(reactTagDescription)"
-        )
         self.itemKey = itemKey
     }
 
@@ -126,19 +87,6 @@ final class HostCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        let previousKey = itemKey ?? "<nil>"
-        let previousType = itemType ?? "<nil>"
-        let reactTagDescription: String
-        if let reactTag {
-            reactTagDescription = String(reactTag)
-        } else {
-            reactTagDescription = "<nil>"
-        }
-        print(
-            "[UserDebug] prepareForReuse HostCell cell=\(debugIdentifier) " +
-            "previousKey=\(previousKey) type=\(previousType) " +
-            "hasHostedView=\(hasHostedView) reactTag=\(reactTagDescription)"
-        )
         itemKey = nil
         if let hostedView {
             contentView.bringSubviewToFront(hostedView)

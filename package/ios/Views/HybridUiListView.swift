@@ -65,12 +65,6 @@ final class CollectionViewDelegateProxy: NSObject, UICollectionViewDelegateFlowL
 }
 
 class HybridUiListView : HybridUiListViewSpec {
-    private enum SizeResolutionSource: String {
-        case explicit
-        case measured
-        case fallback
-    }
-
     let view: UIView
 
     private var collectionView: UICollectionView?
@@ -81,7 +75,6 @@ class HybridUiListView : HybridUiListViewSpec {
     private var registeredReuseIdentifiers = Set<String>()
     private var measuredContentSizeByItemKey: [String: CGSize] = [:]
     private var hasScheduledLayoutInvalidation = false
-    private var flowLayoutSizeQueryCount = 0
     private let measuredSizeTolerance: CGFloat = 0.5
 
     private var createViewCallback: ((_ type: String) -> Double)?
@@ -166,33 +159,16 @@ class HybridUiListView : HybridUiListViewSpec {
             throw RuntimeError.error(withMessage: "Can only call makeView after setListCallbacks.")
         }
 
-        let startTime = CACurrentMediaTime()
-        print("[UserDebug] makeView start type=\(type)")
-        let callbackStartTime = CACurrentMediaTime()
         let rawViewTag = createViewCallback(type)
-        let callbackDuration = (CACurrentMediaTime() - callbackStartTime) * 1000
         let viewTag = ReactTag(rawViewTag)
-
-        let resolveStartTime = CACurrentMediaTime()
         let resolvedView = try SurfaceHelper.getViewByTag(viewTag)
-        let resolveDuration = (CACurrentMediaTime() - resolveStartTime) * 1000
-
-        let viewIdentifier = ObjectIdentifier(resolvedView)
-        let viewDebugIdentifier = String(describing: viewIdentifier)
-        let totalDuration = (CACurrentMediaTime() - startTime) * 1000
-        print(
-            "[UserDebug] makeView callback returned type=\(type) " +
-            "viewTag=\(viewTag) view=\(viewDebugIdentifier) " +
-            "callbackMs=\(callbackDuration) resolveMs=\(resolveDuration) " +
-            "totalMs=\(totalDuration)"
-        )
         resolvedView.removeFromSuperview()
         return (resolvedView, viewTag)
     }
 
     private func measure(view: UIView) -> CGSize? {
         // Fabric has already applied layout metrics after updateView returns.
-        // Asking UIKit Auto Layout to resolve this root (e.g. using setNeedsLayout&layoutIfNeeded) can collapse it back to zero!
+        // Asking UIKit Auto Layout to resolve this root can collapse it back to zero.
         let measuredWidth = [view.bounds.width, view.frame.width]
             .filter { $0.isFinite && $0 > 0 }
             .max()
@@ -206,66 +182,36 @@ class HybridUiListView : HybridUiListViewSpec {
         return CGSize(width: measuredWidth, height: measuredHeight)
     }
 
-    private func describeImmediateSubviews(of view: UIView) -> String {
-        guard !view.subviews.isEmpty else {
-            return "[]"
-        }
-
-        let descriptions = view.subviews.prefix(8).map { subview in
-            let type = String(describing: type(of: subview))
-            return "\(type):frame=\(subview.frame):bounds=\(subview.bounds)"
-        }
-        return descriptions.joined(separator: " | ")
-    }
-
-    private func resolvedContentSizeDetails(
-        for item: NativeListItem
-    ) -> (size: CGSize, widthSource: SizeResolutionSource, heightSource: SizeResolutionSource) {
+    private func resolvedContentSize(for item: NativeListItem) -> CGSize {
         let measuredSize = measuredContentSizeByItemKey[item.key]
 
+        // UICollectionViewFlowLayout asks for item sizes before cells are created.
+        // If JS did not provide a dimension and this item has not been measured yet,
+        // use a viewport-based estimate for the first pass. Once cellForItemAt binds
+        // real content, we measure the Fabric-applied frame and future queries use it.
         let width: CGFloat
-        let widthSource: SizeResolutionSource
         if let itemWidth = item.width {
             width = CGFloat(itemWidth)
-            widthSource = .explicit
         } else if let measuredWidth = measuredSize?.width {
             width = measuredWidth
-            widthSource = .measured
         } else {
             width = estimatedContentWidth()
-            widthSource = .fallback
         }
 
         let height: CGFloat
-        let heightSource: SizeResolutionSource
         if let itemHeight = item.height {
             height = CGFloat(itemHeight)
-            heightSource = .explicit
         } else if let measuredHeight = measuredSize?.height {
             height = measuredHeight
-            heightSource = .measured
         } else {
             height = estimatedContentHeight()
-            heightSource = .fallback
         }
 
-        let size = CGSize(width: width, height: height)
-        return (size: size, widthSource: widthSource, heightSource: heightSource)
-    }
-
-    private func resolvedContentSize(for item: NativeListItem) -> CGSize {
-        let details = resolvedContentSizeDetails(for: item)
-        return details.size
+        return CGSize(width: width, height: height)
     }
 
     private func captureMeasuredContentSize(for item: NativeListItem, view: UIView) -> Bool {
         guard let measuredSize = measure(view: view) else {
-            let subviewDescription = describeImmediateSubviews(of: view)
-            print(
-                "[UserDebug] measure content failed itemKey=\(item.key) " +
-                "type=\(item.type) bounds=\(view.bounds) frame=\(view.frame) " +
-                "subviews=\(subviewDescription)"
-            )
             return false
         }
 
@@ -273,12 +219,6 @@ class HybridUiListView : HybridUiListViewSpec {
         let height = item.height.map { CGFloat($0) } ?? measuredSize.height
         let nextSize = CGSize(width: width, height: height)
         let previousSize = measuredContentSizeByItemKey[item.key]
-        let previousSizeDescription: String
-        if let previousSize {
-            previousSizeDescription = "\(previousSize.width)x\(previousSize.height)"
-        } else {
-            previousSizeDescription = "<nil>"
-        }
 
         if let previousSize {
             let widthDelta = abs(previousSize.width - nextSize.width)
@@ -286,23 +226,11 @@ class HybridUiListView : HybridUiListViewSpec {
             // Fabric can report tiny fractional differences for the same rendered row.
             // Ignoring sub-point churn avoids full layout invalidations for visual no-ops.
             if widthDelta < measuredSizeTolerance && heightDelta < measuredSizeTolerance {
-                print(
-                    "[UserDebug] measure content unchanged itemKey=\(item.key) " +
-                    "type=\(item.type) measured=\(measuredSize.width)x\(measuredSize.height) " +
-                    "previous=\(previousSizeDescription) next=\(nextSize.width)x\(nextSize.height) " +
-                    "bounds=\(view.bounds) frame=\(view.frame)"
-                )
                 return false
             }
         }
 
         measuredContentSizeByItemKey[item.key] = nextSize
-        print(
-            "[UserDebug] measure content changed itemKey=\(item.key) " +
-            "type=\(item.type) measured=\(measuredSize.width)x\(measuredSize.height) " +
-            "previous=\(previousSizeDescription) next=\(nextSize.width)x\(nextSize.height) " +
-            "bounds=\(view.bounds) frame=\(view.frame)"
-        )
         return true
     }
 
@@ -357,27 +285,11 @@ class HybridUiListView : HybridUiListViewSpec {
                         "to item type '\(item.type)'."
                 )
             }
-            let previousKey = cell.itemKey ?? "<nil>"
-            let reactTagDescription: String
-            if let reactTag = cell.reactTag {
-                reactTagDescription = String(reactTag)
-            } else {
-                reactTagDescription = "<nil>"
-            }
-            print(
-                "[UserDebug] reuse hosted view cell=\(cell.debugIdentifier) " +
-                "previousKey=\(previousKey) nextKey=\(item.key) " +
-                "type=\(item.type) reactTag=\(reactTagDescription)"
-            )
             cell.bind(itemKey: item.key)
             cell.updateContentSize(contentSize)
             return
         }
 
-        print(
-            "[UserDebug] create hosted view cell=\(cell.debugIdentifier) " +
-            "itemKey=\(item.key) type=\(item.type)"
-        )
         let result = try makeView(type: item.type)
         cell.install(
             view: result.0,
@@ -406,19 +318,18 @@ class HybridUiListView : HybridUiListViewSpec {
         }
     }
 
-    private func scheduleLayoutInvalidation(reason: String) {
+    private func scheduleLayoutInvalidation() {
         if hasScheduledLayoutInvalidation {
-            print("[UserDebug] coalesce layout invalidation reason=\(reason)")
             return
         }
 
         hasScheduledLayoutInvalidation = true
-        print("[UserDebug] schedule layout invalidation reason=\(reason)")
 
+        // Perf optimization: Several visible cells can discover their real size in the same UI tick.
+        // Coalesce those updates so FlowLayout only recalculates once.
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.hasScheduledLayoutInvalidation = false
-            print("[UserDebug] run scheduled layout invalidation")
             self.collectionView?.collectionViewLayout.invalidateLayout()
         }
     }
@@ -452,116 +363,53 @@ class HybridUiListView : HybridUiListViewSpec {
         }
 
         let item = dataSource.item(at: indexPath.item)
-        let contentSizeDetails = resolvedContentSizeDetails(for: item)
-        let size = layoutProvider.layoutSize(contentSize: contentSizeDetails.size)
-        flowLayoutSizeQueryCount += 1
-
-        let shouldLogEarlyQuery = flowLayoutSizeQueryCount <= 20
-        let shouldLogPeriodicQuery = flowLayoutSizeQueryCount % 250 == 0
-        if shouldLogEarlyQuery || shouldLogPeriodicQuery {
-            print(
-                "[UserDebug] flow layout size query count=\(flowLayoutSizeQueryCount) " +
-                "index=\(indexPath.item) itemKey=\(item.key) " +
-                "widthSource=\(contentSizeDetails.widthSource.rawValue) " +
-                "heightSource=\(contentSizeDetails.heightSource.rawValue) " +
-                "contentSize=\(contentSizeDetails.size.width)x\(contentSizeDetails.size.height) " +
-                "layoutSize=\(size.width)x\(size.height)"
-            )
-        }
-
-        return size
+        let contentSize = resolvedContentSize(for: item)
+        return layoutProvider.layoutSize(contentSize: contentSize)
     }
 
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let totalStartTime = CACurrentMediaTime()
         guard let dataSource else {
             return UICollectionViewCell()
         }
 
-        let itemLookupStartTime = CACurrentMediaTime()
         let item = dataSource.item(at: indexPath.item)
-        let itemLookupDuration = (CACurrentMediaTime() - itemLookupStartTime) * 1000
-
         let reuseIdentifier = reuseIdentifier(for: item)
         ensureReuseRegistered(for: reuseIdentifier)
 
-        let dequeueStartTime = CACurrentMediaTime()
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: reuseIdentifier,
             for: indexPath
         ) as! HostCell
-        let dequeueDuration = (CACurrentMediaTime() - dequeueStartTime) * 1000
-
-        let reactTagDescription: String
-        if let reactTag = cell.reactTag {
-            reactTagDescription = String(reactTag)
-        } else {
-            reactTagDescription = "<nil>"
-        }
-        print(
-            "[UserDebug] dequeue HostCell index=\(indexPath.item) " +
-            "itemKey=\(item.key) type=\(item.type) cell=\(cell.debugIdentifier) " +
-            "hasHostedView=\(cell.hasHostedView) reactTag=\(reactTagDescription)"
-        )
 
         let contentSize = resolvedContentSize(for: item)
 
-        let installStartTime = CACurrentMediaTime()
         do {
             try installHostedContent(in: cell, item: item, contentSize: contentSize)
         } catch {
             print("Failed to create list item view: \(error)")
         }
-        let installDuration = (CACurrentMediaTime() - installStartTime) * 1000
 
-        var prepareDuration = 0.0
-        var updateViewDuration = 0.0
         if let reactTag = cell.reactTag {
             let width = resolvedContentSize(for: item).width
             let height = item.height.map { CGFloat($0) }
 
-            let prepareStartTime = CACurrentMediaTime()
             cell.prepareForMeasurement(width: width, height: height)
-            prepareDuration = (CACurrentMediaTime() - prepareStartTime) * 1000
 
-            let updateViewStartTime = CACurrentMediaTime()
             _ = updateViewCallback?(Double(reactTag), item, Double(indexPath.item))
-            updateViewDuration = (CACurrentMediaTime() - updateViewStartTime) * 1000
         }
 
-        var measureDuration = 0.0
-        var updateContentSizeDuration = 0.0
         if let hostedView = cell.hostedContentView, needsMeasuredContentSize(for: item) {
-            let measureStartTime = CACurrentMediaTime()
             let didMeasureNewSize = captureMeasuredContentSize(for: item, view: hostedView)
-            measureDuration = (CACurrentMediaTime() - measureStartTime) * 1000
             let measuredContentSize = resolvedContentSize(for: item)
-
-            let updateContentSizeStartTime = CACurrentMediaTime()
             cell.updateContentSize(measuredContentSize)
-            updateContentSizeDuration = (CACurrentMediaTime() - updateContentSizeStartTime) * 1000
 
             if didMeasureNewSize {
-                print(
-                    "[UserDebug] invalidate layout measured itemKey=\(item.key) " +
-                    "index=\(indexPath.item) measuredSize=\(measuredContentSize.width)x\(measuredContentSize.height)"
-                )
-                scheduleLayoutInvalidation(reason: "measured")
+                scheduleLayoutInvalidation()
             }
         }
-
-        let totalDuration = (CACurrentMediaTime() - totalStartTime) * 1000
-        print(
-            "[UserDebug] cellForItemAt timing index=\(indexPath.item) " +
-            "itemKey=\(item.key) itemLookupMs=\(itemLookupDuration) " +
-            "dequeueMs=\(dequeueDuration) installMs=\(installDuration) " +
-            "prepareMs=\(prepareDuration) updateViewMs=\(updateViewDuration) " +
-            "measureMs=\(measureDuration) updateContentSizeMs=\(updateContentSizeDuration) " +
-            "totalMs=\(totalDuration)"
-        )
 
         return cell
     }
