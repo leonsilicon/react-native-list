@@ -91,12 +91,9 @@ final class HostCell: UICollectionViewCell {
         self.itemKey = itemKey
     }
 
-    func prepareForMeasurement(width: CGFloat?, height: CGFloat?) {
-        if let width {
-            setWidthConstraint(width)
-        } else {
-            deactivateWidthConstraint()
-        }
+    func prepareForMeasurement(width: CGFloat, height: CGFloat?) {
+        // Text-like rows need a concrete width to wrap before we can measure natural height.
+        setWidthConstraint(width)
 
         if let height {
             setHeightConstraint(height)

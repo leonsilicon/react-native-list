@@ -65,6 +65,12 @@ final class CollectionViewDelegateProxy: NSObject, UICollectionViewDelegateFlowL
 }
 
 class HybridUiListView : HybridUiListViewSpec {
+    private enum SizeResolutionSource: String {
+        case explicit
+        case measured
+        case fallback
+    }
+
     let view: UIView
 
     private var collectionView: UICollectionView?
@@ -185,9 +191,8 @@ class HybridUiListView : HybridUiListViewSpec {
     }
 
     private func measure(view: UIView) -> CGSize? {
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-
+        // Fabric has already applied layout metrics after updateView returns.
+        // Asking UIKit Auto Layout to resolve this root (e.g. using setNeedsLayout&layoutIfNeeded) can collapse it back to zero!
         let measuredWidth = [view.bounds.width, view.frame.width]
             .filter { $0.isFinite && $0 > 0 }
             .max()
@@ -201,16 +206,66 @@ class HybridUiListView : HybridUiListViewSpec {
         return CGSize(width: measuredWidth, height: measuredHeight)
     }
 
-    private func resolvedContentSize(for item: NativeListItem) -> CGSize {
-        let measuredSize = measuredContentSizeByItemKey[item.key]
-        let width = item.width.map { CGFloat($0) } ?? measuredSize?.width ?? estimatedContentWidth()
-        let height = item.height.map { CGFloat($0) } ?? measuredSize?.height ?? estimatedContentHeight()
+    private func describeImmediateSubviews(of view: UIView) -> String {
+        guard !view.subviews.isEmpty else {
+            return "[]"
+        }
 
-        return CGSize(width: width, height: height)
+        let descriptions = view.subviews.prefix(8).map { subview in
+            let type = String(describing: type(of: subview))
+            return "\(type):frame=\(subview.frame):bounds=\(subview.bounds)"
+        }
+        return descriptions.joined(separator: " | ")
+    }
+
+    private func resolvedContentSizeDetails(
+        for item: NativeListItem
+    ) -> (size: CGSize, widthSource: SizeResolutionSource, heightSource: SizeResolutionSource) {
+        let measuredSize = measuredContentSizeByItemKey[item.key]
+
+        let width: CGFloat
+        let widthSource: SizeResolutionSource
+        if let itemWidth = item.width {
+            width = CGFloat(itemWidth)
+            widthSource = .explicit
+        } else if let measuredWidth = measuredSize?.width {
+            width = measuredWidth
+            widthSource = .measured
+        } else {
+            width = estimatedContentWidth()
+            widthSource = .fallback
+        }
+
+        let height: CGFloat
+        let heightSource: SizeResolutionSource
+        if let itemHeight = item.height {
+            height = CGFloat(itemHeight)
+            heightSource = .explicit
+        } else if let measuredHeight = measuredSize?.height {
+            height = measuredHeight
+            heightSource = .measured
+        } else {
+            height = estimatedContentHeight()
+            heightSource = .fallback
+        }
+
+        let size = CGSize(width: width, height: height)
+        return (size: size, widthSource: widthSource, heightSource: heightSource)
+    }
+
+    private func resolvedContentSize(for item: NativeListItem) -> CGSize {
+        let details = resolvedContentSizeDetails(for: item)
+        return details.size
     }
 
     private func captureMeasuredContentSize(for item: NativeListItem, view: UIView) -> Bool {
         guard let measuredSize = measure(view: view) else {
+            let subviewDescription = describeImmediateSubviews(of: view)
+            print(
+                "[UserDebug] measure content failed itemKey=\(item.key) " +
+                "type=\(item.type) bounds=\(view.bounds) frame=\(view.frame) " +
+                "subviews=\(subviewDescription)"
+            )
             return false
         }
 
@@ -218,6 +273,12 @@ class HybridUiListView : HybridUiListViewSpec {
         let height = item.height.map { CGFloat($0) } ?? measuredSize.height
         let nextSize = CGSize(width: width, height: height)
         let previousSize = measuredContentSizeByItemKey[item.key]
+        let previousSizeDescription: String
+        if let previousSize {
+            previousSizeDescription = "\(previousSize.width)x\(previousSize.height)"
+        } else {
+            previousSizeDescription = "<nil>"
+        }
 
         if let previousSize {
             let widthDelta = abs(previousSize.width - nextSize.width)
@@ -225,11 +286,23 @@ class HybridUiListView : HybridUiListViewSpec {
             // Fabric can report tiny fractional differences for the same rendered row.
             // Ignoring sub-point churn avoids full layout invalidations for visual no-ops.
             if widthDelta < measuredSizeTolerance && heightDelta < measuredSizeTolerance {
+                print(
+                    "[UserDebug] measure content unchanged itemKey=\(item.key) " +
+                    "type=\(item.type) measured=\(measuredSize.width)x\(measuredSize.height) " +
+                    "previous=\(previousSizeDescription) next=\(nextSize.width)x\(nextSize.height) " +
+                    "bounds=\(view.bounds) frame=\(view.frame)"
+                )
                 return false
             }
         }
 
         measuredContentSizeByItemKey[item.key] = nextSize
+        print(
+            "[UserDebug] measure content changed itemKey=\(item.key) " +
+            "type=\(item.type) measured=\(measuredSize.width)x\(measuredSize.height) " +
+            "previous=\(previousSizeDescription) next=\(nextSize.width)x\(nextSize.height) " +
+            "bounds=\(view.bounds) frame=\(view.frame)"
+        )
         return true
     }
 
@@ -374,7 +447,13 @@ class HybridUiListView : HybridUiListViewSpec {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        let size = layoutSizeForItem(at: indexPath.item)
+        guard let dataSource else {
+            return .zero
+        }
+
+        let item = dataSource.item(at: indexPath.item)
+        let contentSizeDetails = resolvedContentSizeDetails(for: item)
+        let size = layoutProvider.layoutSize(contentSize: contentSizeDetails.size)
         flowLayoutSizeQueryCount += 1
 
         let shouldLogEarlyQuery = flowLayoutSizeQueryCount <= 20
@@ -382,7 +461,11 @@ class HybridUiListView : HybridUiListViewSpec {
         if shouldLogEarlyQuery || shouldLogPeriodicQuery {
             print(
                 "[UserDebug] flow layout size query count=\(flowLayoutSizeQueryCount) " +
-                "index=\(indexPath.item) size=\(size.width)x\(size.height)"
+                "index=\(indexPath.item) itemKey=\(item.key) " +
+                "widthSource=\(contentSizeDetails.widthSource.rawValue) " +
+                "heightSource=\(contentSizeDetails.heightSource.rawValue) " +
+                "contentSize=\(contentSizeDetails.size.width)x\(contentSizeDetails.size.height) " +
+                "layoutSize=\(size.width)x\(size.height)"
             )
         }
 
@@ -437,7 +520,7 @@ class HybridUiListView : HybridUiListViewSpec {
         var prepareDuration = 0.0
         var updateViewDuration = 0.0
         if let reactTag = cell.reactTag {
-            let width = item.width.map { CGFloat($0) }
+            let width = resolvedContentSize(for: item).width
             let height = item.height.map { CGFloat($0) }
 
             let prepareStartTime = CACurrentMediaTime()

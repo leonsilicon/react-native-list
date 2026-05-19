@@ -15,12 +15,13 @@
 [ ] - ios: rendering one list, and then a second one crashes the app - i assume react key collision
 [x] - Android: you always have to interact with the UI once to render out the changes lol
 [x] - Android: content overflowing
-[ ] - iOS: first content broken layout
+[x] - iOS: first content broken layout
 
 ## Base functionality (what users expect to just work)
 
 [x] - Try pressability stuff (even emitter - i think that should just work tbh, at least the emitting part)
 [x] - Do I have to implement getPublicInstance so people can work with refs as expected?
+[ ] - Vertical/Horizontal support?
 [ ] - RNGH / reanimated (i guess?)
 [ ] - When trying to use RNGH it says: Error: GestureDetector must be used as a descendant of GestureHandlerRootView. Otherwise the gestures will not be recognized. - The problem is that they render a react context to check for the gesture detector - Either i need to add WrapperComponent prop support (i think i still have to do this) - But there might be other more severe issues with running RNGH
 
