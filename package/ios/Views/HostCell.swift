@@ -11,11 +11,30 @@ final class HostCell: UICollectionViewCell {
 
     var reactTag: Int?
     var itemKey: String?
+    var itemType: String?
     var hasHostedView: Bool {
         return hostedView != nil
     }
+    var hostedContentView: UIView? {
+        return hostedView
+    }
 
-    func install(view: UIView, contentSize: CGSize, itemKey: String) {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        print("[UserDebug] create HostCell cell=\(debugIdentifier)")
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        print("[UserDebug] create HostCell cell=\(debugIdentifier)")
+    }
+
+    var debugIdentifier: String {
+        let objectIdentifier = ObjectIdentifier(self)
+        return String(describing: objectIdentifier)
+    }
+
+    func install(view: UIView, contentSize: CGSize, itemKey: String, itemType: String) {
         if let currentHostedView = hostedView {
             let isCurrentViewOwnedByCell = currentHostedView.superview === contentView
             if isCurrentViewOwnedByCell {
@@ -29,6 +48,15 @@ final class HostCell: UICollectionViewCell {
 
         hostedView = view
         self.itemKey = itemKey
+        self.itemType = itemType
+
+        let viewIdentifier = ObjectIdentifier(view)
+        let viewDebugIdentifier = String(describing: viewIdentifier)
+        print(
+            "[UserDebug] install hosted view cell=\(debugIdentifier) " +
+            "itemKey=\(itemKey) type=\(itemType) view=\(viewDebugIdentifier) " +
+            "contentSize=\(contentSize.width)x\(contentSize.height)"
+        )
 
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
@@ -46,9 +74,40 @@ final class HostCell: UICollectionViewCell {
         ])
     }
 
+    func bind(itemKey: String) {
+        let previousKey = self.itemKey ?? "<nil>"
+        let previousType = itemType ?? "<nil>"
+        let reactTagDescription: String
+        if let reactTag {
+            reactTagDescription = String(reactTag)
+        } else {
+            reactTagDescription = "<nil>"
+        }
+        print(
+            "[UserDebug] rebind HostCell cell=\(debugIdentifier) " +
+            "previousKey=\(previousKey) nextKey=\(itemKey) type=\(previousType) " +
+            "reactTag=\(reactTagDescription)"
+        )
+        self.itemKey = itemKey
+    }
+
+    func prepareForMeasurement(width: CGFloat?, height: CGFloat?) {
+        if let width {
+            setWidthConstraint(width)
+        } else {
+            deactivateWidthConstraint()
+        }
+
+        if let height {
+            setHeightConstraint(height)
+        } else {
+            deactivateHeightConstraint()
+        }
+    }
+
     func updateContentSize(_ contentSize: CGSize) {
-        widthConstraint?.constant = contentSize.width
-        heightConstraint?.constant = contentSize.height
+        setWidthConstraint(contentSize.width)
+        setHeightConstraint(contentSize.height)
     }
 
     func detachHostedView() {
@@ -63,29 +122,30 @@ final class HostCell: UICollectionViewCell {
         hostedView = nil
         reactTag = nil
         itemKey = nil
+        itemType = nil
         widthConstraint = nil
         heightConstraint = nil
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        let previousKey = itemKey ?? "<nil>"
+        let previousType = itemType ?? "<nil>"
+        let reactTagDescription: String
+        if let reactTag {
+            reactTagDescription = String(reactTag)
+        } else {
+            reactTagDescription = "<nil>"
+        }
+        print(
+            "[UserDebug] prepareForReuse HostCell cell=\(debugIdentifier) " +
+            "previousKey=\(previousKey) type=\(previousType) " +
+            "hasHostedView=\(hasHostedView) reactTag=\(reactTagDescription)"
+        )
+        itemKey = nil
         if let hostedView {
             contentView.bringSubviewToFront(hostedView)
         }
-    }
-
-    func isHosting(_ view: UIView) -> Bool {
-        return hostedView === view
-    }
-
-    func releaseHostedViewReferenceIfNeeded(for view: UIView) {
-        guard hostedView === view else { return }
-
-        hostedView = nil
-        reactTag = nil
-        itemKey = nil
-        widthConstraint = nil
-        heightConstraint = nil
     }
 
     private func deactivateInstalledConstraints(for view: UIView) {
@@ -110,5 +170,47 @@ final class HostCell: UICollectionViewCell {
             return usesFirstView || usesSecondView
         }
         NSLayoutConstraint.deactivate(parentConstraints)
+    }
+
+    private func setWidthConstraint(_ width: CGFloat) {
+        if let widthConstraint {
+            widthConstraint.constant = width
+            if !widthConstraint.isActive {
+                widthConstraint.isActive = true
+            }
+            return
+        }
+
+        guard let hostedView else { return }
+        let widthConstraint = hostedView.widthAnchor.constraint(equalToConstant: width)
+        self.widthConstraint = widthConstraint
+        widthConstraint.isActive = true
+    }
+
+    private func setHeightConstraint(_ height: CGFloat) {
+        if let heightConstraint {
+            heightConstraint.constant = height
+            if !heightConstraint.isActive {
+                heightConstraint.isActive = true
+            }
+            return
+        }
+
+        guard let hostedView else { return }
+        let heightConstraint = hostedView.heightAnchor.constraint(equalToConstant: height)
+        self.heightConstraint = heightConstraint
+        heightConstraint.isActive = true
+    }
+
+    private func deactivateWidthConstraint() {
+        guard let widthConstraint else { return }
+        widthConstraint.isActive = false
+        self.widthConstraint = nil
+    }
+
+    private func deactivateHeightConstraint() {
+        guard let heightConstraint else { return }
+        heightConstraint.isActive = false
+        self.heightConstraint = nil
     }
 }
