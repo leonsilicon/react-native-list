@@ -14,7 +14,8 @@
 [ ] - Data source API add animated:boolean option for all operations, or also think about how we could give the developer here a proper animation API
 [ ] - ios: rendering one list, and then a second one crashes the app - i assume react key collision
 [x] - Android: you always have to interact with the UI once to render out the changes lol
-[ ] - Android: content overflowing
+[x] - Android: content overflowing
+[ ] - iOS: first content broken layout
 
 ## Base functionality (what users expect to just work)
 

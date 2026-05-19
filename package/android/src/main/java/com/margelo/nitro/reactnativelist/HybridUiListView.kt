@@ -1,6 +1,7 @@
 package com.margelo.nitro.reactnativelist
 
 import android.graphics.Color
+import android.graphics.Canvas
 import android.os.Looper
 import android.util.Log
 import android.view.View
@@ -31,7 +32,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     private var isRecyclerViewLayoutScheduled = false
 
     override val view: RecyclerView by lazy {
-        RecyclerView(reactContext).apply {
+        ClippedRecyclerView(reactContext).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -218,6 +219,18 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             block()
         } else {
             view.post(block)
+        }
+    }
+
+    private class ClippedRecyclerView(context: ThemedReactContext) : RecyclerView(context) {
+        override fun dispatchDraw(canvas: Canvas) {
+            // RN/Fabric parents may allow child drawing outside their bounds.
+            // Keep clipToPadding=false for list insets, but clip rows to the list viewport.
+            // Without this item could overflow the list bounds.
+            val saveCount = canvas.save()
+            canvas.clipRect(0, 0, width, height)
+            super.dispatchDraw(canvas)
+            canvas.restoreToCount(saveCount)
         }
     }
 }
