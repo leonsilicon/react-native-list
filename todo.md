@@ -12,7 +12,9 @@
 [x] - Right now we need to pass a fixed size to the list (with height/width), lets get rid of that
 [x] - Changing item height back and forth breaks layout on iOS
 [ ] - Data source API add animated:boolean option for all operations, or also think about how we could give the developer here a proper animation API
+[ ] - ios: rendering one list, and then a second one crashes the app - i assume react key collision
 [ ] - Android: you always have to interact with the UI once to render out the changes lol
+[ ] - Android: content overflowing
 
 ## Base functionality (what users expect to just work)
 
@@ -20,6 +22,11 @@
 [x] - Do I have to implement getPublicInstance so people can work with refs as expected?
 [ ] - RNGH / reanimated (i guess?)
 [ ] - When trying to use RNGH it says: Error: GestureDetector must be used as a descendant of GestureHandlerRootView. Otherwise the gestures will not be recognized. - The problem is that they render a react context to check for the gesture detector - Either i need to add WrapperComponent prop support (i think i still have to do this) - But there might be other more severe issues with running RNGH
+
+## Features
+
+[ ] - Mosaic layout
+[ ] - An API to pull data in when rendering (see discussion i had with miguel)
 
 ## Performance
 
