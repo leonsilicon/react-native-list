@@ -7,8 +7,8 @@ import { scheduleOnUI } from 'react-native-worklets'
 export type ListKey = string
 
 export type ListItemSize = {
-  width: number
-  height: number
+  width?: number
+  height?: number
 }
 
 export type ListItem<

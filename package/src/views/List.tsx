@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { View, ViewStyle } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import { Platform, View, ViewStyle } from 'react-native'
 import { callback, NitroModules } from 'react-native-nitro-modules'
 import {
   createShareable,
@@ -18,6 +18,7 @@ import {
   getNativeListDataSource,
 } from '../ListDataSource'
 import { createLinearListLayout, ListLayout } from '../ListLayout'
+import { useChangeEffect } from '../hooks/useChangeEffect'
 import {
   renderSyncWorklet,
   uiListModuleBoxed,
@@ -83,8 +84,6 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
   const { dataSource, layout, renderers, style } = props
   const isSetup = useRef(false)
   const nativeListRef = useRef<UiListViewMethods | null>(null)
-  // TODO: can we get rid of this state?!
-  const [isNativeReady, setIsNativeReady] = useState(false)
 
   const listState = useMemo(() => {
     return createShareable<ListState>(UIRuntimeId, {
@@ -197,16 +196,16 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
     )
   }, [dataSource, handleDataSourceMutation])
 
-  useEffect(() => {
+  useChangeEffect(() => {
     const ref = nativeListRef.current
-    if (ref == null || !isNativeReady) return
+    if (ref == null) return
 
     scheduleOnUI(clearListItemKeys)
 
     const nativeDataSource = getNativeListDataSource(dataSource)
     ref.setDataSource(nativeDataSource)
     ref.setLayout(resolvedLayout.__nativeLayout)
-  }, [clearListItemKeys, dataSource, isNativeReady, resolvedLayout])
+  }, [clearListItemKeys, dataSource, resolvedLayout])
 
   return (
     <UiListHostComponent
@@ -421,8 +420,6 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
           )
           setNativeListDataSource()
         })
-
-        setIsNativeReady(true)
       })}
     />
   )
