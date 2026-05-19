@@ -110,7 +110,6 @@ class HybridUiListView : HybridUiListViewSpec {
             concreteDataSource.observer = self
             self.configureCollectionViewIfNeeded()
             self.retainMeasuredContent(in: concreteDataSource)
-            self.markLayoutDirty(from: 0)
             self.collectionView?.collectionViewLayout.invalidateLayout()
             self.collectionView?.reloadData()
         }
@@ -334,14 +333,7 @@ class HybridUiListView : HybridUiListViewSpec {
         }
     }
 
-    private func markLayoutDirty(from index: Int) {
-        let layout = collectionView?.collectionViewLayout as? LinearCollectionViewLayout
-        layout?.markDirty(from: index)
-    }
-
-    private func scheduleLayoutInvalidation(reason: String, from index: Int) {
-        markLayoutDirty(from: index)
-
+    private func scheduleLayoutInvalidation(reason: String) {
         if hasScheduledLayoutInvalidation {
             print("[UserDebug] coalesce layout invalidation reason=\(reason)")
             return
@@ -474,7 +466,7 @@ class HybridUiListView : HybridUiListViewSpec {
                     "[UserDebug] invalidate layout measured itemKey=\(item.key) " +
                     "index=\(indexPath.item) measuredSize=\(measuredContentSize.width)x\(measuredContentSize.height)"
                 )
-                scheduleLayoutInvalidation(reason: "measured", from: indexPath.item)
+                scheduleLayoutInvalidation(reason: "measured")
             }
         }
 
@@ -502,7 +494,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
             guard let self else { return }
             configureCollectionViewIfNeeded()
             retainMeasuredContent(in: dataSource)
-            markLayoutDirty(from: 0)
 
             guard animated, let collectionView, let changeset else {
                 collectionView?.reloadData()
@@ -511,7 +502,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
 
             collectionView.reload(using: changeset) { nextItems in
                 dataSource.replaceWrappedItemsFromCollectionView(nextItems)
-                self.markLayoutDirty(from: 0)
                 collectionView.collectionViewLayout.invalidateLayout()
             }
         }
@@ -525,7 +515,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
             ensureReuseRegistered(for: reuseIdentifier)
             let indexPath = IndexPath(item: index, section: 0)
             let indexPaths = [indexPath]
-            markLayoutDirty(from: index)
             collectionView?.insertItems(at: indexPaths)
         }
     }
@@ -546,7 +535,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
             ensureReuseRegistered(for: reuseIdentifier)
             let indexPath = IndexPath(item: index, section: 0)
             let indexPaths = [indexPath]
-            markLayoutDirty(from: index)
             collectionView?.reloadItems(at: indexPaths)
         }
     }
@@ -561,7 +549,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
             measuredContentSizeByItemKey[removedItem.key] = nil
             let indexPath = IndexPath(item: index, section: 0)
             let indexPaths = [indexPath]
-            markLayoutDirty(from: index)
             collectionView?.deleteItems(at: indexPaths)
         }
     }
@@ -571,7 +558,6 @@ extension HybridUiListView: NativeListDataSourceObserver {
             guard let self else { return }
             let sourceIndexPath = IndexPath(item: fromIndex, section: 0)
             let targetIndexPath = IndexPath(item: toIndex, section: 0)
-            markLayoutDirty(from: min(fromIndex, toIndex))
             collectionView?.moveItem(at: sourceIndexPath, to: targetIndexPath)
         }
     }
