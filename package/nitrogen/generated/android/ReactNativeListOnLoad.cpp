@@ -15,15 +15,15 @@
 #include <fbjni/fbjni.h>
 #include <NitroModules/HybridObjectRegistry.hpp>
 
-#include "JHybridAdapterSpec.hpp"
-#include "JHybridAdapterFactorySpec.hpp"
-#include "JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double.hpp"
-#include "JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double.hpp"
 #include "JHybridIOSWorkletsModuleProxyHolderSpec.hpp"
+#include "JHybridNativeLinearListLayoutSpec.hpp"
+#include "JHybridNativeListDataSourceSpec.hpp"
+#include "JFunc_bool_NativeListItem_NativeListItem.hpp"
+#include "JHybridNativeListLayoutSpec.hpp"
 #include "JHybridUiListModuleSpec.hpp"
 #include "JHybridUiListViewSpec.hpp"
-#include "JFunc_double.hpp"
-#include "JFunc_bool_double_double.hpp"
+#include "JFunc_double_std__string.hpp"
+#include "JFunc_bool_double_NativeListItem_double.hpp"
 #include "views/JHybridUiListViewStateUpdater.hpp"
 #include "JHybridViewHolderSpec.hpp"
 #include "views/JHybridViewHolderStateUpdater.hpp"
@@ -54,12 +54,28 @@ struct JHybridUiListViewSpecImpl: public jni::JavaClass<JHybridUiListViewSpecImp
     return javaPart->getJHybridUiListViewSpec();
   }
 };
-struct JHybridAdapterFactorySpecImpl: public jni::JavaClass<JHybridAdapterFactorySpecImpl, JHybridAdapterFactorySpec::JavaPart> {
-  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridAdapterFactory;";
-  static std::shared_ptr<JHybridAdapterFactorySpec> create() {
-    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridAdapterFactorySpecImpl::javaobject()>();
-    jni::local_ref<JHybridAdapterFactorySpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
-    return javaPart->getJHybridAdapterFactorySpec();
+struct JHybridNativeListDataSourceSpecImpl: public jni::JavaClass<JHybridNativeListDataSourceSpecImpl, JHybridNativeListDataSourceSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridNativeListDataSource;";
+  static std::shared_ptr<JHybridNativeListDataSourceSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridNativeListDataSourceSpecImpl::javaobject()>();
+    jni::local_ref<JHybridNativeListDataSourceSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridNativeListDataSourceSpec();
+  }
+};
+struct JHybridNativeListLayoutSpecImpl: public jni::JavaClass<JHybridNativeListLayoutSpecImpl, JHybridNativeListLayoutSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridNativeListLayout;";
+  static std::shared_ptr<JHybridNativeListLayoutSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridNativeListLayoutSpecImpl::javaobject()>();
+    jni::local_ref<JHybridNativeListLayoutSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridNativeListLayoutSpec();
+  }
+};
+struct JHybridNativeLinearListLayoutSpecImpl: public jni::JavaClass<JHybridNativeLinearListLayoutSpecImpl, JHybridNativeLinearListLayoutSpec::JavaPart> {
+  static constexpr auto kJavaDescriptor = "Lcom/margelo/nitro/reactnativelist/HybridNativeLinearListLayout;";
+  static std::shared_ptr<JHybridNativeLinearListLayoutSpec> create() {
+    static const auto constructorFn = javaClassStatic()->getConstructor<JHybridNativeLinearListLayoutSpecImpl::javaobject()>();
+    jni::local_ref<JHybridNativeLinearListLayoutSpec::JavaPart> javaPart = javaClassStatic()->newObject(constructorFn);
+    return javaPart->getJHybridNativeLinearListLayoutSpec();
   }
 };
 struct JHybridUiListModuleSpecImpl: public jni::JavaClass<JHybridUiListModuleSpecImpl, JHybridUiListModuleSpec::JavaPart> {
@@ -76,15 +92,15 @@ void registerAllNatives() {
   using namespace margelo::nitro::reactnativelist;
 
   // Register native JNI methods
-  margelo::nitro::reactnativelist::JHybridAdapterSpec::CxxPart::registerNatives();
-  margelo::nitro::reactnativelist::JHybridAdapterFactorySpec::CxxPart::registerNatives();
-  margelo::nitro::reactnativelist::JFunc_std__shared_ptr_Promise_std__shared_ptr_HybridViewHolderSpec____double_cxx::registerNatives();
-  margelo::nitro::reactnativelist::JFunc_void_std__shared_ptr_HybridViewHolderSpec__std__shared_ptr_AnyMap__double_cxx::registerNatives();
   margelo::nitro::reactnativelist::JHybridIOSWorkletsModuleProxyHolderSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JHybridNativeLinearListLayoutSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JHybridNativeListDataSourceSpec::CxxPart::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_bool_NativeListItem_NativeListItem_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JHybridNativeListLayoutSpec::CxxPart::registerNatives();
   margelo::nitro::reactnativelist::JHybridUiListModuleSpec::CxxPart::registerNatives();
   margelo::nitro::reactnativelist::JHybridUiListViewSpec::CxxPart::registerNatives();
-  margelo::nitro::reactnativelist::JFunc_double_cxx::registerNatives();
-  margelo::nitro::reactnativelist::JFunc_bool_double_double_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_double_std__string_cxx::registerNatives();
+  margelo::nitro::reactnativelist::JFunc_bool_double_NativeListItem_double_cxx::registerNatives();
   margelo::nitro::reactnativelist::views::JHybridUiListViewStateUpdater::registerNatives();
   margelo::nitro::reactnativelist::JHybridViewHolderSpec::CxxPart::registerNatives();
   margelo::nitro::reactnativelist::views::JHybridViewHolderStateUpdater::registerNatives();
@@ -103,9 +119,21 @@ void registerAllNatives() {
     }
   );
   HybridObjectRegistry::registerHybridObjectConstructor(
-    "AdapterFactory",
+    "NativeListDataSource",
     []() -> std::shared_ptr<HybridObject> {
-      return JHybridAdapterFactorySpecImpl::create();
+      return JHybridNativeListDataSourceSpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "NativeListLayout",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridNativeListLayoutSpecImpl::create();
+    }
+  );
+  HybridObjectRegistry::registerHybridObjectConstructor(
+    "NativeLinearListLayout",
+    []() -> std::shared_ptr<HybridObject> {
+      return JHybridNativeLinearListLayoutSpecImpl::create();
     }
   );
   HybridObjectRegistry::registerHybridObjectConstructor(

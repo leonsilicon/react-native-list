@@ -15,10 +15,20 @@
 
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
+// Forward declaration of `NativeListItem` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeListItem; }
+// Forward declaration of `HybridNativeListDataSourceSpec` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { class HybridNativeListDataSourceSpec; }
+// Forward declaration of `HybridNativeListLayoutSpec` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { class HybridNativeListLayoutSpec; }
 
 #include <memory>
 #include "HybridUiListModuleSpec.hpp"
+#include <string>
 #include <functional>
+#include "NativeListItem.hpp"
+#include "HybridNativeListDataSourceSpec.hpp"
+#include "HybridNativeListLayoutSpec.hpp"
 
 namespace margelo::nitro::reactnativelist {
 
@@ -51,8 +61,9 @@ namespace margelo::nitro::reactnativelist {
 
     public:
       // Methods
-      virtual void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) = 0;
-      virtual void setUpdateViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<bool(double /* reactTag */, double /* index */)>& callback) = 0;
+      virtual void setListCallbacks(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double(const std::string& /* type */)>& createView, const std::function<bool(double /* reactTag */, const NativeListItem& /* item */, double /* index */)>& updateView) = 0;
+      virtual void setDataSource(const std::shared_ptr<HybridNativeListDataSourceSpec>& dataSource) = 0;
+      virtual void setLayout(const std::shared_ptr<HybridNativeListLayoutSpec>& layout) = 0;
 
     protected:
       // Hybrid Setup

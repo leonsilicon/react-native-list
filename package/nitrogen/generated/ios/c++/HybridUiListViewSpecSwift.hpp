@@ -14,10 +14,22 @@ namespace ReactNativeList { class HybridUiListViewSpec_cxx; }
 
 // Forward declaration of `HybridUiListModuleSpec` to properly resolve imports.
 namespace margelo::nitro::reactnativelist { class HybridUiListModuleSpec; }
+// Forward declaration of `NativeListItem` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { struct NativeListItem; }
+// Forward declaration of `HybridNativeListDataSourceSpec` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { class HybridNativeListDataSourceSpec; }
+// Forward declaration of `HybridNativeListLayoutSpec` to properly resolve imports.
+namespace margelo::nitro::reactnativelist { class HybridNativeListLayoutSpec; }
 
 #include <memory>
 #include "HybridUiListModuleSpec.hpp"
+#include <string>
 #include <functional>
+#include "NativeListItem.hpp"
+#include <optional>
+#include <NitroModules/AnyMap.hpp>
+#include "HybridNativeListDataSourceSpec.hpp"
+#include "HybridNativeListLayoutSpec.hpp"
 
 #include "ReactNativeList-Swift-Cxx-Umbrella.hpp"
 
@@ -69,14 +81,20 @@ namespace margelo::nitro::reactnativelist {
 
   public:
     // Methods
-    inline void setMakeNativeViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double()>& callback) override {
-      auto __result = _swiftPart.setMakeNativeViewCallback(uiListModule, callback);
+    inline void setListCallbacks(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<double(const std::string& /* type */)>& createView, const std::function<bool(double /* reactTag */, const NativeListItem& /* item */, double /* index */)>& updateView) override {
+      auto __result = _swiftPart.setListCallbacks(uiListModule, createView, updateView);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
     }
-    inline void setUpdateViewCallback(const std::shared_ptr<HybridUiListModuleSpec>& uiListModule, const std::function<bool(double /* reactTag */, double /* index */)>& callback) override {
-      auto __result = _swiftPart.setUpdateViewCallback(uiListModule, callback);
+    inline void setDataSource(const std::shared_ptr<HybridNativeListDataSourceSpec>& dataSource) override {
+      auto __result = _swiftPart.setDataSource(dataSource);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+    }
+    inline void setLayout(const std::shared_ptr<HybridNativeListLayoutSpec>& layout) override {
+      auto __result = _swiftPart.setLayout(layout);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

@@ -21,8 +21,17 @@
       "kotlin": "HybridUiListView",
       "swift": "HybridUiListView"
     },
-    "AdapterFactory": {
-      "kotlin": "HybridAdapterFactory"
+    "NativeListDataSource": {
+      "kotlin": "HybridNativeListDataSource",
+      "swift": "HybridNativeListDataSource"
+    },
+    "NativeListLayout": {
+      "kotlin": "HybridNativeListLayout",
+      "swift": "HybridNativeListLayout"
+    },
+    "NativeLinearListLayout": {
+      "kotlin": "HybridNativeLinearListLayout",
+      "swift": "HybridNativeLinearListLayout"
     },
     "UiListModule": {
       "kotlin": "HybridUiListModule",

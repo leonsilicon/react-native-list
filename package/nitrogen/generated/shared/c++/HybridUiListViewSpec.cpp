@@ -14,8 +14,9 @@ namespace margelo::nitro::reactnativelist {
     HybridObject::loadHybridMethods();
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
-      prototype.registerHybridMethod("setMakeNativeViewCallback", &HybridUiListViewSpec::setMakeNativeViewCallback);
-      prototype.registerHybridMethod("setUpdateViewCallback", &HybridUiListViewSpec::setUpdateViewCallback);
+      prototype.registerHybridMethod("setListCallbacks", &HybridUiListViewSpec::setListCallbacks);
+      prototype.registerHybridMethod("setDataSource", &HybridUiListViewSpec::setDataSource);
+      prototype.registerHybridMethod("setLayout", &HybridUiListViewSpec::setLayout);
     });
   }
 

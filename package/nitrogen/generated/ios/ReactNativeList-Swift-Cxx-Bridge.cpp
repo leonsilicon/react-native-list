@@ -9,6 +9,9 @@
 
 // Include C++ implementation defined types
 #include "HybridIOSWorkletsModuleProxyHolderSpecSwift.hpp"
+#include "HybridNativeLinearListLayoutSpecSwift.hpp"
+#include "HybridNativeListDataSourceSpecSwift.hpp"
+#include "HybridNativeListLayoutSpecSwift.hpp"
 #include "HybridUiListModuleSpecSwift.hpp"
 #include "HybridUiListViewSpecSwift.hpp"
 #include "HybridViewHolderSpecSwift.hpp"
@@ -32,7 +35,64 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
     ReactNativeList::HybridIOSWorkletsModuleProxyHolderSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
-  
+
+  // pragma MARK: std::shared_ptr<HybridNativeListLayoutSpec>
+  std::shared_ptr<HybridNativeListLayoutSpec> create_std__shared_ptr_HybridNativeListLayoutSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    ReactNativeList::HybridNativeListLayoutSpec_cxx swiftPart = ReactNativeList::HybridNativeListLayoutSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::reactnativelist::HybridNativeListLayoutSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridNativeListLayoutSpec_(std__shared_ptr_HybridNativeListLayoutSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::reactnativelist::HybridNativeListLayoutSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::reactnativelist::HybridNativeListLayoutSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridNativeListLayoutSpec\" is not implemented in Swift!");
+    }
+    #endif
+    ReactNativeList::HybridNativeListLayoutSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+
+  // pragma MARK: std::shared_ptr<HybridNativeLinearListLayoutSpec>
+  std::shared_ptr<HybridNativeLinearListLayoutSpec> create_std__shared_ptr_HybridNativeLinearListLayoutSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    ReactNativeList::HybridNativeLinearListLayoutSpec_cxx swiftPart = ReactNativeList::HybridNativeLinearListLayoutSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::reactnativelist::HybridNativeLinearListLayoutSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridNativeLinearListLayoutSpec_(std__shared_ptr_HybridNativeLinearListLayoutSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::reactnativelist::HybridNativeLinearListLayoutSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::reactnativelist::HybridNativeLinearListLayoutSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridNativeLinearListLayoutSpec\" is not implemented in Swift!");
+    }
+    #endif
+    ReactNativeList::HybridNativeLinearListLayoutSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+
+  // pragma MARK: std::function<bool(const NativeListItem& /* oldItem */, const NativeListItem& /* newItem */)>
+  Func_bool_NativeListItem_NativeListItem create_Func_bool_NativeListItem_NativeListItem(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = ReactNativeList::Func_bool_NativeListItem_NativeListItem::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const NativeListItem& oldItem, const NativeListItem& newItem) mutable -> bool {
+      auto __result = swiftClosure.call(oldItem, newItem);
+      return __result;
+    };
+  }
+
+  // pragma MARK: std::shared_ptr<HybridNativeListDataSourceSpec>
+  std::shared_ptr<HybridNativeListDataSourceSpec> create_std__shared_ptr_HybridNativeListDataSourceSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    ReactNativeList::HybridNativeListDataSourceSpec_cxx swiftPart = ReactNativeList::HybridNativeListDataSourceSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::reactnativelist::HybridNativeListDataSourceSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridNativeListDataSourceSpec_(std__shared_ptr_HybridNativeListDataSourceSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::reactnativelist::HybridNativeListDataSourceSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::reactnativelist::HybridNativeListDataSourceSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridNativeListDataSourceSpec\" is not implemented in Swift!");
+    }
+    #endif
+    ReactNativeList::HybridNativeListDataSourceSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+
   // pragma MARK: std::shared_ptr<HybridUiListModuleSpec>
   std::shared_ptr<HybridUiListModuleSpec> create_std__shared_ptr_HybridUiListModuleSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     ReactNativeList::HybridUiListModuleSpec_cxx swiftPart = ReactNativeList::HybridUiListModuleSpec_cxx::fromUnsafe(swiftUnsafePointer);
@@ -48,25 +108,25 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
     ReactNativeList::HybridUiListModuleSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
-  
-  // pragma MARK: std::function<double()>
-  Func_double create_Func_double(void* NON_NULL swiftClosureWrapper) noexcept {
-    auto swiftClosure = ReactNativeList::Func_double::fromUnsafe(swiftClosureWrapper);
-    return [swiftClosure = std::move(swiftClosure)]() mutable -> double {
-      auto __result = swiftClosure.call();
+
+  // pragma MARK: std::function<double(const std::string& /* type */)>
+  Func_double_std__string create_Func_double_std__string(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = ReactNativeList::Func_double_std__string::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::string& type) mutable -> double {
+      auto __result = swiftClosure.call(type);
       return __result;
     };
   }
-  
-  // pragma MARK: std::function<bool(double /* reactTag */, double /* index */)>
-  Func_bool_double_double create_Func_bool_double_double(void* NON_NULL swiftClosureWrapper) noexcept {
-    auto swiftClosure = ReactNativeList::Func_bool_double_double::fromUnsafe(swiftClosureWrapper);
-    return [swiftClosure = std::move(swiftClosure)](double reactTag, double index) mutable -> bool {
-      auto __result = swiftClosure.call(reactTag, index);
+
+  // pragma MARK: std::function<bool(double /* reactTag */, const NativeListItem& /* item */, double /* index */)>
+  Func_bool_double_NativeListItem_double create_Func_bool_double_NativeListItem_double(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = ReactNativeList::Func_bool_double_NativeListItem_double::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](double reactTag, const NativeListItem& item, double index) mutable -> bool {
+      auto __result = swiftClosure.call(reactTag, item, index);
       return __result;
     };
   }
-  
+
   // pragma MARK: std::shared_ptr<HybridUiListViewSpec>
   std::shared_ptr<HybridUiListViewSpec> create_std__shared_ptr_HybridUiListViewSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     ReactNativeList::HybridUiListViewSpec_cxx swiftPart = ReactNativeList::HybridUiListViewSpec_cxx::fromUnsafe(swiftUnsafePointer);
@@ -82,7 +142,7 @@ namespace margelo::nitro::reactnativelist::bridge::swift {
     ReactNativeList::HybridUiListViewSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
-  
+
   // pragma MARK: std::shared_ptr<HybridViewHolderSpec>
   std::shared_ptr<HybridViewHolderSpec> create_std__shared_ptr_HybridViewHolderSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     ReactNativeList::HybridViewHolderSpec_cxx swiftPart = ReactNativeList::HybridViewHolderSpec_cxx::fromUnsafe(swiftUnsafePointer);

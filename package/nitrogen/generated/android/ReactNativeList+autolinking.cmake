@@ -33,9 +33,10 @@ target_sources(
   # Autolinking Setup
   ../nitrogen/generated/android/ReactNativeListOnLoad.cpp
   # Shared Nitrogen C++ sources
-  ../nitrogen/generated/shared/c++/HybridAdapterSpec.cpp
-  ../nitrogen/generated/shared/c++/HybridAdapterFactorySpec.cpp
   ../nitrogen/generated/shared/c++/HybridIOSWorkletsModuleProxyHolderSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridNativeLinearListLayoutSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridNativeListDataSourceSpec.cpp
+  ../nitrogen/generated/shared/c++/HybridNativeListLayoutSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUiListModuleSpec.cpp
   ../nitrogen/generated/shared/c++/HybridUiListViewSpec.cpp
   ../nitrogen/generated/shared/c++/views/HybridUiListViewComponent.cpp
@@ -43,9 +44,10 @@ target_sources(
   ../nitrogen/generated/shared/c++/HybridViewHolderSpec.cpp
   ../nitrogen/generated/shared/c++/views/HybridViewHolderComponent.cpp
   # Android-specific Nitrogen C++ sources
-  ../nitrogen/generated/android/c++/JHybridAdapterSpec.cpp
-  ../nitrogen/generated/android/c++/JHybridAdapterFactorySpec.cpp
   ../nitrogen/generated/android/c++/JHybridIOSWorkletsModuleProxyHolderSpec.cpp
+  ../nitrogen/generated/android/c++/JHybridNativeLinearListLayoutSpec.cpp
+  ../nitrogen/generated/android/c++/JHybridNativeListDataSourceSpec.cpp
+  ../nitrogen/generated/android/c++/JHybridNativeListLayoutSpec.cpp
   ../nitrogen/generated/android/c++/JHybridUiListModuleSpec.cpp
   ../nitrogen/generated/android/c++/JVariant_NullType_HybridIOSWorkletsModuleProxyHolderSpec.cpp
   ../nitrogen/generated/android/c++/JHybridUiListViewSpec.cpp

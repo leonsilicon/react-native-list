@@ -1,40 +1,29 @@
 import {
-  // HybridObject,
   HybridView,
   HybridViewMethods,
   HybridViewProps,
   Sync,
 } from 'react-native-nitro-modules'
+import {
+  NativeListDataSource,
+  NativeListItem,
+} from './NativeListDataSource.nitro'
+import { NativeListLayout } from './NativeListLayout.nitro'
 import { UiListModule } from './UIListModule.nitro'
-// import { ViewHolder } from './ViewHolder.nitro'
 
-export interface UiListViewProps extends HybridViewProps {
-  // makeNativeViewCallback: Sync<() => ViewHolder>
-}
+export interface UiListViewProps extends HybridViewProps {}
 
 export interface UiListViewMethods extends HybridViewMethods {
-  setMakeNativeViewCallback(
+  setListCallbacks(
     uiListModule: UiListModule,
-    callback: Sync<() => number>
-  ): void
-
-  // TODO: maybe we can combine with make function?
-  setUpdateViewCallback(
-    uiListModule: UiListModule,
-    // This callback should issue update operations on the existing view!
-    callback: Sync<
-      (
-        reactTag: number,
-        index: number
-        // TODO: view type i guess
-        // TODO: data
-      ) => boolean // we have to return something to make nitro work
+    createView: Sync<(type: string) => number>,
+    updateView: Sync<
+      (reactTag: number, item: NativeListItem, index: number) => boolean
     >
   ): void
+
+  setDataSource(dataSource: NativeListDataSource): void
+  setLayout(layout: NativeListLayout): void
 }
 
 export type UiListView = HybridView<UiListViewProps, UiListViewMethods>
-
-// export interface CallbackHolder extends HybridObject<{ android: 'kotlin' }> {
-//   invokeCallback(): void
-// }
