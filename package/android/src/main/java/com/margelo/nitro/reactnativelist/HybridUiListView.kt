@@ -57,6 +57,12 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             ?: throw IllegalStateException("NativeListDataSource must be created by react-native-list.")
 
         runOnMain {
+            val existingDataSource = this.dataSource
+            if (existingDataSource === nativeDataSource) {
+                Log.w("HybridUiListView", "setDataSource called with the same data source instance. Ignoring.")
+                return@runOnMain
+            }
+
             this.dataSource?.observer = null
             this.dataSource = nativeDataSource
             nativeDataSource.observer = this
