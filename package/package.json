@@ -42,7 +42,8 @@
     "bundle:js": "bun run react-bundler/bundle.ts",
     "bundle:js:prod": "NODE_ENV=production bun run react-bundler/bundle.ts",
     "prepack": "cp ../README.md ./README.md",
-    "postpack": "rm ./README.md"
+    "postpack": "rm ./README.md",
+    "release": "release-it"
   },
   "keywords": [
     "react-native",
@@ -74,6 +75,7 @@
     "react-native-nitro-modules": "catalog:",
     "react-native-worklets": "catalog:",
     "react-reconciler": "^0.33.0",
+    "release-it": "^20.0.1",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
