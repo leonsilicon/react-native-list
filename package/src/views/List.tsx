@@ -21,6 +21,8 @@ import { createLinearListLayout, ListLayout } from '../ListLayout'
 import { useChangeEffect } from '../hooks/useChangeEffect'
 import {
   renderSyncWorklet,
+  registerManagedSurfaceWorklet,
+  unregisterManagedSurfaceWorklet,
   uiListModuleBoxed,
 } from '../renderer/fabric/RenderHelper'
 import { getReactFabricRenderer } from '../renderer/react/ReactFabricRenderer'
@@ -58,6 +60,8 @@ type ListState = {
   reactTagToDataKey: Record<number, string>
   dataKeyToReactTag: Record<string, number>
   nextReactKey: number
+  isDisposed: boolean
+  surfaceId: number | null
 }
 
 export type ListRenderer<TItem extends ListItem> = {
@@ -97,6 +101,8 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
       // or need to find the reactTag for a dataKey
       reactTagToDataKey: {},
       dataKeyToReactTag: {},
+      isDisposed: false,
+      surfaceId: null,
     })
   }, [])
 
@@ -111,8 +117,24 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
   }, [listState])
 
   const resolvedLayout = useMemo(() => {
-    return layout ?? createLinearListLayout()
+    if (layout != null) {
+      return layout
+    }
+
+    return createLinearListLayout()
   }, [layout])
+
+  const ownsResolvedLayout = layout == null
+
+  useEffect(() => {
+    if (!ownsResolvedLayout) {
+      return
+    }
+
+    return () => {
+      resolvedLayout.release()
+    }
+  }, [ownsResolvedLayout, resolvedLayout])
 
   const boxedDataSource = useMemo(() => {
     const nativeDataSource = getNativeListDataSource(dataSource)
@@ -196,6 +218,61 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
     )
   }, [dataSource, handleDataSourceMutation])
 
+  useEffect(() => {
+    return () => {
+      const ref = nativeListRef.current
+      const didSetup = isSetup.current
+
+      nativeListRef.current = null
+      isSetup.current = false
+
+      if (ref == null) {
+        return
+      }
+
+      scheduleOnUI(() => {
+        'worklet'
+
+        const state = getListState()
+        state.isDisposed = true
+
+        if (!didSetup) {
+          ref.disposeRendererSurface()
+          return
+        }
+
+        const surfaceId = state.surfaceId
+        ref.disposeRendererSurface()
+        state.surfaceId = null
+
+        if (surfaceId == null) {
+          return
+        }
+
+        const { disposeReactRoot } = getReactFabricRenderer()
+        unregisterManagedSurfaceWorklet(surfaceId)
+        disposeReactRoot(surfaceId)
+        state.elementRecords = []
+
+        for (const key of Object.keys(state.reactTagToRecordIndex)) {
+          delete state.reactTagToRecordIndex[Number(key)]
+        }
+
+        for (const key of Object.keys(state.reactTagToReactKey)) {
+          delete state.reactTagToReactKey[Number(key)]
+        }
+
+        for (const key of Object.keys(state.reactTagToDataKey)) {
+          delete state.reactTagToDataKey[Number(key)]
+        }
+
+        for (const key of Object.keys(state.dataKeyToReactTag)) {
+          delete state.dataKeyToReactTag[key]
+        }
+      })
+    }
+  }, [getListState])
+
   useChangeEffect(() => {
     const ref = nativeListRef.current
     if (ref == null) return
@@ -221,6 +298,10 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
 
           const { reactRender } = getReactFabricRenderer()
           const state = getListState()
+          const surfaceId = ref.getSurfaceId()
+          state.isDisposed = false
+          state.surfaceId = surfaceId
+          registerManagedSurfaceWorklet(surfaceId)
 
           function renderListElements() {
             'worklet'
@@ -293,9 +374,13 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
           function renderContentInReact() {
             'worklet'
 
+            if (state.isDisposed) {
+              return
+            }
+
             const elements = renderListElements()
             const parentContainer = <View>{elements}</View>
-            reactRender(parentContainer, () => {})
+            reactRender(surfaceId, parentContainer, () => {})
             rebuildTagPositions()
           }
 
@@ -309,6 +394,10 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
           }
 
           function createViewCallback(type: string) {
+            if (state.isDisposed) {
+              throw new Error('Cannot create view after list was disposed')
+            }
+
             const nativeRef = globalThis.React.createRef<NativeTaggedRef>()
             const reactKey = state.nextReactKey++
             const typedType = type as ListItemType<TItem>
@@ -355,7 +444,7 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
             state.reactTagToRecordIndex[reactTag] = currentIndex
             state.reactTagToReactKey[reactTag] = reactKey
 
-            renderSyncWorklet()
+            renderSyncWorklet(surfaceId)
 
             return reactTag
           }
@@ -365,6 +454,10 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
             item: NativeListItem,
             index: number
           ) {
+            if (state.isDisposed) {
+              return false
+            }
+
             const typedType: ListItemType<TItem> = item.type
             const renderer = renderers[typedType] as ListRenderer<TItem>
 
@@ -407,7 +500,7 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
             record.dataKey = item.key
 
             renderContentInReact()
-            renderSyncWorklet()
+            renderSyncWorklet(surfaceId)
 
             return true
           }
