@@ -5,6 +5,7 @@
 #include <fbjni/fbjni.h>
 #include <react/fabric/JFabricUIManager.h>
 #include <react/renderer/core/EventListener.h>
+#include <worklets/WorkletRuntime/WorkletRuntime.h>
 #include <worklets/android/WorkletsModule.h>
 
 namespace margelo::nitro::reactnativelist
@@ -30,7 +31,7 @@ namespace margelo::nitro::reactnativelist
             jni::alias_ref<JHybridUiListModule> jThis,
             jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule);
 
-        static void prepareUiRuntime(
+        static bool prepareUiRuntime(
             jni::alias_ref<JHybridUiListModule> jThis,
             jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule);
 
@@ -42,6 +43,7 @@ namespace margelo::nitro::reactnativelist
 
     private:
         static std::shared_ptr<react::CallInvoker> uiCallInvoker_;
+        static std::shared_ptr<worklets::WorkletRuntime> uiWorkletRuntime_;
         static std::shared_ptr<const react::EventListener> eventInterceptor_;
     };
 

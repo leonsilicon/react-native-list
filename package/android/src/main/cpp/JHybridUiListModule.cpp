@@ -16,6 +16,7 @@ namespace margelo::nitro::reactnativelist
     }
 
     std::shared_ptr<react::CallInvoker> JHybridUiListModule::uiCallInvoker_ = nullptr;
+    std::shared_ptr<worklets::WorkletRuntime> JHybridUiListModule::uiWorkletRuntime_ = nullptr;
 
     void JHybridUiListModule::registerNatives()
     {
@@ -34,11 +35,6 @@ namespace margelo::nitro::reactnativelist
     std::shared_ptr<react::CallInvoker> JHybridUiListModule::getOrInitCallInvoker(
         jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule)
     {
-        if (uiCallInvoker_)
-        {
-            return uiCallInvoker_;
-        }
-
         if (!workletsModule)
         {
             throw std::runtime_error("WorkletsModule reference is null");
@@ -64,6 +60,12 @@ namespace margelo::nitro::reactnativelist
             throw std::runtime_error("Failed to get UIWorkletRuntime from WorkletsModuleProxy");
         }
 
+        if (uiCallInvoker_ && uiWorkletRuntime_ == uiWorkletRuntime)
+        {
+            return uiCallInvoker_;
+        }
+
+        uiWorkletRuntime_ = uiWorkletRuntime;
         uiCallInvoker_ = std::make_shared<WorkletsUiCallInvoker>(uiScheduler, uiWorkletRuntime, isOnAndroidUiThread);
         return uiCallInvoker_;
     }
@@ -78,7 +80,7 @@ namespace margelo::nitro::reactnativelist
         return react::CallInvokerHolder::newObjectCxxArgs(uiCallInvoker);
     }
 
-    void JHybridUiListModule::prepareUiRuntime(
+    bool JHybridUiListModule::prepareUiRuntime(
         jni::alias_ref<JHybridUiListModule> jThis,
         jni::alias_ref<worklets::WorkletsModule::javaobject> workletsModule)
     {
@@ -105,12 +107,16 @@ namespace margelo::nitro::reactnativelist
 
         // React Native checks this global while installing TurboModule bindings.
         // Worklets creates a separate UI runtime, so we mirror the bridgeless marker there.
-        uiWorkletRuntime->runSync([](jsi::Runtime &runtime)
+        bool hasNativeModuleProxy = false;
+        uiWorkletRuntime->runSync([&hasNativeModuleProxy](jsi::Runtime &runtime)
                                   {
-                                      if (!runtime.global().hasProperty(runtime, "RN$Bridgeless"))
+                                      auto global = runtime.global();
+                                      if (!global.hasProperty(runtime, "RN$Bridgeless"))
                                       {
                                           react::defineReadOnlyGlobal(runtime, "RN$Bridgeless", jsi::Value(true));
                                       }
+
+                                      hasNativeModuleProxy = global.hasProperty(runtime, "nativeModuleProxy");
                                   });
 
         // Do not call the Android Nitro TurboModule installer from the UI runtime.
@@ -134,6 +140,8 @@ namespace margelo::nitro::reactnativelist
                                           std::make_shared<margelo::nitro::CallInvokerDispatcher>(uiCallInvoker);
                                       margelo::nitro::install(runtime, dispatcher);
                                   });
+
+        return hasNativeModuleProxy;
     }
 
     jni::local_ref<react::JRuntimeExecutor::javaobject>

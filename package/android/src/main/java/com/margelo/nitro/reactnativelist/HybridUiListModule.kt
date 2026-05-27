@@ -35,66 +35,67 @@ class HybridUiListModule : HybridUiListModuleSpec() {
         val context: ReactApplicationContext = NitroModules.applicationContext
             ?: throw IllegalStateException("ReactApplicationContext is null! Is Nitro installed?")
 
-        val uiManager = UIManagerHelper.getUIManager(context, UIManagerType.FABRIC)
-            ?: throw IllegalStateException("Fabric UIManager is null! Is the Fabric architecture enabled?")
-        val reactActivity = context.currentActivity as? ReactActivity
-            ?: throw IllegalStateException("Current activity is not a ReactActivity!")
-        val reactHost = reactActivity.reactActivityDelegate.reactHost
-            ?: throw IllegalStateException("ReactNativeHost is null!")
-
-        // Next: Create a TurboModuleManager for the UI runtime, which will set global.nativeModuleProxy
-        // This is whats being used when doing NativeModule.MyNativeModule in JS!
-        // TODO: i use a bunch of internals here, can this be improved?
-
         val workletsModule = context.getNativeModule(WorkletsModule::class.java)
             ?: throw IllegalStateException("WorkletsModule is null! Is the WorkletsModule properly registered?")
-        prepareUiRuntime(workletsModule)
+        val nativeModuleProxyInstalled = prepareUiRuntime(workletsModule)
 
-        val reactHostImpl = reactHost as? ReactHostImpl
-            ?: throw IllegalStateException("ReactHost is not a ReactHostImpl! Is the New Architecture enabled?")
+        if (!nativeModuleProxyInstalled) {
+            val reactActivity = context.currentActivity as? ReactActivity
+                ?: throw IllegalStateException("Current activity is not a ReactActivity!")
+            val reactHost = reactActivity.reactActivityDelegate.reactHost
+                ?: throw IllegalStateException("ReactNativeHost is null!")
 
-        val reactHostDelegateField = reactHostImpl.javaClass.getDeclaredField("reactHostDelegate")
-        reactHostDelegateField.isAccessible = true
-        val reactHostDelegate = reactHostDelegateField.get(reactHostImpl) as? ReactHostDelegate
-            ?: throw IllegalStateException("ReactHostDelegate is null! Is the New Architecture enabled?")
+            // Next: Create a TurboModuleManager for the UI runtime, which will set global.nativeModuleProxy
+            // This is whats being used when doing NativeModule.MyNativeModule in JS!
+            // TODO: i use a bunch of internals here, can this be improved?
+            val reactHostImpl = reactHost as? ReactHostImpl
+                ?: throw IllegalStateException("ReactHost is not a ReactHostImpl! Is the New Architecture enabled?")
 
-        // Get nativeMethodCallInvokerHolder from reactInstance, which lives on reactHostImpl
-        val reactInstanceField = reactHostImpl.javaClass.getDeclaredField("reactInstance")
-        reactInstanceField.isAccessible = true
-        val reactInstance = reactInstanceField.get(reactHostImpl)
-            ?: throw IllegalStateException("ReactInstance is null! Is the New Architecture enabled?")
-        val getNativeMethodCallInvokerHolderMethod = reactInstance.javaClass.getDeclaredMethod("getNativeMethodCallInvokerHolder")
-        getNativeMethodCallInvokerHolderMethod.isAccessible = true
-        val nativeMethodCallInvokerHolder = getNativeMethodCallInvokerHolderMethod.invoke(reactInstance) as? NativeMethodCallInvokerHolder
-            ?: throw IllegalStateException("NativeMethodCallInvokerHolder is null! Is the New Architecture enabled?")
+            val reactHostDelegateField = reactHostImpl.javaClass.getDeclaredField("reactHostDelegate")
+            reactHostDelegateField.isAccessible = true
+            val reactHostDelegate = reactHostDelegateField.get(reactHostImpl) as? ReactHostDelegate
+                ?: throw IllegalStateException("ReactHostDelegate is null! Is the New Architecture enabled?")
 
-        val reactPackages: MutableList<ReactPackage> = ArrayList<ReactPackage>()
-        val coreReactPackageClass = Class.forName("com.facebook.react.runtime.CoreReactPackage")
-        val constructor = coreReactPackageClass.declaredConstructors.first()
-        constructor.isAccessible = true
-        // TODO: this will create dev support modules on the UI runtime which is unnecessary overhead we don't need!
-        //       In a past version i simply put in the most important core modules from JS, which was somewhat nicer.
-        val coreReactPackage = constructor.newInstance(reactHost.devSupportManager, DefaultHardwareBackBtnHandler {}) as ReactPackage
-        reactPackages.add(coreReactPackage)
-        reactPackages.addAll(reactHostDelegate.reactPackages)
+            // Get nativeMethodCallInvokerHolder from reactInstance, which lives on reactHostImpl
+            val reactInstanceField = reactHostImpl.javaClass.getDeclaredField("reactInstance")
+            reactInstanceField.isAccessible = true
+            val reactInstance = reactInstanceField.get(reactHostImpl)
+                ?: throw IllegalStateException("ReactInstance is null! Is the New Architecture enabled?")
+            val getNativeMethodCallInvokerHolderMethod = reactInstance.javaClass.getDeclaredMethod("getNativeMethodCallInvokerHolder")
+            getNativeMethodCallInvokerHolderMethod.isAccessible = true
+            val nativeMethodCallInvokerHolder = getNativeMethodCallInvokerHolderMethod.invoke(reactInstance) as? NativeMethodCallInvokerHolder
+                ?: throw IllegalStateException("NativeMethodCallInvokerHolder is null! Is the New Architecture enabled?")
 
-        val turboModuleManagerDelegate = reactHostDelegate.turboModuleManagerDelegateBuilder
-            .setPackages(reactPackages)
-            .setReactApplicationContext(context)
-            .build()
+            val reactPackages: MutableList<ReactPackage> = ArrayList<ReactPackage>()
+            val coreReactPackageClass = Class.forName("com.facebook.react.runtime.CoreReactPackage")
+            val constructor = coreReactPackageClass.declaredConstructors.first()
+            constructor.isAccessible = true
+            // TODO: this will create dev support modules on the UI runtime which is unnecessary overhead we don't need!
+            //       In a past version i simply put in the most important core modules from JS, which was somewhat nicer.
+            val coreReactPackage = constructor.newInstance(reactHost.devSupportManager, DefaultHardwareBackBtnHandler {}) as ReactPackage
+            reactPackages.add(coreReactPackage)
+            reactPackages.addAll(reactHostDelegate.reactPackages)
 
-        val uiCallInvokerHolder = getUiCallInvokerHolder(workletsModule)
-        val uiRuntimeExecutor = getUiRuntimeExecutor(workletsModule)
+            val turboModuleManagerDelegate = reactHostDelegate.turboModuleManagerDelegateBuilder
+                .setPackages(reactPackages)
+                .setReactApplicationContext(context)
+                .build()
 
-        // This will install the JSI bindings
-        uiTurboModuleManager = TurboModuleManager(
-            // TurboModuleManager will call jni -> cpp, to actually setup nativeModuleProxy
-            runtimeExecutor = uiRuntimeExecutor,
-            delegate = turboModuleManagerDelegate,
-            jsCallInvokerHolder = uiCallInvokerHolder,
-            nativeMethodCallInvokerHolder = nativeMethodCallInvokerHolder
-        )
+            val uiCallInvokerHolder = getUiCallInvokerHolder(workletsModule)
+            val uiRuntimeExecutor = getUiRuntimeExecutor(workletsModule)
 
+            // This will install the JSI bindings
+            uiTurboModuleManager = TurboModuleManager(
+                // TurboModuleManager will call jni -> cpp, to actually setup nativeModuleProxy
+                runtimeExecutor = uiRuntimeExecutor,
+                delegate = turboModuleManagerDelegate,
+                jsCallInvokerHolder = uiCallInvokerHolder,
+                nativeMethodCallInvokerHolder = nativeMethodCallInvokerHolder
+            )
+        }
+
+        val uiManager = UIManagerHelper.getUIManager(context, UIManagerType.FABRIC)
+            ?: throw IllegalStateException("Fabric UIManager is null! Is the Fabric architecture enabled?")
         val fabricUIManager = uiManager as? FabricUIManager
             ?: throw IllegalStateException("UIManager is not a FabricUIManager! Is the Fabric architecture enabled?")
         setupEventInterceptor(fabricUIManager)
@@ -103,7 +104,7 @@ class HybridUiListModule : HybridUiListModuleSpec() {
     }
 
     @OptIn(FrameworkAPI::class)
-    private external fun prepareUiRuntime(workletsModule: WorkletsModule)
+    private external fun prepareUiRuntime(workletsModule: WorkletsModule): Boolean
 
     @OptIn(FrameworkAPI::class)
     private external fun getUiCallInvokerHolder(workletsModule: WorkletsModule): CallInvokerHolderImpl
