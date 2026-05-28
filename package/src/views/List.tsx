@@ -20,7 +20,7 @@ import {
 import { createLinearListLayout, ListLayout } from '../ListLayout'
 import { useChangeEffect } from '../hooks/useChangeEffect'
 import {
-  renderSyncWorklet,
+  completeRootSyncWorklet,
   registerManagedSurfaceWorklet,
   unregisterManagedSurfaceWorklet,
   uiListModuleBoxed,
@@ -251,7 +251,7 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
 
         const { disposeReactRoot } = getReactFabricRenderer()
         unregisterManagedSurfaceWorklet(surfaceId)
-        disposeReactRoot(surfaceId)
+        disposeReactRoot(surfaceId, completeRootSyncWorklet)
         state.elementRecords = []
 
         for (const key of Object.keys(state.reactTagToRecordIndex)) {
@@ -380,7 +380,12 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
 
             const elements = renderListElements()
             const parentContainer = <View>{elements}</View>
-            reactRender(surfaceId, parentContainer, () => {})
+            reactRender(
+              surfaceId,
+              parentContainer,
+              () => {},
+              completeRootSyncWorklet
+            )
             rebuildTagPositions()
           }
 
@@ -444,8 +449,6 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
             state.reactTagToRecordIndex[reactTag] = currentIndex
             state.reactTagToReactKey[reactTag] = reactKey
 
-            renderSyncWorklet(surfaceId)
-
             return reactTag
           }
 
@@ -500,7 +503,6 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
             record.dataKey = item.key
 
             renderContentInReact()
-            renderSyncWorklet(surfaceId)
 
             return true
           }

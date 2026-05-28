@@ -46,6 +46,8 @@ const {
   IdleEventPriority,
 } = require('react-reconciler/constants')
 global.currentUpdatePriority = NoEventPriority
+let currentCompleteRootSync: null | ((surfaceId: number, childSet: unknown) => void) =
+  null
 
 global.rootContainersBySurfaceId = global.rootContainersBySurfaceId ?? {}
 
@@ -533,7 +535,12 @@ const HostConfig = {
   },
   replaceContainerChildren(container, newChildren) {
     nativeLog('[replaceContainerChildren]')
-    uiManager.completeRoot(container.containerTag, newChildren)
+    const completeRootSync = currentCompleteRootSync
+    if (completeRootSync == null) {
+      throw new Error('completeRootSync callback is required.')
+    }
+
+    completeRootSync(container.containerTag, newChildren)
   },
 
   // TODO: hm, this could get problematic, to share event priorities between the fabric ui manager.
@@ -733,27 +740,43 @@ function getRootContainer(surfaceId: number) {
 function reactRender(
   surfaceId: number,
   element: ReactModule.ReactElement,
-  callback?: () => void
+  callback?: () => void,
+  completeRootSync?: (surfaceId: number, childSet: unknown) => void
 ): void {
   const rootContainer = getRootContainer(surfaceId)
+  const previousCompleteRootSync = currentCompleteRootSync
+  currentCompleteRootSync = completeRootSync ?? null
 
   // updateContainerSync + flushSyncWork is making the renderer work immediately/blocking/…sync
-  Renderer.updateContainerSync(element, rootContainer, null, callback)
-  // Renderer.flushPassiveEffects();
-  Renderer.flushSyncWork()
-  nativeLog('[ReactFabricMirror] updateContainer finished')
+  try {
+    Renderer.updateContainerSync(element, rootContainer, null, callback)
+    // Renderer.flushPassiveEffects();
+    Renderer.flushSyncWork()
+    nativeLog('[ReactFabricMirror] updateContainer finished')
+  } finally {
+    currentCompleteRootSync = previousCompleteRootSync
+  }
 }
 
-function disposeReactRoot(surfaceId: number): void {
+function disposeReactRoot(
+  surfaceId: number,
+  completeRootSync: (surfaceId: number, childSet: unknown) => void
+): void {
   const rootContainer = global.rootContainersBySurfaceId[surfaceId]
   if (rootContainer == null) {
     return
   }
 
-  Renderer.updateContainerSync(null, rootContainer, null, null)
-  Renderer.flushSyncWork()
-  delete global.rootContainersBySurfaceId[surfaceId]
-  nativeLog('[ReactFabricMirror] disposed root', surfaceId)
+  const previousCompleteRootSync = currentCompleteRootSync
+  currentCompleteRootSync = completeRootSync
+  try {
+    Renderer.updateContainerSync(null, rootContainer, null, null)
+    Renderer.flushSyncWork()
+    delete global.rootContainersBySurfaceId[surfaceId]
+    nativeLog('[ReactFabricMirror] disposed root', surfaceId)
+  } finally {
+    currentCompleteRootSync = previousCompleteRootSync
+  }
 }
 nativeLog('[ReactFabricMirror] ReactFabricMirror initialized')
 

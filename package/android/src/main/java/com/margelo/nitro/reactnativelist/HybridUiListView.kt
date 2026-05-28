@@ -3,7 +3,6 @@ package com.margelo.nitro.reactnativelist
 import android.graphics.Color
 import android.graphics.Canvas
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -39,6 +38,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     private var isRecyclerViewLayoutScheduled = false
     private var rendererSurface: ReactSurface? = null
     private var rendererSurfaceId: Int? = null
+    private var isRendererSurfaceStarted = false
     private var isDisposed = false
 
     override val view: RecyclerView by lazy {
@@ -91,6 +91,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             val surface = rendererSurface
             rendererSurface = null
             rendererSurfaceId = null
+            isRendererSurfaceStarted = false
 
             if (surface == null) {
                 return@runOnMainSync
@@ -114,7 +115,6 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
         runOnMain {
             val existingDataSource = this.dataSource
             if (existingDataSource === nativeDataSource) {
-                Log.w("HybridUiListView", "setDataSource called with the same data source instance. Ignoring.")
                 return@runOnMain
             }
 
@@ -213,8 +213,25 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
         )
         nativeAdapter.dataSource = dataSource
         adapter = nativeAdapter
-        view.adapter = nativeAdapter
+        attachAdapterIfRendererReady()
         return nativeAdapter
+    }
+
+    private fun attachAdapterIfRendererReady() {
+        val nativeAdapter = adapter
+            ?: return
+
+        val surfaceId = rendererSurfaceId
+        if (surfaceId != null && !isRendererSurfaceStarted) {
+            return
+        }
+
+        val currentAdapter = view.adapter
+        if (currentAdapter === nativeAdapter) {
+            return
+        }
+
+        view.adapter = nativeAdapter
     }
 
     private fun ensureRendererSurface(): Int {
@@ -237,9 +254,40 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
 
         rendererSurface = surface
         rendererSurfaceId = surfaceId
+        isRendererSurfaceStarted = false
         isDisposed = false
 
-        surface.start()
+        val startTask = surface.start()
+        val waitThread = Thread {
+            try {
+                startTask.waitForCompletion()
+                view.post {
+                    val startError = startTask.getError()
+                    if (startError != null) {
+                        throw startError
+                    }
+
+                    if (isDisposed) {
+                        return@post
+                    }
+
+                    val currentSurfaceId = rendererSurfaceId
+                    if (currentSurfaceId != surfaceId) {
+                        return@post
+                    }
+
+                    isRendererSurfaceStarted = true
+                    attachAdapterIfRendererReady()
+                    scheduleRecyclerViewLayout()
+                }
+            } catch (throwable: Throwable) {
+                view.post {
+                    throw throwable
+                }
+            }
+        }
+        waitThread.name = "UiListSurfaceStart-$surfaceId"
+        waitThread.start()
 
         return surfaceId
     }
@@ -274,6 +322,11 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     }
 
     private fun scheduleRecyclerViewLayout() {
+        val surfaceId = rendererSurfaceId
+        if (surfaceId != null && !isRendererSurfaceStarted) {
+            return
+        }
+
         if (isRecyclerViewLayoutScheduled) {
             return
         }
@@ -345,4 +398,5 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             canvas.restoreToCount(saveCount)
         }
     }
+
 }

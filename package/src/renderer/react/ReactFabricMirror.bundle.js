@@ -1575,6 +1575,7 @@ var {
   IdleEventPriority
 } = require("react-reconciler/constants");
 global.currentUpdatePriority = NoEventPriority;
+var currentCompleteRootSync = null;
 global.rootContainersBySurfaceId = global.rootContainersBySurfaceId ?? {};
 var {
   getPublicInstance
@@ -1871,7 +1872,11 @@ var HostConfig = {
   },
   replaceContainerChildren(container, newChildren) {
     nativeLog("[replaceContainerChildren]");
-    uiManager.completeRoot(container.containerTag, newChildren);
+    const completeRootSync = currentCompleteRootSync;
+    if (completeRootSync == null) {
+      throw new Error("completeRootSync callback is required.");
+    }
+    completeRootSync(container.containerTag, newChildren);
   },
   setCurrentUpdatePriority(priority) {
     global.currentUpdatePriority = priority;
@@ -1961,20 +1966,32 @@ function getRootContainer(surfaceId) {
   }
   return rootContainer;
 }
-function reactRender(surfaceId, element, callback) {
+function reactRender(surfaceId, element, callback, completeRootSync) {
   const rootContainer = getRootContainer(surfaceId);
-  Renderer.updateContainerSync(element, rootContainer, null, callback);
-  Renderer.flushSyncWork();
-  nativeLog("[ReactFabricMirror] updateContainer finished");
+  const previousCompleteRootSync = currentCompleteRootSync;
+  currentCompleteRootSync = completeRootSync ?? null;
+  try {
+    Renderer.updateContainerSync(element, rootContainer, null, callback);
+    Renderer.flushSyncWork();
+    nativeLog("[ReactFabricMirror] updateContainer finished");
+  } finally {
+    currentCompleteRootSync = previousCompleteRootSync;
+  }
 }
-function disposeReactRoot(surfaceId) {
+function disposeReactRoot(surfaceId, completeRootSync) {
   const rootContainer = global.rootContainersBySurfaceId[surfaceId];
   if (rootContainer == null) {
     return;
   }
-  Renderer.updateContainerSync(null, rootContainer, null, null);
-  Renderer.flushSyncWork();
-  delete global.rootContainersBySurfaceId[surfaceId];
-  nativeLog("[ReactFabricMirror] disposed root", surfaceId);
+  const previousCompleteRootSync = currentCompleteRootSync;
+  currentCompleteRootSync = completeRootSync;
+  try {
+    Renderer.updateContainerSync(null, rootContainer, null, null);
+    Renderer.flushSyncWork();
+    delete global.rootContainersBySurfaceId[surfaceId];
+    nativeLog("[ReactFabricMirror] disposed root", surfaceId);
+  } finally {
+    currentCompleteRootSync = previousCompleteRootSync;
+  }
 }
 nativeLog("[ReactFabricMirror] ReactFabricMirror initialized");
