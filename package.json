@@ -21,8 +21,7 @@
     "metro@0.83.7": "patches/metro@0.83.7.patch",
     "metro-runtime@0.83.7": "patches/metro-runtime@0.83.7.patch",
     "react-native@0.83.6": "patches/react-native@0.83.6.patch",
-    "@expo/metro-config@55.0.18": "patches/@expo%2Fmetro-config@55.0.18.patch",
-    "react-native-worklets@0.8.1": "patches/react-native-worklets@0.8.1.patch"
+    "react-native-worklets@0.9.1": "patches/react-native-worklets@0.9.1.patch"
   },
   "scripts": {},
   "dependencies": {
@@ -33,7 +32,7 @@
   "catalog": {
     "react": "19.2.0",
     "react-native": "0.83.6",
-    "react-native-worklets": "0.8.1",
+    "react-native-worklets": "0.9.1",
     "nitrogen": "^0.35.6",
     "react-native-nitro-modules": "^0.35.6"
   }

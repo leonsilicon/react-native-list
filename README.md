@@ -6,7 +6,9 @@ High-performance list primitives for React Native.
 
 > [!WARNING]
 > Using this library requires you to use [react-native-worklets **bundle mode**](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/setup).
-> Please follow the setup instructions of it first, and make sure your app works before using react-native-list!
+>
+> - Please follow the setup instructions of it first, and make sure your app works before using react-native-list!
+> - You need at least version 0.9.1!
 
 ```sh
 bun add react-native-list
