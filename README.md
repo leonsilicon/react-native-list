@@ -8,7 +8,7 @@ High-performance list primitives for React Native.
 - 🐎 Platform native animations out of the box for list item transitions
 - 📉 Low memory usage due to true native view recycling
 
-https://github.com/hannojg/react-native-list/raw/refs/heads/main/docs/demo.MP4
+https://github.com/d4d55a55-cb03-402b-8876-b93b08a260bd
 
 ## Installation
 
