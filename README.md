@@ -2,6 +2,12 @@
 
 High-performance list primitives for React Native.
 
+- 📱 True native [`UICollectionView`](https://developer.apple.com/documentation/uikit/uicollectionview) on iOS
+- 🤖 True native [`RecyclerView`](https://developer.android.com/develop/ui/views/layout/recyclerview) on android
+- 🔄 Synchronous rendering of react components using "worklet" function components
+- 🐎 Platform native animations out of the box for list item transitions
+- 📉 Low memory usage due to true native view recycling
+
 ## Installation
 
 > [!WARNING]
@@ -55,6 +61,18 @@ module.exports = rnlistConfig;
 > ```
 >
 > If you don't see a `metro.config.js` in your project, see [expo's documentation on modifying metro](https://docs.expo.dev/guides/customizing-metro/).
+
+## Simple example
+
+XXXX
+
+## API
+
+XXXX
+
+## Benchmark
+
+XXXX
 
 ## Development
 
