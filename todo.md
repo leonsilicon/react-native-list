@@ -11,12 +11,12 @@
 [x] - Right now we need to pass a fixed size to the list (with height/width), lets get rid of that
 [x] - Changing item height back and forth breaks layout on iOS
 [ ] - Data source API add animated:boolean option for all operations, or also think about how we could give the developer here a proper animation API
-[ ] - ios: rendering one list, and then a second one crashes the app - i assume react key collision
+[x] - ios: rendering one list, and then a second one crashes the app - i assume react key collision
 [x] - Android: you always have to interact with the UI once to render out the changes lol
 [x] - Android: content overflowing
 [x] - iOS: first content broken layout
 [ ] - Upgrade nitro to latest
-[ ] - I have hardcoded surface 3 basically everywhere thats not good
+[x] - I have hardcoded surface 3 basically everywhere thats not good
 
 ## Base functionality (what users expect to just work)
 
@@ -41,9 +41,9 @@ with some other performance data.
 
 ## Stability
 
-[ ] - Fix the crash by delaying setting the adapter after the render phase - I think the issue is really that the adapter fill will be requested on layout
-[ ] - Fix crash during hot reload
+[x] - Fix the crash by delaying setting the adapter after the render phase - I think the issue is really that the adapter fill will be requested on layout
+[x] - Fix crash during hot reload
 [ ] - Test with worklets global strict mode
-[ ] - (Android) There is an issue with the how the mounting item dispatcher works. I think it only executes at choreographer frame interval, but
+[x] - (Android) There is an issue with the how the mounting item dispatcher works. I think it only executes at choreographer frame interval, but
 we basically want it to "force render" something for our view. In 90% of cases the window is hit, but sometimes the app crashes here
 because the view has not yet rendered out.
