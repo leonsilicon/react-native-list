@@ -11,7 +11,11 @@ High-performance list primitives for React Native.
 > - You need at least version 0.9.1!
 
 > [!CAUTION]
-> Right now you will have to patch react-native-worklets. Once those PRs are landed upstream it will no longer be necessary:
+> Right now you will have to patch react-native-worklets. See the patch file here and ask your friendly AI to apply it:
+>
+> - [react-native-worklets@0.9.1.patch](https://github.com/hannojg/react-native-list/blob/main/patches/react-native-worklets%400.9.1.patch)
+>
+> Once those PRs are landed upstream it will no longer be necessary:
 >
 > - [fix(bundlemode): getBundleModeMetroConfig consider user config's resolveRequest](https://github.com/software-mansion/react-native-reanimated/pull/9327)
 > - [worklets plugin: allow react-native imports in bundle mode](https://github.com/software-mansion/react-native-reanimated/pull/9213)
