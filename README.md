@@ -2,13 +2,22 @@
 
 High-performance list primitives for React Native.
 
-- 📱 True native [`UICollectionView`](https://developer.apple.com/documentation/uikit/uicollectionview) on iOS
-- 🤖 True native [`RecyclerView`](https://developer.android.com/develop/ui/views/layout/recyclerview) on android
-- 🔄 Synchronous rendering of react components using "worklet" function components
-- 🐎 Platform native animations out of the box for list item transitions
-- 📉 Low memory usage due to true native view recycling
-
-https://github.com/user-attachments/assets/bd1eddd7-e166-4b91-b7ee-d177ce8edb58
+<table>
+<tr>
+<td valign="top">
+<ul>
+<li>📱 True native <a href="https://developer.apple.com/documentation/uikit/uicollectionview">UICollectionView</a> on iOS</li>
+<li>🤖 True native <a href="https://developer.android.com/develop/ui/views/layout/recyclerview">RecyclerView</a> on android</li>
+<li>🔄 Synchronous rendering of react components using "worklet" function components</li>
+<li>🐎 Platform native animations out of the box for list item transitions</li>
+<li>📉 Low memory usage due to true native view recycling</li>
+</ul>
+</td>
+<td valign="top">
+<video src="https://github.com/user-attachments/assets/bd1eddd7-e166-4b91-b7ee-d177ce8edb58" width="320" controls></video>
+</td>
+</tr>
+</table>
 
 ## Installation
 
