@@ -66,7 +66,68 @@ module.exports = rnlistConfig;
 
 ## Simple example
 
-XXXX
+```tsx
+import {  List, useLinearListLayout, useListDataSource } from "react-native-list";
+import type { ListItem, ListRenderers } from "react-native-list";
+
+type TextItem = ListItem<
+  // The type of your list item
+  "text",
+  // The data shape for that list item:
+  {
+    text: string;
+  }
+>;
+
+type ImageItem = ...
+
+type Items = TextItem | ImageItem
+
+// Provide render functions for your item types:
+const renderers: ListRenderers<Items> = {
+  text: {
+    renderItemWorklet: ({ item }) => {
+      "worklet";
+
+      return (
+        <View
+          style={{
+            justifyContent: "center",
+            paddingHorizontal: 16,
+            backgroundColor: "#f6f8fa",
+          }}
+        >
+          // Note: there are two phases: 1. View creation (without data), 2. binding data to the views
+          //       that's why item.data can be undefined because the native list is requesting to
+          //       create the view hierarchy, but without any data yet.
+          <Text>{item.data?.text}</Text>
+        </View>
+      );
+    },
+  },
+  image: ...
+};
+
+export function ExampleList() {
+  const dataSource = useListDataSource<Items>({
+    data: [...],
+  });
+  const layout = useLinearListLayout({
+    itemSpacing: 8,
+  });
+
+  return (
+    <List
+      dataSource={dataSource}
+      layout={layout}
+      renderers={renderers}
+      style={{
+        flex: 1,
+      }}
+    />
+  );
+}
+```
 
 ## API
 
