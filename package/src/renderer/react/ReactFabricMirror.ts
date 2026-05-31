@@ -402,13 +402,6 @@ const HostConfig = {
 
     let node
     try {
-      nativeLog(
-        '[createInstance] calling createNode with type=',
-        type,
-        'tag=',
-        tag
-      )
-      nativeLog('[createInstance] props=', updatePayload)
       node = uiManager.createNode(
         tag, // reactTag
         viewConfig.uiViewClassName, // viewName
@@ -439,12 +432,10 @@ const HostConfig = {
   },
 
   finalizeInitialChildren(parentInstance, type, props, hostContext) {
-    nativeLog('[finalizeInitialChildren]')
     return false
   },
 
   cloneInstance(instance, type, oldProps, newProps, keepChildren, newChildSet) {
-    nativeLog('[cloneInstance] tag=', instance.canonical.nativeTag)
 
     const viewConfig = instance.canonical.viewConfig
     const updatePayload = diffAttributePayloads(
@@ -452,7 +443,6 @@ const HostConfig = {
       newProps,
       viewConfig.validAttributes
     )
-    nativeLog('[cloneInstance] updatePayload=', updatePayload)
     // TODO: If the event handlers have changed, we need to update the current props
     // in the commit phase but there is no host config hook to do it yet.
     // So instead we hack it by updating it in the render phase.
@@ -518,23 +508,18 @@ const HostConfig = {
     }
   },
   createContainerChildSet() {
-    nativeLog('[createContainerChildSet]')
     return uiManager.createChildSet()
   },
   appendChildToContainerChildSet(childSet, child) {
-    nativeLog('[appendChildToContainerChildSet]')
     uiManager.appendChildToSet(childSet, child.node)
   },
   finalizeContainerChildren(container, newChildren) {
     // Noop - children will be replaced in replaceContainerChildren
-    nativeLog('[finalizeContainerChildren]')
   },
   appendInitialChild(parentInstance, child) {
-    nativeLog('[appendInitialChild]')
     uiManager.appendChild(parentInstance.node, child.node)
   },
   replaceContainerChildren(container, newChildren) {
-    nativeLog('[replaceContainerChildren]')
     const completeRootSync = currentCompleteRootSync
     if (completeRootSync == null) {
       throw new Error('completeRootSync callback is required.')
@@ -752,7 +737,6 @@ function reactRender(
     Renderer.updateContainerSync(element, rootContainer, null, callback)
     // Renderer.flushPassiveEffects();
     Renderer.flushSyncWork()
-    nativeLog('[ReactFabricMirror] updateContainer finished')
   } finally {
     currentCompleteRootSync = previousCompleteRootSync
   }
@@ -773,7 +757,6 @@ function disposeReactRoot(
     Renderer.updateContainerSync(null, rootContainer, null, null)
     Renderer.flushSyncWork()
     delete global.rootContainersBySurfaceId[surfaceId]
-    nativeLog('[ReactFabricMirror] disposed root', surfaceId)
   } finally {
     currentCompleteRootSync = previousCompleteRootSync
   }
