@@ -41,12 +41,18 @@ namespace margelo::nitro::reactnativelist {
       double bottomInset = this->getFieldValue(fieldBottomInset);
       static const auto fieldItemSpacing = clazz->getField<double>("itemSpacing");
       double itemSpacing = this->getFieldValue(fieldItemSpacing);
+      static const auto fieldItemHorizontalInset = clazz->getField<double>("itemHorizontalInset");
+      double itemHorizontalInset = this->getFieldValue(fieldItemHorizontalInset);
+      static const auto fieldItemVerticalInset = clazz->getField<double>("itemVerticalInset");
+      double itemVerticalInset = this->getFieldValue(fieldItemVerticalInset);
       static const auto fieldIosConfig = clazz->getField<JNativeLinearListLayoutIOSConfig>("iosConfig");
       jni::local_ref<JNativeLinearListLayoutIOSConfig> iosConfig = this->getFieldValue(fieldIosConfig);
       return NativeLinearListLayoutConfig(
         topInset,
         bottomInset,
         itemSpacing,
+        itemHorizontalInset,
+        itemVerticalInset,
         iosConfig != nullptr ? std::make_optional(iosConfig->toCpp()) : std::nullopt
       );
     }
@@ -57,7 +63,7 @@ namespace margelo::nitro::reactnativelist {
      */
     [[maybe_unused]]
     static jni::local_ref<JNativeLinearListLayoutConfig::javaobject> fromCpp(const NativeLinearListLayoutConfig& value) {
-      using JSignature = JNativeLinearListLayoutConfig(double, double, double, jni::alias_ref<JNativeLinearListLayoutIOSConfig>);
+      using JSignature = JNativeLinearListLayoutConfig(double, double, double, double, double, jni::alias_ref<JNativeLinearListLayoutIOSConfig>);
       static const auto clazz = javaClassStatic();
       static const auto create = clazz->getStaticMethod<JSignature>("fromCpp");
       return create(
@@ -65,6 +71,8 @@ namespace margelo::nitro::reactnativelist {
         value.topInset,
         value.bottomInset,
         value.itemSpacing,
+        value.itemHorizontalInset,
+        value.itemVerticalInset,
         value.iosConfig.has_value() ? JNativeLinearListLayoutIOSConfig::fromCpp(value.iosConfig.value()) : nullptr
       );
     }

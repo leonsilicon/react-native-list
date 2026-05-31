@@ -38,6 +38,8 @@ const defaultLinearListLayoutConfig: NativeLinearListLayoutConfig = {
   topInset: 16,
   bottomInset: 16,
   itemSpacing: 12,
+  itemHorizontalInset: 0,
+  itemVerticalInset: 0,
 }
 
 function normalizeLinearConfig(
@@ -49,6 +51,12 @@ function normalizeLinearConfig(
       config.bottomInset ?? defaultLinearListLayoutConfig.bottomInset,
     itemSpacing:
       config.itemSpacing ?? defaultLinearListLayoutConfig.itemSpacing,
+    itemHorizontalInset:
+      config.itemHorizontalInset ??
+      defaultLinearListLayoutConfig.itemHorizontalInset,
+    itemVerticalInset:
+      config.itemVerticalInset ??
+      defaultLinearListLayoutConfig.itemVerticalInset,
     iosConfig: config.iosConfig,
   }
 }

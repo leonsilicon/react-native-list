@@ -13,6 +13,8 @@ export interface NativeLinearListLayoutConfig {
   topInset: number
   bottomInset: number
   itemSpacing: number
+  itemHorizontalInset: number
+  itemVerticalInset: number
   iosConfig?: NativeLinearListLayoutIOSConfig
 }
 

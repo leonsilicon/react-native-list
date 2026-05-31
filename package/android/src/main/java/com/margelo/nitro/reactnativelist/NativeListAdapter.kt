@@ -18,6 +18,7 @@ internal class NativeListAdapter(
     private val itemTypeByViewType = mutableMapOf<Int, String>()
     private val measuredContentSizeByItemKey = mutableMapOf<String, PixelSize>()
     private var nextViewType = 1
+    var itemContentInsets = ItemContentInsets(horizontal = 0, vertical = 0)
 
     class ViewHolder(val container: FrameLayout) : RecyclerView.ViewHolder(container) {
         var hostedView: View? = null
@@ -167,11 +168,21 @@ internal class NativeListAdapter(
     }
 
     private fun bindContainerLayout(container: FrameLayout, contentSize: ResolvedPixelSize) {
+        val horizontalInset = itemContentInsets.horizontal
+        val verticalInset = itemContentInsets.vertical
+        val containerWidth = contentSize.width + horizontalInset * 2
+        val containerHeight = contentSize.height + verticalInset * 2
         val layoutParams = container.layoutParams as? RecyclerView.LayoutParams
-            ?: RecyclerView.LayoutParams(contentSize.width, contentSize.height)
-        layoutParams.width = contentSize.width
-        layoutParams.height = contentSize.height
+            ?: RecyclerView.LayoutParams(containerWidth, containerHeight)
+        layoutParams.width = containerWidth
+        layoutParams.height = containerHeight
         container.layoutParams = layoutParams
+        container.setPadding(
+            horizontalInset,
+            verticalInset,
+            horizontalInset,
+            verticalInset
+        )
     }
 
     private fun bindChildLayout(child: View, contentSize: ResolvedPixelSize) {

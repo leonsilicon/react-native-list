@@ -82,6 +82,8 @@ class HybridUiListView : HybridUiListViewSpec {
     private var measuredContentSizeByItemKey: [String: CGSize] = [:]
     private var hasScheduledLayoutInvalidation = false
     private let measuredSizeTolerance: CGFloat = 0.5
+    private let debugInvalidSizeLogLimit = 20
+    private var debugInvalidSizeLogCount = 0
     private var rendererSurfaceId: ReactTag?
     // Fabric unmount asserts that a child is still mounted under its original parent.
     // Cells temporarily host those views, so teardown must restore the parent first.
@@ -227,6 +229,8 @@ class HybridUiListView : HybridUiListViewSpec {
             configureCollectionViewIfNeeded()
             let collectionViewLayout = nextLayout.makeCollectionViewLayout(owner: self)
             collectionView?.setCollectionViewLayout(collectionViewLayout, animated: false)
+            updateVisibleCellContentLayouts()
+            collectionView?.collectionViewLayout.invalidateLayout()
         }
     }
 
@@ -442,7 +446,10 @@ class HybridUiListView : HybridUiListViewSpec {
                 )
             }
             cell.bind(itemKey: item.key)
-            cell.updateContentSize(contentSize)
+            cell.updateContentLayout(
+                contentSize: contentSize,
+                contentInset: layoutProvider.itemContentInset()
+            )
             return
         }
 
@@ -450,6 +457,7 @@ class HybridUiListView : HybridUiListViewSpec {
         cell.install(
             view: result.0,
             contentSize: contentSize,
+            contentInset: layoutProvider.itemContentInset(),
             itemKey: item.key,
             itemType: item.type
         )
@@ -464,6 +472,23 @@ class HybridUiListView : HybridUiListViewSpec {
         let activeKeySet = Set(activeKeys)
         measuredContentSizeByItemKey = measuredContentSizeByItemKey.filter { entry in
             return activeKeySet.contains(entry.key)
+        }
+    }
+
+    private func updateVisibleCellContentLayouts() {
+        guard let collectionView, let dataSource else { return }
+
+        let visibleCells = collectionView.visibleCells
+        for visibleCell in visibleCells {
+            guard let cell = visibleCell as? HostCell else { continue }
+            guard let indexPath = collectionView.indexPath(for: cell) else { continue }
+
+            let item = dataSource.itemForCollectionViewQuery(at: indexPath.item)
+            let contentSize = resolvedContentSize(for: item)
+            cell.updateContentLayout(
+                contentSize: contentSize,
+                contentInset: layoutProvider.itemContentInset()
+            )
         }
     }
 
@@ -489,6 +514,55 @@ class HybridUiListView : HybridUiListViewSpec {
             self.hasScheduledLayoutInvalidation = false
             self.collectionView?.collectionViewLayout.invalidateLayout()
         }
+    }
+
+    private func logSuspiciousLayoutSizeIfNeeded(
+        collectionView: UICollectionView,
+        collectionViewLayout: UICollectionViewLayout,
+        indexPath: IndexPath,
+        item: NativeListItem,
+        contentSize: CGSize,
+        itemSize: CGSize
+    ) {
+        if debugInvalidSizeLogCount >= debugInvalidSizeLogLimit {
+            return
+        }
+
+        let adjustedInset = collectionView.adjustedContentInset
+        let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout
+        let sectionInset = flowLayout?.sectionInset ?? .zero
+        let horizontalInset = adjustedInset.left + adjustedInset.right
+        let horizontalSectionInset = sectionInset.left + sectionInset.right
+        let availableWidth = collectionView.bounds.width - horizontalInset - horizontalSectionInset
+        let isTooWide = itemSize.width > availableWidth + measuredSizeTolerance
+        let hasInvalidWidth = !itemSize.width.isFinite || itemSize.width <= 0
+        let hasInvalidHeight = !itemSize.height.isFinite || itemSize.height <= 0
+
+        if !isTooWide && !hasInvalidWidth && !hasInvalidHeight {
+            return
+        }
+
+        debugInvalidSizeLogCount += 1
+
+        let cachedSize = measuredContentSizeByItemKey[item.key]
+        let itemWidthText = String(describing: item.width)
+        let itemHeightText = String(describing: item.height)
+        let cachedSizeText = String(describing: cachedSize)
+        let message =
+            "[UserDebug] Suspicious UICollectionViewFlowLayout item size " +
+            "index=\(indexPath.item) " +
+            "key=\(item.key) " +
+            "itemSize=\(itemSize) " +
+            "contentSize=\(contentSize) " +
+            "itemWidth=\(itemWidthText) " +
+            "itemHeight=\(itemHeightText) " +
+            "cachedMeasuredSize=\(cachedSizeText) " +
+            "collectionBounds=\(collectionView.bounds) " +
+            "adjustedInset=\(adjustedInset) " +
+            "sectionInset=\(sectionInset) " +
+            "availableWidth=\(availableWidth)"
+
+        print(message)
     }
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -521,7 +595,16 @@ class HybridUiListView : HybridUiListViewSpec {
 
         let item = dataSource.itemForCollectionViewQuery(at: indexPath.item)
         let contentSize = resolvedContentSize(for: item)
-        return layoutProvider.layoutSize(contentSize: contentSize)
+        let itemSize = layoutProvider.layoutSize(contentSize: contentSize)
+        logSuspiciousLayoutSizeIfNeeded(
+            collectionView: collectionView,
+            collectionViewLayout: collectionViewLayout,
+            indexPath: indexPath,
+            item: item,
+            contentSize: contentSize,
+            itemSize: itemSize
+        )
+        return itemSize
     }
 
     func collectionView(
@@ -561,7 +644,10 @@ class HybridUiListView : HybridUiListViewSpec {
         if let hostedView = cell.hostedContentView, needsMeasuredContentSize(for: item) {
             let didMeasureNewSize = captureMeasuredContentSize(for: item, view: hostedView)
             let measuredContentSize = resolvedContentSize(for: item)
-            cell.updateContentSize(measuredContentSize)
+            cell.updateContentLayout(
+                contentSize: measuredContentSize,
+                contentInset: layoutProvider.itemContentInset()
+            )
 
             if didMeasureNewSize {
                 scheduleLayoutInvalidation()

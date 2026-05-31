@@ -36,6 +36,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
     private var adapter: NativeListAdapter? = null
     private var dataSource: HybridNativeListDataSource? = null
     private var isRecyclerViewLayoutScheduled = false
+    private var itemContentInsets = ItemContentInsets(horizontal = 0, vertical = 0)
     private var rendererSurface: ReactSurface? = null
     private var rendererSurfaceId: Int? = null
     private var isRendererSurfaceStarted = false
@@ -134,6 +135,12 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
             ?: throw IllegalStateException("NativeListLayout must provide a platform layout.")
 
         runOnMain {
+            itemContentInsets = layoutProvider.itemContentInsets(reactContext)
+            val nativeAdapter = adapter
+            if (nativeAdapter != null) {
+                nativeAdapter.itemContentInsets = itemContentInsets
+                nativeAdapter.notifyDataSetChanged()
+            }
             layoutProvider.applyTo(view, reactContext)
             scheduleRecyclerViewLayout()
         }
@@ -211,6 +218,7 @@ class HybridUiListView(val reactContext: ThemedReactContext) :
                 capturedCallback(reactTag, item, index)
             }
         )
+        nativeAdapter.itemContentInsets = itemContentInsets
         nativeAdapter.dataSource = dataSource
         adapter = nativeAdapter
         attachAdapterIfRendererReady()

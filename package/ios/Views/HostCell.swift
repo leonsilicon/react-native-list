@@ -2,10 +2,9 @@ import UIKit
 
 final class HostCell: UICollectionViewCell {
 
-    static let verticalInset: CGFloat = 8
-    static let horizontalInset: CGFloat = 16
-
     private var hostedView: UIView?
+    private var topConstraint: NSLayoutConstraint?
+    private var leadingConstraint: NSLayoutConstraint?
     private var widthConstraint: NSLayoutConstraint?
     private var heightConstraint: NSLayoutConstraint?
 
@@ -16,7 +15,13 @@ final class HostCell: UICollectionViewCell {
         return hostedView
     }
 
-    func install(view: UIView, contentSize: CGSize, itemKey: String, itemType: String) {
+    func install(
+        view: UIView,
+        contentSize: CGSize,
+        contentInset: UIEdgeInsets,
+        itemKey: String,
+        itemType: String
+    ) {
         if let currentHostedView = hostedView {
             let isCurrentViewOwnedByCell = currentHostedView.superview === contentView
             if isCurrentViewOwnedByCell {
@@ -37,12 +42,22 @@ final class HostCell: UICollectionViewCell {
 
         let widthConstraint = view.widthAnchor.constraint(equalToConstant: contentSize.width)
         let heightConstraint = view.heightAnchor.constraint(equalToConstant: contentSize.height)
+        let topConstraint = view.topAnchor.constraint(
+            equalTo: contentView.topAnchor,
+            constant: contentInset.top
+        )
+        let leadingConstraint = view.leadingAnchor.constraint(
+            equalTo: contentView.leadingAnchor,
+            constant: contentInset.left
+        )
+        self.topConstraint = topConstraint
+        self.leadingConstraint = leadingConstraint
         self.widthConstraint = widthConstraint
         self.heightConstraint = heightConstraint
 
         NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Self.verticalInset),
-            view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Self.horizontalInset),
+            topConstraint,
+            leadingConstraint,
             widthConstraint,
             heightConstraint,
         ])
@@ -63,7 +78,9 @@ final class HostCell: UICollectionViewCell {
         }
     }
 
-    func updateContentSize(_ contentSize: CGSize) {
+    func updateContentLayout(contentSize: CGSize, contentInset: UIEdgeInsets) {
+        setTopConstraint(contentInset.top)
+        setLeadingConstraint(contentInset.left)
         setWidthConstraint(contentSize.width)
         setHeightConstraint(contentSize.height)
     }
@@ -81,6 +98,8 @@ final class HostCell: UICollectionViewCell {
         reactTag = nil
         itemKey = nil
         itemType = nil
+        topConstraint = nil
+        leadingConstraint = nil
         widthConstraint = nil
         heightConstraint = nil
     }
@@ -130,6 +149,42 @@ final class HostCell: UICollectionViewCell {
         let widthConstraint = hostedView.widthAnchor.constraint(equalToConstant: width)
         self.widthConstraint = widthConstraint
         widthConstraint.isActive = true
+    }
+
+    private func setTopConstraint(_ topInset: CGFloat) {
+        if let topConstraint {
+            topConstraint.constant = topInset
+            if !topConstraint.isActive {
+                topConstraint.isActive = true
+            }
+            return
+        }
+
+        guard let hostedView else { return }
+        let topConstraint = hostedView.topAnchor.constraint(
+            equalTo: contentView.topAnchor,
+            constant: topInset
+        )
+        self.topConstraint = topConstraint
+        topConstraint.isActive = true
+    }
+
+    private func setLeadingConstraint(_ leadingInset: CGFloat) {
+        if let leadingConstraint {
+            leadingConstraint.constant = leadingInset
+            if !leadingConstraint.isActive {
+                leadingConstraint.isActive = true
+            }
+            return
+        }
+
+        guard let hostedView else { return }
+        let leadingConstraint = hostedView.leadingAnchor.constraint(
+            equalTo: contentView.leadingAnchor,
+            constant: leadingInset
+        )
+        self.leadingConstraint = leadingConstraint
+        leadingConstraint.isActive = true
     }
 
     private func setHeightConstraint(_ height: CGFloat) {

@@ -18,8 +18,8 @@ public extension NativeLinearListLayoutConfig {
   /**
    * Create a new instance of `NativeLinearListLayoutConfig`.
    */
-  init(topInset: Double, bottomInset: Double, itemSpacing: Double, iosConfig: NativeLinearListLayoutIOSConfig?) {
-    self.init(topInset, bottomInset, itemSpacing, { () -> bridge.std__optional_NativeLinearListLayoutIOSConfig_ in
+  init(topInset: Double, bottomInset: Double, itemSpacing: Double, itemHorizontalInset: Double, itemVerticalInset: Double, iosConfig: NativeLinearListLayoutIOSConfig?) {
+    self.init(topInset, bottomInset, itemSpacing, itemHorizontalInset, itemVerticalInset, { () -> bridge.std__optional_NativeLinearListLayoutIOSConfig_ in
       if let __unwrappedValue = iosConfig {
         return bridge.create_std__optional_NativeLinearListLayoutIOSConfig_(__unwrappedValue)
       } else {
@@ -41,6 +41,16 @@ public extension NativeLinearListLayoutConfig {
   @inline(__always)
   var itemSpacing: Double {
     return self.__itemSpacing
+  }
+  
+  @inline(__always)
+  var itemHorizontalInset: Double {
+    return self.__itemHorizontalInset
+  }
+  
+  @inline(__always)
+  var itemVerticalInset: Double {
+    return self.__itemVerticalInset
   }
   
   @inline(__always)

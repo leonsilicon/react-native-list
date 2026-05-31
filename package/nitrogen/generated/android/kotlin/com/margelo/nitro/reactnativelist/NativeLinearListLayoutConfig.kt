@@ -29,6 +29,12 @@ data class NativeLinearListLayoutConfig(
   val itemSpacing: Double,
   @DoNotStrip
   @Keep
+  val itemHorizontalInset: Double,
+  @DoNotStrip
+  @Keep
+  val itemVerticalInset: Double,
+  @DoNotStrip
+  @Keep
   val iosConfig: NativeLinearListLayoutIOSConfig?
 ) {
   /* primary constructor */
@@ -39,6 +45,8 @@ data class NativeLinearListLayoutConfig(
     return Objects.deepEquals(this.topInset, other.topInset)
       && Objects.deepEquals(this.bottomInset, other.bottomInset)
       && Objects.deepEquals(this.itemSpacing, other.itemSpacing)
+      && Objects.deepEquals(this.itemHorizontalInset, other.itemHorizontalInset)
+      && Objects.deepEquals(this.itemVerticalInset, other.itemVerticalInset)
       && Objects.deepEquals(this.iosConfig, other.iosConfig)
   }
 
@@ -47,6 +55,8 @@ data class NativeLinearListLayoutConfig(
       topInset,
       bottomInset,
       itemSpacing,
+      itemHorizontalInset,
+      itemVerticalInset,
       iosConfig
     ).contentDeepHashCode()
   }
@@ -59,8 +69,8 @@ data class NativeLinearListLayoutConfig(
     @Keep
     @Suppress("unused")
     @JvmStatic
-    private fun fromCpp(topInset: Double, bottomInset: Double, itemSpacing: Double, iosConfig: NativeLinearListLayoutIOSConfig?): NativeLinearListLayoutConfig {
-      return NativeLinearListLayoutConfig(topInset, bottomInset, itemSpacing, iosConfig)
+    private fun fromCpp(topInset: Double, bottomInset: Double, itemSpacing: Double, itemHorizontalInset: Double, itemVerticalInset: Double, iosConfig: NativeLinearListLayoutIOSConfig?): NativeLinearListLayoutConfig {
+      return NativeLinearListLayoutConfig(topInset, bottomInset, itemSpacing, itemHorizontalInset, itemVerticalInset, iosConfig)
     }
   }
 }

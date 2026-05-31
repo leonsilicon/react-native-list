@@ -44,11 +44,13 @@ namespace margelo::nitro::reactnativelist {
     double topInset     SWIFT_PRIVATE;
     double bottomInset     SWIFT_PRIVATE;
     double itemSpacing     SWIFT_PRIVATE;
+    double itemHorizontalInset     SWIFT_PRIVATE;
+    double itemVerticalInset     SWIFT_PRIVATE;
     std::optional<NativeLinearListLayoutIOSConfig> iosConfig     SWIFT_PRIVATE;
 
   public:
     NativeLinearListLayoutConfig() = default;
-    explicit NativeLinearListLayoutConfig(double topInset, double bottomInset, double itemSpacing, std::optional<NativeLinearListLayoutIOSConfig> iosConfig): topInset(topInset), bottomInset(bottomInset), itemSpacing(itemSpacing), iosConfig(iosConfig) {}
+    explicit NativeLinearListLayoutConfig(double topInset, double bottomInset, double itemSpacing, double itemHorizontalInset, double itemVerticalInset, std::optional<NativeLinearListLayoutIOSConfig> iosConfig): topInset(topInset), bottomInset(bottomInset), itemSpacing(itemSpacing), itemHorizontalInset(itemHorizontalInset), itemVerticalInset(itemVerticalInset), iosConfig(iosConfig) {}
 
   public:
     friend bool operator==(const NativeLinearListLayoutConfig& lhs, const NativeLinearListLayoutConfig& rhs) = default;
@@ -67,6 +69,8 @@ namespace margelo::nitro {
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "topInset"))),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "bottomInset"))),
         JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing"))),
+        JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemHorizontalInset"))),
+        JSIConverter<double>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemVerticalInset"))),
         JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "iosConfig")))
       );
     }
@@ -75,6 +79,8 @@ namespace margelo::nitro {
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "topInset"), JSIConverter<double>::toJSI(runtime, arg.topInset));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "bottomInset"), JSIConverter<double>::toJSI(runtime, arg.bottomInset));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing"), JSIConverter<double>::toJSI(runtime, arg.itemSpacing));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "itemHorizontalInset"), JSIConverter<double>::toJSI(runtime, arg.itemHorizontalInset));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "itemVerticalInset"), JSIConverter<double>::toJSI(runtime, arg.itemVerticalInset));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "iosConfig"), JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::toJSI(runtime, arg.iosConfig));
       return obj;
     }
@@ -89,6 +95,8 @@ namespace margelo::nitro {
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "topInset")))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "bottomInset")))) return false;
       if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemSpacing")))) return false;
+      if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemHorizontalInset")))) return false;
+      if (!JSIConverter<double>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "itemVerticalInset")))) return false;
       if (!JSIConverter<std::optional<margelo::nitro::reactnativelist::NativeLinearListLayoutIOSConfig>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "iosConfig")))) return false;
       return true;
     }

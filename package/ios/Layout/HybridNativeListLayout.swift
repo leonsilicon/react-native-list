@@ -6,6 +6,7 @@ class HybridNativeListLayout: HybridNativeListLayoutSpec {}
 protocol NativeListLayoutProviding: AnyObject {
     func makeCollectionViewLayout(owner: HybridUiListView) -> UICollectionViewLayout
     func layoutSize(contentSize: CGSize) -> CGSize
+    func itemContentInset() -> UIEdgeInsets
     func estimatedContentWidth(collectionViewWidth: CGFloat, viewWidth: CGFloat) -> CGFloat
     func estimatedContentHeight(collectionViewHeight: CGFloat, viewHeight: CGFloat) -> CGFloat
 }
@@ -14,6 +15,8 @@ class HybridNativeLinearListLayout: HybridNativeLinearListLayoutSpec, NativeList
     private var topInset: CGFloat = 16
     private var bottomInset: CGFloat = 16
     private var itemSpacing: CGFloat = 12
+    private var itemHorizontalInset: CGFloat = 0
+    private var itemVerticalInset: CGFloat = 0
     private var estimatedItemWidth: CGFloat?
     private var estimatedItemHeight: CGFloat?
 
@@ -21,6 +24,8 @@ class HybridNativeLinearListLayout: HybridNativeLinearListLayoutSpec, NativeList
         topInset = 16
         bottomInset = 16
         itemSpacing = 12
+        itemHorizontalInset = 0
+        itemVerticalInset = 0
         estimatedItemWidth = nil
         estimatedItemHeight = nil
     }
@@ -29,6 +34,8 @@ class HybridNativeLinearListLayout: HybridNativeLinearListLayoutSpec, NativeList
         topInset = CGFloat(config.topInset)
         bottomInset = CGFloat(config.bottomInset)
         itemSpacing = CGFloat(config.itemSpacing)
+        itemHorizontalInset = CGFloat(config.itemHorizontalInset)
+        itemVerticalInset = CGFloat(config.itemVerticalInset)
 
         let estimatedItemSize = config.iosConfig?.estimatedItemSize
         if let width = estimatedItemSize?.width {
@@ -61,9 +68,18 @@ class HybridNativeLinearListLayout: HybridNativeLinearListLayoutSpec, NativeList
     }
 
     func layoutSize(contentSize: CGSize) -> CGSize {
-        let width = ceil(contentSize.width + HostCell.horizontalInset * 2)
-        let height = ceil(contentSize.height + HostCell.verticalInset * 2)
+        let width = ceil(contentSize.width + itemHorizontalInset * 2)
+        let height = ceil(contentSize.height + itemVerticalInset * 2)
         return CGSize(width: width, height: height)
+    }
+
+    func itemContentInset() -> UIEdgeInsets {
+        return UIEdgeInsets(
+            top: itemVerticalInset,
+            left: itemHorizontalInset,
+            bottom: itemVerticalInset,
+            right: itemHorizontalInset
+        )
     }
 
     func estimatedContentWidth(collectionViewWidth: CGFloat, viewWidth: CGFloat) -> CGFloat {
@@ -74,12 +90,12 @@ class HybridNativeLinearListLayout: HybridNativeLinearListLayoutSpec, NativeList
             return estimatedItemWidth
         }
 
-        let availableWidth = collectionViewWidth - HostCell.horizontalInset * 2
+        let availableWidth = collectionViewWidth - itemHorizontalInset * 2
         if availableWidth.isFinite && availableWidth > 0 {
             return availableWidth
         }
 
-        let fallbackWidth = viewWidth - HostCell.horizontalInset * 2
+        let fallbackWidth = viewWidth - itemHorizontalInset * 2
         if fallbackWidth.isFinite && fallbackWidth > 0 {
             return fallbackWidth
         }
