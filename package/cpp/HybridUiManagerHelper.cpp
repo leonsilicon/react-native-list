@@ -84,8 +84,7 @@ namespace margelo::nitro::reactnativelist
                 auto eventSurfaceId = event.eventTarget->getSurfaceId();
                 if (isManagedSurface(eventSurfaceId))
                 {
-                    // This is an event from a view we manage, special handling needed
-                    Logger::log(LogLevel::Debug, "HybridUiManagerHelper", "[HannoDebug] Intercepted event of type %s from managed surface %d!", event.type.c_str(), eventSurfaceId);
+                    // This is an event from a view we manage, special handling needed.
                     // Expect function handler to be installed on global
                     uiCallInvoker->invokeAsync([event_ = event](jsi::Runtime &runtime)
                                                {
@@ -141,7 +140,6 @@ namespace margelo::nitro::reactnativelist
                                             jsi::String::createFromUtf8(runtime, event_.type),
                                             std::move(payload)
                                     );
-                                    Logger::log(LogLevel::Debug, "HybridUiManagerHelper", "[HannoDebug] Called JS event handler successfully for event of type %s", event_.type.c_str());
                                     event_.eventTarget->release(runtime);
                                 }
                             } else {
@@ -170,7 +168,7 @@ namespace margelo::nitro::reactnativelist
 
         std::shared_ptr<react::EventListener> eventInterceptor = createEventInterceptor(std::move(uiCallInvoker));
 
-        // TODO: unregister.
+        // TODO: unregister. memory leak.
         scheduler->addEventListener(eventInterceptor);
     }
 }
