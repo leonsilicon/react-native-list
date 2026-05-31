@@ -155,6 +155,7 @@ Performance difference is best described as this:
 
 - For iOS when using dynamically sized items, try to use `iosConfig.estimatedItemSize` to roughly specify how many items will be visible in the view port. This can help a lot with performance.
 - When specifying sizes for items use `useLinearListLayout({})` inset configs. Avoid setting a width in the styles that exceed the actual available view port width.
+- If you can, always provide item sizes upfront. With that the performance will be unbeatable.
 - In your item render function, when you have no item data yet it is tempting to return early with `null` or just an empty `<View />`. However, this is super bad for performance. There are two phases for native lists. First is view creation, where you're expected to create the view hierarchy for your item - just not with any data yet (so that any data could be bind to it). The second phase is actually binding data to the view. This will result in a simple "update props" operation on the native side instead of needing to create a new view hierarchy. Example:
 
 ❌ **Bad**:
@@ -183,8 +184,6 @@ renderItemWorklet: ({ item }) => {
     </View>
   )
 ```
-
-- If you can, always provide item sizes upfront. With that the performance will be unbeatable.
 
 ## Development
 
