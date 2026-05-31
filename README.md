@@ -32,7 +32,7 @@ High-performance list primitives for React Native.
 Once that's out of the way, you can start with the regular setup of the library:
 
 ```sh
-bun add react-native-list
+bun add react-native-list@alpha
 ```
 
 ### Configuring Metro
