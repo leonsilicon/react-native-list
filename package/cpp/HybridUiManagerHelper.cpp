@@ -34,7 +34,6 @@ namespace margelo::nitro::reactnativelist
 
         react::UIManager &uiManager = binding->getUIManager();
         react::SurfaceId targetSurfaceId = static_cast<react::SurfaceId>(surfaceId);
-        Logger::log(LogLevel::Debug, "HybridUiManagerHelper", "[UserDebug] completeRootSync start surfaceId %d", targetSurfaceId);
         uiManager.completeSurface(
             targetSurfaceId,
             childSet,
@@ -43,7 +42,6 @@ namespace margelo::nitro::reactnativelist
                 .mountSynchronously = true,
                 .source = react::ShadowTree::CommitSource::React,
             });
-        Logger::log(LogLevel::Debug, "HybridUiManagerHelper", "[UserDebug] completeRootSync end surfaceId %d", targetSurfaceId);
     }
 
     void HybridUiManagerHelper::registerManagedSurface(double surfaceId)
