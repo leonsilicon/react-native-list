@@ -169,13 +169,9 @@ function replaceDataSourceData(
   dataSource.replaceData(rows, animated);
 }
 
-function getChatContentWidth(windowWidth: number) {
-  return windowWidth - chatBenchmarkItemHorizontalInset * 2;
-}
-
 export function ChatBenchmarkExample(props: { onBack: () => void }) {
   const { width, height } = useWindowDimensions();
-  const contentWidth = getChatContentWidth(width);
+  const contentWidth = width - chatBenchmarkItemHorizontalInset * 2;
   const messages = useMemo(() => {
     return makeChatBenchmarkMessages();
   }, []);

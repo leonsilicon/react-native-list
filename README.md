@@ -137,6 +137,11 @@ XXXX
 
 XXXX
 
+## Known performance pitfalls
+
+- For iOS when using dynamically sized items, try to use `iosConfig.estimatedItemSize` to roughly specify how many items will be visible in the view port. This can help a lot with performance.
+- When specifying sizes for items use `useLinearListLayout({})` inset configs. Avoid setting a width in the styles that exceed the actual available view port width.
+
 ## Development
 
 First clone init the submodules:
