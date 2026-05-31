@@ -391,6 +391,19 @@ class HybridUiListView : HybridUiListViewSpec {
         return CGSize(width: width, height: height)
     }
 
+    private func resolvedLayoutSize(for item: NativeListItem) -> CGSize {
+        let contentSize = resolvedContentSize(for: item)
+        return layoutProvider.layoutSize(contentSize: contentSize)
+    }
+
+    private func resolvedHostedContentSize(for item: NativeListItem) -> CGSize {
+        let layoutSize = resolvedLayoutSize(for: item)
+        let contentInset = layoutProvider.itemContentInset()
+        let width = layoutSize.width - contentInset.left - contentInset.right
+        let height = layoutSize.height - contentInset.top - contentInset.bottom
+        return CGSize(width: width, height: height)
+    }
+
     private func captureMeasuredContentSize(for item: NativeListItem, view: UIView) -> Bool {
         guard let measuredSize = measure(view: view) else {
             return false
@@ -482,7 +495,7 @@ class HybridUiListView : HybridUiListViewSpec {
             guard let indexPath = collectionView.indexPath(for: cell) else { continue }
 
             let item = dataSource.itemForCollectionViewQuery(at: indexPath.item)
-            let contentSize = resolvedContentSize(for: item)
+            let contentSize = resolvedHostedContentSize(for: item)
             cell.updateContentLayout(
                 contentSize: contentSize,
                 contentInset: layoutProvider.itemContentInset()
@@ -529,8 +542,7 @@ class HybridUiListView : HybridUiListViewSpec {
     func layoutSizeForItem(at index: Int) -> CGSize {
         guard let dataSource else { return .zero }
         let item = dataSource.itemForCollectionViewQuery(at: index)
-        let contentSize = resolvedContentSize(for: item)
-        return layoutProvider.layoutSize(contentSize: contentSize)
+        return resolvedLayoutSize(for: item)
     }
 
     func collectionView(
@@ -543,8 +555,7 @@ class HybridUiListView : HybridUiListViewSpec {
         }
 
         let item = dataSource.itemForCollectionViewQuery(at: indexPath.item)
-        let contentSize = resolvedContentSize(for: item)
-        return layoutProvider.layoutSize(contentSize: contentSize)
+        return resolvedLayoutSize(for: item)
     }
 
     func collectionView(
@@ -564,7 +575,7 @@ class HybridUiListView : HybridUiListViewSpec {
             for: indexPath
         ) as! HostCell
 
-        let contentSize = resolvedContentSize(for: item)
+        let contentSize = resolvedHostedContentSize(for: item)
 
         do {
             try installHostedContent(in: cell, item: item, contentSize: contentSize)
@@ -573,8 +584,13 @@ class HybridUiListView : HybridUiListViewSpec {
         }
 
         if let reactTag = cell.reactTag {
-            let width = resolvedContentSize(for: item).width
-            let height = item.height.map { CGFloat($0) }
+            let width = contentSize.width
+            let height: CGFloat?
+            if item.height != nil {
+                height = contentSize.height
+            } else {
+                height = nil
+            }
 
             cell.prepareForMeasurement(width: width, height: height)
 
@@ -583,7 +599,7 @@ class HybridUiListView : HybridUiListViewSpec {
 
         if let hostedView = cell.hostedContentView, needsMeasuredContentSize(for: item) {
             let didMeasureNewSize = captureMeasuredContentSize(for: item, view: hostedView)
-            let measuredContentSize = resolvedContentSize(for: item)
+            let measuredContentSize = resolvedHostedContentSize(for: item)
             cell.updateContentLayout(
                 contentSize: measuredContentSize,
                 contentInset: layoutProvider.itemContentInset()
