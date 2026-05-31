@@ -237,10 +237,11 @@ class HybridUiListView : HybridUiListViewSpec {
 
         let layout = layoutProvider.makeCollectionViewLayout(owner: self)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
+        collectionView.backgroundColor = .clear
+        collectionView.isOpaque = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
 
-        view.backgroundColor = .clear
+        view.isOpaque = false
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
