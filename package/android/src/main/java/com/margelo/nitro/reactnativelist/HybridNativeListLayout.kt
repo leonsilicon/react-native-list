@@ -14,7 +14,7 @@ internal interface NativeListLayoutProvider {
     fun itemContentInsets(reactContext: ThemedReactContext): ItemContentInsets
 }
 
-internal data class ItemContentInsets(
+data class ItemContentInsets(
     val horizontal: Int,
     val vertical: Int
 )
