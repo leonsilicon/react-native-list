@@ -139,12 +139,12 @@ XXXX
 
 https://github.com/user-attachments/assets/aa7c2c41-b7ac-4d8b-9eb1-fd8b2feda4de
 
-|           | react-native-list | Legend List |
-| --------- | ----------------- | ----------- |
-| FPS       | 60                | 60          |
-| Memory    | 86.88mb           | 86.89mb     |
-| Total CPU | 185.93%           | 144.69%     |
-| Can blank | no                | yes         |
+|           | Legend List | react-native-list |
+| --------- | ----------- | ----------------- |
+| FPS       | 60          | 60                |
+| Memory    | 86.89mb     | 86.88mb           |
+| Total CPU | 144.69%     | 185.93%           |
+| Can blank | yes         | no                |
 
 Performance difference is best described as this:
 
