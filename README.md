@@ -135,6 +135,8 @@ XXXX
 
 ## Benchmark
 
+> Scrolling as fast as possible. Release build. iPhone 13 Pro.
+
 https://github.com/user-attachments/assets/10ebbccd-290a-44cb-9c70-4aa283134249
 
 |           | react-native-list | Legend List |
