@@ -82,8 +82,6 @@ class HybridUiListView : HybridUiListViewSpec {
     private var measuredContentSizeByItemKey: [String: CGSize] = [:]
     private var hasScheduledLayoutInvalidation = false
     private let measuredSizeTolerance: CGFloat = 0.5
-    private let debugInvalidSizeLogLimit = 20
-    private var debugInvalidSizeLogCount = 0
     private var rendererSurfaceId: ReactTag?
     // Fabric unmount asserts that a child is still mounted under its original parent.
     // Cells temporarily host those views, so teardown must restore the parent first.
@@ -516,55 +514,6 @@ class HybridUiListView : HybridUiListViewSpec {
         }
     }
 
-    private func logSuspiciousLayoutSizeIfNeeded(
-        collectionView: UICollectionView,
-        collectionViewLayout: UICollectionViewLayout,
-        indexPath: IndexPath,
-        item: NativeListItem,
-        contentSize: CGSize,
-        itemSize: CGSize
-    ) {
-        if debugInvalidSizeLogCount >= debugInvalidSizeLogLimit {
-            return
-        }
-
-        let adjustedInset = collectionView.adjustedContentInset
-        let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout
-        let sectionInset = flowLayout?.sectionInset ?? .zero
-        let horizontalInset = adjustedInset.left + adjustedInset.right
-        let horizontalSectionInset = sectionInset.left + sectionInset.right
-        let availableWidth = collectionView.bounds.width - horizontalInset - horizontalSectionInset
-        let isTooWide = itemSize.width > availableWidth + measuredSizeTolerance
-        let hasInvalidWidth = !itemSize.width.isFinite || itemSize.width <= 0
-        let hasInvalidHeight = !itemSize.height.isFinite || itemSize.height <= 0
-
-        if !isTooWide && !hasInvalidWidth && !hasInvalidHeight {
-            return
-        }
-
-        debugInvalidSizeLogCount += 1
-
-        let cachedSize = measuredContentSizeByItemKey[item.key]
-        let itemWidthText = String(describing: item.width)
-        let itemHeightText = String(describing: item.height)
-        let cachedSizeText = String(describing: cachedSize)
-        let message =
-            "[UserDebug] Suspicious UICollectionViewFlowLayout item size " +
-            "index=\(indexPath.item) " +
-            "key=\(item.key) " +
-            "itemSize=\(itemSize) " +
-            "contentSize=\(contentSize) " +
-            "itemWidth=\(itemWidthText) " +
-            "itemHeight=\(itemHeightText) " +
-            "cachedMeasuredSize=\(cachedSizeText) " +
-            "collectionBounds=\(collectionView.bounds) " +
-            "adjustedInset=\(adjustedInset) " +
-            "sectionInset=\(sectionInset) " +
-            "availableWidth=\(availableWidth)"
-
-        print(message)
-    }
-
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -595,16 +544,7 @@ class HybridUiListView : HybridUiListViewSpec {
 
         let item = dataSource.itemForCollectionViewQuery(at: indexPath.item)
         let contentSize = resolvedContentSize(for: item)
-        let itemSize = layoutProvider.layoutSize(contentSize: contentSize)
-        logSuspiciousLayoutSizeIfNeeded(
-            collectionView: collectionView,
-            collectionViewLayout: collectionViewLayout,
-            indexPath: indexPath,
-            item: item,
-            contentSize: contentSize,
-            itemSize: itemSize
-        )
-        return itemSize
+        return layoutProvider.layoutSize(contentSize: contentSize)
     }
 
     func collectionView(
