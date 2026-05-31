@@ -1,6 +1,6 @@
 # React Native List
 
-High-performance list primitives for React Native.
+High-performance list for React Native.
 
 - 📱 True native [`UICollectionView`](https://developer.apple.com/documentation/uikit/uicollectionview) on iOS
 - 🤖 True native [`RecyclerView`](https://developer.android.com/develop/ui/views/layout/recyclerview) on android
@@ -87,9 +87,10 @@ type Items = TextItem | ImageItem
 const renderers: ListRenderers<Items> = {
   text: {
     renderItemWorklet: ({ item }) => {
-      "worklet";
+      "worklet"; // 👀 Note: our render function is a worklet!
 
       return (
+        // Though being in a worklet, you can use any component you like in here
         <View
           style={{
             justifyContent: "center",
