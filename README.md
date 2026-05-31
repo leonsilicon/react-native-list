@@ -8,7 +8,7 @@ High-performance list primitives for React Native.
 - 🐎 Platform native animations out of the box for list item transitions
 - 📉 Low memory usage due to true native view recycling
 
-<video src="https://github.com/user-attachments/assets/bd1eddd7-e166-4b91-b7ee-d177ce8edb58" width="320" controls align="right"></video>
+https://github.com/user-attachments/assets/4a2684bf-7337-45e0-bb17-ee7b8a382943
 
 ## Installation
 
@@ -137,7 +137,7 @@ XXXX
 
 > Scrolling as fast as possible. Release build. iPhone 13 Pro.
 
-https://github.com/user-attachments/assets/10ebbccd-290a-44cb-9c70-4aa283134249
+https://github.com/user-attachments/assets/aa7c2c41-b7ac-4d8b-9eb1-fd8b2feda4de
 
 |           | react-native-list | Legend List |
 | --------- | ----------------- | ----------- |
