@@ -164,4 +164,74 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#59636e",
   },
+  chatRow: {
+    alignSelf: "stretch",
+    paddingHorizontal: 24,
+    paddingVertical: 5,
+  },
+  chatListContent: {
+    paddingTop: 12,
+    paddingBottom: 20,
+  },
+  chatRowOwn: {
+    alignItems: "flex-end",
+  },
+  chatRowOther: {
+    alignItems: "flex-start",
+  },
+  chatBubble: {
+    maxWidth: "78%",
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  chatBubbleOwn: {
+    backgroundColor: "#dff5e7",
+    borderColor: "#acd3ba",
+  },
+  chatBubbleOther: {
+    backgroundColor: "#eef2ff",
+    borderColor: "#c5ccef",
+  },
+  chatAuthor: {
+    marginBottom: 3,
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#445066",
+  },
+  chatMessage: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: "#15171a",
+  },
+  chatMeta: {
+    marginTop: 5,
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#68717f",
+  },
+  chatReactions: {
+    maxWidth: "78%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 5,
+    marginTop: 3,
+  },
+  chatReactionChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#cfd4dc",
+    backgroundColor: "#ffffff",
+  },
+  chatReactionText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#343a40",
+  },
 });

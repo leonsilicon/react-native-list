@@ -22,6 +22,18 @@ const exampleCases: ExampleCase[] = [
     description:
       "Pushes a fresh dynamic-height list screen every 400ms to stress list creation.",
   },
+  {
+    id: "chat-benchmark",
+    title: "Chat benchmark",
+    description:
+      "10k dynamic chat rows in react-native-list with left/right messages and reactions.",
+  },
+  {
+    id: "legend-list-chat-benchmark",
+    title: "Legend List chat benchmark",
+    description:
+      "The same 10k dynamic chat dataset rendered through Legend List.",
+  },
 ];
 
 export function ExamplePicker(props: {

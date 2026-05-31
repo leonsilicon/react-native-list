@@ -6,7 +6,9 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text, View } from "react-native";
 import { ExampleHeader } from "./components";
 import { ExamplePicker } from "./ExamplePicker";
+import { ChatBenchmarkExample } from "./examples/ChatBenchmarkExample";
 import { DynamicTextHeightsExample } from "./examples/DynamicTextHeightsExample";
+import { LegendListChatBenchmarkExample } from "./examples/LegendListChatBenchmarkExample";
 import { ListUpdateLabExample } from "./examples/ListUpdateLabExample";
 import { styles } from "./styles";
 import type { ExampleId } from "./types";
@@ -16,6 +18,8 @@ type ExamplesStackParamList = {
   ListUpdateLab: undefined;
   DynamicTextHeights: DynamicTextHeightsRouteParams | undefined;
   DynamicTextHeightsPushStress: undefined;
+  ChatBenchmark: undefined;
+  LegendListChatBenchmark: undefined;
 };
 
 type DynamicTextHeightsRouteParams = {
@@ -43,6 +47,16 @@ type DynamicTextHeightsPushStressScreenProps = NativeStackScreenProps<
   "DynamicTextHeightsPushStress"
 >;
 
+type ChatBenchmarkScreenProps = NativeStackScreenProps<
+  ExamplesStackParamList,
+  "ChatBenchmark"
+>;
+
+type LegendListChatBenchmarkScreenProps = NativeStackScreenProps<
+  ExamplesStackParamList,
+  "LegendListChatBenchmark"
+>;
+
 const Stack = createNativeStackNavigator<ExamplesStackParamList>();
 
 const screenOptions: NativeStackNavigationOptions = {
@@ -58,6 +72,16 @@ function ExamplePickerScreen(props: ExamplePickerScreenProps) {
 
     if (exampleId === "dynamic-text-push-stress") {
       props.navigation.navigate("DynamicTextHeightsPushStress");
+      return;
+    }
+
+    if (exampleId === "chat-benchmark") {
+      props.navigation.navigate("ChatBenchmark");
+      return;
+    }
+
+    if (exampleId === "legend-list-chat-benchmark") {
+      props.navigation.navigate("LegendListChatBenchmark");
       return;
     }
 
@@ -187,10 +211,31 @@ function DynamicTextHeightsPushStressScreen(
   );
 }
 
+function ChatBenchmarkScreen(props: ChatBenchmarkScreenProps) {
+  function goBack() {
+    props.navigation.goBack();
+  }
+
+  return <ChatBenchmarkExample onBack={goBack} />;
+}
+
+function LegendListChatBenchmarkScreen(
+  props: LegendListChatBenchmarkScreenProps,
+) {
+  function goBack() {
+    props.navigation.goBack();
+  }
+
+  return <LegendListChatBenchmarkExample onBack={goBack} />;
+}
+
 export function ExamplesApp() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Examples" screenOptions={screenOptions}>
+      <Stack.Navigator
+        initialRouteName="Examples"
+        screenOptions={screenOptions}
+      >
         <Stack.Screen name="Examples" component={ExamplePickerScreen} />
         <Stack.Screen name="ListUpdateLab" component={ListUpdateLabScreen} />
         <Stack.Screen
@@ -200,6 +245,11 @@ export function ExamplesApp() {
         <Stack.Screen
           name="DynamicTextHeightsPushStress"
           component={DynamicTextHeightsPushStressScreen}
+        />
+        <Stack.Screen name="ChatBenchmark" component={ChatBenchmarkScreen} />
+        <Stack.Screen
+          name="LegendListChatBenchmark"
+          component={LegendListChatBenchmarkScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
