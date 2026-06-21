@@ -16,18 +16,7 @@ https://github.com/user-attachments/assets/4a2684bf-7337-45e0-bb17-ee7b8a382943
 > Using this library requires you to use [react-native-worklets **bundle mode**](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/setup).
 >
 > - Please follow [the setup instructions of it first](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/setup), and make sure your app works before using react-native-list!
-> - You need at least version 0.9.1!
-
-> [!CAUTION]
-> Right now you will have to patch react-native-worklets. See the patch file here and ask your friendly AI to apply it:
->
-> - [react-native-worklets@0.9.1.patch](https://github.com/hannojg/react-native-list/blob/main/patches/react-native-worklets%400.9.1.patch)
->
-> Once those PRs are landed upstream it will no longer be necessary:
->
-> - [fix(bundlemode): getBundleModeMetroConfig consider user config's resolveRequest](https://github.com/software-mansion/react-native-reanimated/pull/9327)
-> - [worklets plugin: allow react-native imports in bundle mode](https://github.com/software-mansion/react-native-reanimated/pull/9213)
-> - [worklets plugin: Add opt-in bundle mode JSX component capture](https://github.com/software-mansion/react-native-reanimated/pull/9212)
+> - You need at least version 0.10.0!
 
 Once that's out of the way, you can start with the regular setup of the library:
 
