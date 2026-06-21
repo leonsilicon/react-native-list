@@ -24,7 +24,7 @@
     "react-native-nitro-modules": "catalog:",
     "react-native-reanimated": "4.4.0",
     "react-native-safe-area-context": "^5.7.0",
-    "react-native-screens": "^4.24.0",
+    "react-native-screens": "^4.25.2",
     "react-native-worklets": "catalog:"
   },
   "devDependencies": {
