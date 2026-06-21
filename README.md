@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/4a2684bf-7337-45e0-bb17-ee7b8a382943
 > [!WARNING]
 > Using this library requires you to use [react-native-worklets **bundle mode**](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/setup).
 >
-> - Please follow the setup instructions of it first, and make sure your app works before using react-native-list!
+> - Please follow [the setup instructions of it first](https://docs.swmansion.com/react-native-worklets/docs/bundleMode/setup), and make sure your app works before using react-native-list!
 > - You need at least version 0.9.1!
 
 > [!CAUTION]
@@ -41,8 +41,15 @@ Simply wrap your config with `getReactNativeListMetroConfig` in `metro.config.js
 
 ```js
 const { getDefaultConfig } = require("expo/metro-config");
-const rnlistConfig = getReactNativeListMetroConfig(getDefaultConfig());
-module.exports = rnlistConfig;
+const {
+  getBundleModeMetroConfig,
+} = require("react-native-worklets/bundleMode");
+
+let config = getDefaultConfig(__dirname);
+config = getBundleModeMetroConfig(config);
+// ⚠️ Make sure to apply this _after_ the bundle mode metro config:
+config = getReactNativeListMetroConfig(config);
+module.exports = config;
 ```
 
 > [!NOTE]

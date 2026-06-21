@@ -2,16 +2,18 @@
 const workletsPluginOptions = {
   // globals: ['React'],
   bundleMode: true,
-  workletizableModules: [
-    "react-native-list",
-    "react-native-reanimated",
-    "react-native-worklets",
-    "react-native",
-    "_reactNative",
-    "react-native-nitro-modules",
-    "expo-modules-core",
-    "expo",
-  ],
+  importForwarding: {
+    moduleNames: [
+      "react-native-list",
+      "react-native-reanimated",
+      "react-native-worklets",
+      "react-native",
+      "_reactNative",
+      "react-native-nitro-modules",
+      "expo-modules-core",
+      "expo",
+    ],
+  },
   // TODO: test with setting this to true, as true will become the default!
   // https://docs.swmansion.com/react-native-worklets/docs/worklets-babel-plugin/plugin-options#strictglobal-
   strictGlobals: false,

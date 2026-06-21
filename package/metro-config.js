@@ -11,6 +11,67 @@ function isRendererProxyImport(moduleName) {
   return /(?:^|\/)RendererProxy(?:\.js)?$/.test(moduleName)
 }
 
+//#region Turbo module handling
+// react-native-worklets installs a shim preventing the usage of TurboModules on other runtimes:
+// - https://github.com/software-mansion/react-native-reanimated/blob/9c2e3b05216b22d3c1ed4be67719876d1fa9115d/packages/react-native-worklets/bundleMode/shims/turboModuleRegistryShim.js#L36
+// As we properly handle turbo modules we want to allow for it.
+// So we basically redirect all imports of the shim back to the original TurboModuleRegistry.js file:
+const turboModuleRegistryModuleName =
+  'react-native/Libraries/TurboModule/TurboModuleRegistry'
+const turboModuleRegistryPath = require.resolve(turboModuleRegistryModuleName)
+const turboModuleRegistryFileSuffix = path.join(
+  'react-native',
+  'Libraries',
+  'TurboModule',
+  'TurboModuleRegistry.js'
+)
+const workletsTurboModuleRegistryShimSuffix = path.join(
+  'react-native-worklets',
+  'bundleMode',
+  'shims',
+  'turboModuleRegistryShim.js'
+)
+
+function isTurboModuleRegistryImport(moduleName) {
+  return moduleName === turboModuleRegistryModuleName
+}
+
+function isSourceFileResolution(result) {
+  if (result == null) {
+    return false
+  }
+
+  if (result.type !== 'sourceFile') {
+    return false
+  }
+
+  return typeof result.filePath === 'string'
+}
+
+function isTurboModuleRegistryResolution(result) {
+  if (!isSourceFileResolution(result)) {
+    return false
+  }
+
+  return result.filePath.endsWith(turboModuleRegistryFileSuffix)
+}
+
+function isWorkletsTurboModuleRegistryShimResolution(result) {
+  if (!isSourceFileResolution(result)) {
+    return false
+  }
+
+  return result.filePath.endsWith(workletsTurboModuleRegistryShimSuffix)
+}
+
+function createTurboModuleRegistryResolution() {
+  return {
+    type: 'sourceFile',
+    filePath: turboModuleRegistryPath,
+  }
+}
+//#endregion
+
 function isReactNativeDomInternalsImporter(originModulePath) {
   if (typeof originModulePath !== 'string') {
     return false
@@ -26,6 +87,10 @@ function getReactNativeListMetroConfig(config) {
   const currentResolveRequest = config.resolver.resolveRequest
 
   config.resolver.resolveRequest = (context, moduleName, platform) => {
+    if (isTurboModuleRegistryImport(moduleName)) {
+      return createTurboModuleRegistryResolution()
+    }
+
     // Redirect only React Native DOM internals to a runtime-switching proxy.
     if (
       isRendererProxyImport(moduleName) &&
@@ -37,11 +102,18 @@ function getReactNativeListMetroConfig(config) {
       }
     }
 
-    return (currentResolveRequest || context.resolveRequest)(
-      context,
-      moduleName,
-      platform
-    )
+    const resolveRequest = currentResolveRequest || context.resolveRequest
+    const resolved = resolveRequest(context, moduleName, platform)
+
+    if (isTurboModuleRegistryResolution(resolved)) {
+      return createTurboModuleRegistryResolution()
+    }
+
+    if (isWorkletsTurboModuleRegistryShimResolution(resolved)) {
+      return createTurboModuleRegistryResolution()
+    }
+
+    return resolved
   }
 
   return config

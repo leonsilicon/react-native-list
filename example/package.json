@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index",
   "scripts": {
-    "start": "rm -rf ../node_modules/react-native-worklets/.worklets && expo start --dev-client --clear",
+    "start": "mkdir -p ../node_modules/react-native-worklets/.worklets && find ../node_modules/react-native-worklets/.worklets -mindepth 1 -maxdepth 1 -exec rm -rf {} + && expo start --dev-client --clear",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
@@ -22,7 +22,7 @@
     "react-native-gesture-handler": "^2.31.1",
     "react-native-list": "workspace:*",
     "react-native-nitro-modules": "catalog:",
-    "react-native-reanimated": "4.4.0",
+    "react-native-reanimated": "4.5.0-nightly-20260620-9c2e3b052",
     "react-native-safe-area-context": "^5.7.0",
     "react-native-screens": "^4.25.2",
     "react-native-worklets": "catalog:"

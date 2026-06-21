@@ -32,7 +32,7 @@ const config = {
 
 const defaultConfig = getDefaultConfig(__dirname);
 const mergedConfig = mergeConfig(defaultConfig, config);
-const rnlistConfig = getReactNativeListMetroConfig(mergedConfig);
-const bundleModeConfig = getBundleModeMetroConfig(rnlistConfig);
+const bundleModeConfig = getBundleModeMetroConfig(mergedConfig);
+const rnlistConfig = getReactNativeListMetroConfig(bundleModeConfig);
 
-module.exports = bundleModeConfig;
+module.exports = rnlistConfig;

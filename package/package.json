@@ -81,7 +81,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-worklets": "*",
+    "react-native-worklets": ">=0.10.0",
     "react-native-nitro-modules": "*"
   },
   "eslintConfig": {
