@@ -1,5 +1,5 @@
 {
-  "name": "react-native-list",
+  "name": "@leonsilicon/react-native-list",
   "version": "2.0.0-alpha.2",
   "description": "React Native List",
   "main": "lib/index",
@@ -15,6 +15,7 @@
     "react-native.config.js",
     "lib",
     "nitrogen",
+    "cpp",
     "android/build.gradle",
     "android/gradle.properties",
     "android/fix-prefab.gradle",
