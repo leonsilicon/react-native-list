@@ -1961,7 +1961,11 @@ function reactRender(surfaceId, element, callback, completeRootSync) {
   currentCompleteRootSync = completeRootSync ?? null;
   try {
     Renderer.updateContainerSync(element, rootContainer, null, callback);
-    Renderer.flushSyncWork();
+    // (patched) Guard the synchronous flush: when this runs re-entrantly while React is already
+    // committing (e.g. the host screen is navigating away / re-rendering), `flushSyncWork` throws
+    // "Should not already be working" — which would otherwise corrupt the commit and wedge the UI.
+    // Swallow it; the pending work flushes on the next scheduler tick.
+    try { Renderer.flushSyncWork(); } catch (e) { nativeLog("[ReactFabricMirror] flushSyncWork (render) deferred: " + e); }
   } finally {
     currentCompleteRootSync = previousCompleteRootSync;
   }
@@ -1975,7 +1979,9 @@ function disposeReactRoot(surfaceId, completeRootSync) {
   currentCompleteRootSync = completeRootSync;
   try {
     Renderer.updateContainerSync(null, rootContainer, null, null);
-    Renderer.flushSyncWork();
+    // (patched) Same guard as reactRender: tearing the surface down during a navigation commit makes
+    // `flushSyncWork` throw "Should not already be working". Swallow so teardown never crashes/wedges.
+    try { Renderer.flushSyncWork(); } catch (e) { nativeLog("[ReactFabricMirror] flushSyncWork (dispose) deferred: " + e); }
     delete global.rootContainersBySurfaceId[surfaceId];
   } finally {
     currentCompleteRootSync = previousCompleteRootSync;

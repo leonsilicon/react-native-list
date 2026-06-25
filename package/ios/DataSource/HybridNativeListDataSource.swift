@@ -152,6 +152,15 @@ class HybridNativeListDataSource: HybridNativeListDataSourceSpec {
             return animatedReloadSourceItems[index].nativeItem
         }
 
+        // Crash-resistance (patched): the UICollectionView prefetcher can query an index that no
+        // longer exists when `items` is replaced faster than the collection view reconciles (e.g. the
+        // app rebuilds the dataset as async data streams in). Crashing the whole app for a transient
+        // off-by-one in a prefetch/sizing query is never acceptable, so clamp to the nearest valid
+        // item instead of `preconditionFailure`. The next layout pass re-queries with a correct index.
+        if let fallback = items.last?.nativeItem ?? animatedReloadSourceItems?.last?.nativeItem {
+            return fallback
+        }
+
         preconditionFailure("List item index \(index) is out of bounds for collection view query.")
     }
 

@@ -97,11 +97,13 @@ namespace margelo::nitro::reactnativelist
                                         runtime);
 
                                 // from: UIManagerBinding.cpp#63
-                                if (event_.eventPayload->getType() ==
-                                    react::EventPayloadType::PointerEvent) {
-                                    throw std::runtime_error(
-                                            "PointerEvent payload handling is not implemented yet");
-                                } else {
+                                // PointerEvents (taps/press on the new architecture) implement
+                                // `asJSIValue` just like every other RawEvent payload, so route them
+                                // through the SAME generic dispatch path instead of throwing. This is
+                                // what makes worklet-rendered items interactive (e.g. a `Pressable`'s
+                                // onPress firing). Without this the interceptor threw on every tap, so
+                                // touch events never reached the item's React tree (patched).
+                                {
                                     auto payload = event_.eventPayload->asJSIValue(runtime);
                                     if (payload.isNull()) {
                                         Logger::log(LogLevel::Error, "HybridUiManagerHelper", "[HannoDebug] Event payload is null, skipping event handling");

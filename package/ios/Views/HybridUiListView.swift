@@ -10,6 +10,38 @@ import Foundation
 import NitroModules
 import UIKit
 
+/// Lets the list's tap recognizer recognize alongside the collection view's scroll pan so it never
+/// blocks scrolling — only a clean tap (no drag) reaches the handler.
+final class ListTapGestureDelegate: NSObject, UIGestureRecognizerDelegate {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        return true
+    }
+}
+
+/// Root view for the list that reports when it has appeared on screen and when it later leaves the
+/// window. Leaving the window after having appeared means the hosting screen is being torn down
+/// (e.g. navigation pushed another screen) — at which point invoking the `createView` worklet
+/// callback would throw an uncaught C++ exception (→ std::terminate). The owner uses this to set its
+/// teardown flag.
+final class WindowAwareView: UIView {
+    var onDidAppear: (() -> Void)?
+    var onDidLeaveWindow: (() -> Void)?
+    private var hasAppeared = false
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window != nil {
+            hasAppeared = true
+            onDidAppear?()
+        } else if hasAppeared {
+            onDidLeaveWindow?()
+        }
+    }
+}
+
 final class CollectionViewDataSourceProxy: NSObject, UICollectionViewDataSource {
     weak var owner: HybridUiListView?
 
@@ -83,6 +115,13 @@ class HybridUiListView : HybridUiListViewSpec {
     private var hasScheduledLayoutInvalidation = false
     private let measuredSizeTolerance: CGFloat = 0.5
     private var rendererSurfaceId: ReactTag?
+    // Set once the list is leaving the screen / being torn down. Calling the `createView` worklet
+    // callback after the JS/worklet context starts tearing down throws an UNCAUGHT C++ exception
+    // through the Nitro bridge → `std::terminate` (crash when navigating away from a screen that
+    // hosts the list). We must never invoke that callback once teardown begins.
+    private var isTearingDown = false
+    // Retained because `UIGestureRecognizer.delegate` is weak.
+    private let listTapGestureDelegate = ListTapGestureDelegate()
     // Fabric unmount asserts that a child is still mounted under its original parent.
     // Cells temporarily host those views, so teardown must restore the parent first.
     private var fabricRestorePointsByReactTag: [ReactTag: HostedFabricViewRestorePoint] = [:]
@@ -92,8 +131,14 @@ class HybridUiListView : HybridUiListViewSpec {
     private var updateViewCallback: ((_ reactTag: Double, _ item: NativeListItem, _ index: Double) -> Bool)?
 
     override init() {
-        view = UIView(frame: .zero)
+        let windowAwareView = WindowAwareView(frame: .zero)
+        view = windowAwareView
         super.init()
+        // When the list leaves the window after having appeared, the hosting screen is being torn
+        // down — stop invoking the `createView` worklet callback to avoid a std::terminate crash.
+        windowAwareView.onDidLeaveWindow = { [weak self] in
+            self?.isTearingDown = true
+        }
     }
 
     func getSurfaceId() throws -> Double {
@@ -133,6 +178,7 @@ class HybridUiListView : HybridUiListViewSpec {
     }
 
     func disposeRendererSurface() throws {
+        isTearingDown = true
         let surfaceId = rendererSurfaceId
         rendererSurfaceId = nil
         createViewCallback = nil
@@ -257,9 +303,46 @@ class HybridUiListView : HybridUiListViewSpec {
         collectionView.dataSource = dataSourceProxy
         collectionView.delegate = delegateProxy
         self.collectionView = collectionView
+
+        // ONE tap recognizer for the whole list. A tap (no movement) → map to the tapped item +
+        // cell-local point → JS `__rnlListTap` (which owns the geometry/data and navigates). Set up to
+        // recognize simultaneously with the scroll pan and NOT cancel touches, so it never interferes
+        // with scrolling — only a clean tap fires it. This replaces per-tile Fabric touch handlers,
+        // which fought the scroll gesture and left the responder stuck.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleListTap(_:)))
+        tap.cancelsTouchesInView = false
+        tap.delaysTouchesBegan = false
+        tap.delaysTouchesEnded = false
+        tap.delegate = listTapGestureDelegate
+        collectionView.addGestureRecognizer(tap)
+    }
+
+    @objc private func handleListTap(_ recognizer: UITapGestureRecognizer) {
+        guard recognizer.state == .ended, let collectionView else { return }
+        let point = recognizer.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: point) else {
+            return
+        }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? HostCell,
+              let hostedView = cell.hostedContentView else {
+            return
+        }
+        // Convert into the hosted Fabric surface view (the origin the JS grid geometry assumes) —
+        // NOT the cell's contentView, which is offset by the list's item content inset.
+        let localPoint = collectionView.convert(point, to: hostedView)
+        SurfaceHelper.dispatchListTap(toJS: Double(indexPath.item), x: Double(localPoint.x), y: Double(localPoint.y))
     }
 
     private func makeView(type: String) throws -> (UIView, ReactTag) {
+        // Never call the `createView` worklet callback during teardown — it throws an uncaught C++
+        // exception through the Nitro bridge (→ std::terminate). Throwing a Swift error here is
+        // caught by `cellForItemAt`'s do/catch, which falls back to an empty cell. `isTearingDown` is
+        // set both by `disposeRendererSurface` and the moment the list leaves the window (navigating
+        // away unmounts the hosting screen → the worklet context goes away while the collection view
+        // is still doing a final reload / prefetch pass).
+        guard !isTearingDown else {
+            throw RuntimeError.error(withMessage: "makeView skipped: list is tearing down.")
+        }
         guard let createViewCallback else {
             throw RuntimeError.error(withMessage: "Can only call makeView after setListCallbacks.")
         }

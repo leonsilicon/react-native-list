@@ -7,6 +7,7 @@
 
 #import "SurfaceHelper.h"
 #import "SurfacePresenterRegistry.h"
+#import "TurboModuleInstaller.h"
 #import "ErrorUtils.h"
 
 #import <React/RCTBridge+Private.h>
@@ -19,6 +20,10 @@
 #import <React/RCTComponentViewProtocol.h>
 #import <React/RCTComponentViewRegistry.h>
 #import <React/RCTMountingManager.h>
+#import <React/RCTSurfaceTouchHandler.h>
+#import <objc/runtime.h>
+#import <ReactCommon/RuntimeExecutor.h>
+#include <jsi/jsi.h>
 
 using namespace facebook;
 using namespace facebook::react;
@@ -42,7 +47,17 @@ namespace {
         return surfacePresenter;
       }
 
-      return [bridge surfacePresenter];
+      if (bridge != nil) {
+        RCTSurfacePresenter *fromBridge = [bridge surfacePresenter];
+        if (fromBridge != nil) {
+          return fromBridge;
+        }
+      }
+
+      // Bridgeless / new-arch (Expo SDK 56): `[RCTBridge currentBridge]` is nil and RN never injected
+      // the presenter into our registry. Recover it by walking the mounted window hierarchy (also
+      // publishes it into the registry for subsequent calls).
+      return (RCTSurfacePresenter *)[TurboModuleInstaller recoverSurfacePresenterFromKeyWindow];
     }
 } // namespace
 
@@ -56,11 +71,10 @@ namespace {
       return nil;
     }
 
+    // `[RCTBridge currentBridge]` is nil under bridgeless / new-arch; that's fine — the surface
+    // presenter is recovered from the registry / mounted window hierarchy inside
+    // `resolveSurfacePresenter`, which is all this path actually needs.
     RCTBridge *bridge = [RCTBridge currentBridge];
-    if (bridge == nil) {
-      assignError(error, @"Could not access RCTBridge.currentBridge.");
-      return nil;
-    }
 
     RCTSurfacePresenter *surfacePresenter = resolveSurfacePresenter(bridge);
     if (surfacePresenter == nil) {
@@ -118,11 +132,9 @@ namespace {
       return nil;
     }
 
+    // `[RCTBridge currentBridge]` is nil under bridgeless / new-arch; `resolveSurfacePresenter`
+    // recovers the presenter from the registry / mounted window hierarchy instead.
     RCTBridge *bridge = [RCTBridge currentBridge];
-    if (bridge == nil) {
-      assignError(error, @"Could not access RCTBridge.currentBridge.");
-      return nil;
-    }
 
     RCTSurfacePresenter *surfacePresenter = resolveSurfacePresenter(bridge);
     if (surfacePresenter == nil) {
@@ -139,6 +151,56 @@ namespace {
     }
     
     return componentView;
+}
+
++ (BOOL)attachTouchHandler:(UIView *)view
+{
+    if (view == nil) {
+        return NO;
+    }
+    if (![NSThread isMainThread]) {
+        return NO;
+    }
+
+    // Retain the handler via an associated object so it lives as long as the view; also lets us make
+    // the attach idempotent (the cell re-installs hosted views on recycle).
+    static const void *kTouchHandlerKey = &kTouchHandlerKey;
+    if (objc_getAssociatedObject(view, kTouchHandlerKey) != nil) {
+        return YES;
+    }
+
+    RCTSurfaceTouchHandler *touchHandler = [RCTSurfaceTouchHandler new];
+    [touchHandler attachToView:view];
+    objc_setAssociatedObject(view, kTouchHandlerKey, touchHandler, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return YES;
+}
+
++ (void)dispatchListTapToJS:(double)itemIndex x:(double)x y:(double)y
+{
+    RCTBridge *bridge = [RCTBridge currentBridge];
+    RCTSurfacePresenter *surfacePresenter = resolveSurfacePresenter(bridge);
+    if (surfacePresenter == nil) {
+        return;
+    }
+    facebook::react::RuntimeExecutor runtimeExecutor = surfacePresenter.runtimeExecutor;
+    if (runtimeExecutor == nullptr) {
+        return;
+    }
+    runtimeExecutor([itemIndex, x, y](facebook::jsi::Runtime &runtime) {
+        @try {
+            facebook::jsi::Value handler = runtime.global().getProperty(runtime, "__rnlListTap");
+            if (!handler.isObject() || !handler.asObject(runtime).isFunction(runtime)) {
+                return;
+            }
+            handler.asObject(runtime).asFunction(runtime).call(
+                runtime,
+                facebook::jsi::Value(itemIndex),
+                facebook::jsi::Value(x),
+                facebook::jsi::Value(y));
+        } @catch (__unused NSException *e) {
+            // Never let a tap-dispatch error crash the app.
+        }
+    });
 }
 
 @end

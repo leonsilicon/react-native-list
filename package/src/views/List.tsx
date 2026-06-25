@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { View, ViewStyle } from 'react-native'
 import { callback, NitroModules } from 'react-native-nitro-modules'
-import {
-  createShareable,
-  scheduleOnUI,
-  UIRuntimeId,
-} from 'react-native-worklets'
+import { scheduleOnUI } from 'react-native-worklets'
 import type {
   ListDataSource,
   ListDataSourceMutation,
@@ -64,6 +60,62 @@ type ListState = {
   surfaceId: number | null
 }
 
+// Per-`<List>` mutable state lives on the UI runtime's global object, keyed by a plain
+// numeric `listId`. Worklets capture ONLY that primitive id (`getListState(listId)`) and
+// look the state up here at call time.
+//
+// Why not a `Shareable`? Capturing a worklets `Shareable` (its guest proxy) inside a worklet
+// closure makes `createSerializable` walk the proxy's own `getSync`/`setSync`/… accessor
+// worklets, and those close over the proxy itself — a true reference cycle
+// (proxy → accessor worklet → its closure → proxy → …). The native unpack path
+// (`Serializable::toJSValue`) has no cycle/visited memo, so it recurses until the UI-runtime
+// stack overflows (SIGSEGV in `runSyncWithStack` → `SerializableWorklet::toJSValue`). A bare
+// number captures cleanly, so the worklet closures stay acyclic and finite.
+type ListStateRegistry = Record<number, ListState>
+
+declare global {
+  var __rnlListStateRegistry: ListStateRegistry | undefined
+}
+
+// Read (get-or-create) the state for `listId` on the UI runtime. Lazily allocates on first
+// access so there is no ordering dependency between the init effect and the `hybridRef` setup
+// worklet — whichever touches the state first creates it.
+//
+// The fresh-state object is built INLINE (not via a shared `createListState` helper): a plain
+// JS function referenced from a worklet is serialized as a cross-runtime *Remote Function*, so
+// calling it synchronously on the UI runtime throws "Tried to synchronously call a Remote
+// Function". Constructing the object literal in-worklet keeps everything on the UI runtime.
+function getListStateWorklet(listId: number): ListState {
+  'worklet'
+  const registry = (globalThis.__rnlListStateRegistry ??=
+    {} as ListStateRegistry)
+  return (registry[listId] ??= {
+    elementRecords: [],
+    nextReactKey: 0,
+    reactTagToRecordIndex: {},
+    reactTagToReactKey: {},
+    // Maintain two reverse lookups that are one-to-one
+    // Used for O(1) operations in element updates and removals,
+    // where we only get the reactTag from native, and need to find the record,
+    // or need to find the reactTag for a dataKey
+    reactTagToDataKey: {},
+    dataKeyToReactTag: {},
+    isDisposed: false,
+    surfaceId: null,
+  })
+}
+
+// Free the state for `listId` on the UI runtime, after the list is disposed.
+function deleteListStateWorklet(listId: number) {
+  'worklet'
+  const registry = globalThis.__rnlListStateRegistry
+  if (registry != null) {
+    delete registry[listId]
+  }
+}
+
+let nextListId = 0
+
 export type ListRenderer<TItem extends ListItem> = {
   renderItemWorklet: (info: {
     item?: TItem
@@ -89,32 +141,15 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
   const isSetup = useRef(false)
   const nativeListRef = useRef<UiListViewMethods | null>(null)
 
-  const listState = useMemo(() => {
-    return createShareable<ListState>(UIRuntimeId, {
-      elementRecords: [],
-      nextReactKey: 0,
-      reactTagToRecordIndex: {},
-      reactTagToReactKey: {},
-      // Maintain two reverse lookups that are one-to-one
-      // Used for O(1) operations in element updates and removals,
-      // where we only get the reactTag from native, and need to find the record,
-      // or need to find the reactTag for a dataKey
-      reactTagToDataKey: {},
-      dataKeyToReactTag: {},
-      isDisposed: false,
-      surfaceId: null,
-    })
-  }, [])
+  // Stable, per-instance id for this list's UI-runtime state. A primitive, so worklets that
+  // need the state capture only this number (see `getListStateWorklet`) — never a Shareable
+  // proxy, which would serialize cyclically (see notes above the registry helpers).
+  const listId = useMemo(() => nextListId++, [])
 
   const getListState = useCallback(() => {
     'worklet'
-    if (listState.isHost === false) {
-      throw new Error(
-        'Expected listState to be only accessed on the UI Runtime!'
-      )
-    }
-    return listState.value
-  }, [listState])
+    return getListStateWorklet(listId)
+  }, [listId])
 
   const resolvedLayout = useMemo(() => {
     if (layout != null) {
@@ -238,6 +273,7 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
 
         if (!didSetup) {
           ref.disposeRendererSurface()
+          deleteListStateWorklet(listId)
           return
         }
 
@@ -246,6 +282,7 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
         state.surfaceId = null
 
         if (surfaceId == null) {
+          deleteListStateWorklet(listId)
           return
         }
 
@@ -275,9 +312,11 @@ function ListInner<TItem extends ListItem>(props: ListProps<TItem>) {
         for (const key of Object.keys(state.dataKeyToReactTag)) {
           delete state.dataKeyToReactTag[key]
         }
+
+        deleteListStateWorklet(listId)
       })
     }
-  }, [getListState])
+  }, [getListState, listId])
 
   useChangeEffect(() => {
     const ref = nativeListRef.current
